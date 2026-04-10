@@ -1,0 +1,1 @@
+Sei un esperto sviluppatore React. Stiamo costruendo un web game basato su Vite, React e Tailwind CSS. Usa un design pulito ed elegante. Tutto lo stato globale deve essere gestito con custom hooks e localStorage. I dati risiedono in file JSON locali. Usa functional components. Preferisci React Router v6 per la navigazione.

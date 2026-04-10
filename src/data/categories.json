@@ -1,0 +1,197 @@
+[
+  {
+    "id": "musica",
+    "kind": "room",
+    "title": "Sala delle Frequenze",
+    "ghost": "Il Silenzio dei film horror",
+    "description": "Una sala di risonanze, archivi sonori e tracce trattenute. Il Curatore custodisce gli indizi; il Critico li piega in echi contraddittori.",
+    "unlockCost": 0,
+    "challenges": [
+      {
+        "id": "musica-easy-mc-01",
+        "difficulty": "easy",
+        "type": "multiple_choice",
+        "prompt": "Quale oggetto vibra ancora dietro il velluto della teca centrale?",
+        "assets": [],
+        "choices": [
+          {
+            "id": "a",
+            "text": "Un diapason inciso in argento"
+          },
+          {
+            "id": "b",
+            "text": "Un ventaglio di carta laccata"
+          },
+          {
+            "id": "c",
+            "text": "Una chiave d'ambra opaca"
+          }
+        ],
+        "correctChoiceId": "a",
+        "introNarration": "Il Curatore lascia una nota sospesa nell'aria e indica una teca coperta di polvere sottile.",
+        "hint": "Non e un oggetto decorativo: serve ad accordare, non a ornare.",
+        "explanation": "La vibrazione torna nitida: la teca custodiva davvero il diapason.",
+        "successMessage": "La frequenza giusta riaccende il corridoio laterale.",
+        "failureMessage": "Il Critico mescola gli oggetti e spegne la risonanza.",
+        "speaker": "curator"
+      },
+      {
+        "id": "musica-easy-ft-01",
+        "difficulty": "easy",
+        "type": "free_text",
+        "prompt": "Completa il sigillo sonoro con una sola parola: quando il rumore si ritrae, resta solo l'...",
+        "assets": [],
+        "acceptedAnswers": ["eco"],
+        "placeholder": "Una parola essenziale",
+        "introNarration": "Il Critico ha abraso l'ultima parola sul margine del registro.",
+        "hint": "E una risposta breve che ritorna dalle pareti.",
+        "explanation": "La parola corre sulla pietra e torna esattamente al punto di partenza.",
+        "successMessage": "Il sigillo si richiude in una vibrazione perfetta.",
+        "failureMessage": "La sala restituisce una sillaba incompleta.",
+        "speaker": "critic"
+      },
+      {
+        "id": "musica-med-order-01",
+        "difficulty": "medium",
+        "type": "ordering",
+        "prompt": "Ricostruisci l'ordine con cui il Curatore ha riaperto l'organo della sala.",
+        "assets": [],
+        "items": [
+          {
+            "id": "leva",
+            "label": "Sollevare la leva di ottone"
+          },
+          {
+            "id": "soffietto",
+            "label": "Distendere il soffietto interno"
+          },
+          {
+            "id": "spartito",
+            "label": "Allineare lo spartito sul leggio"
+          },
+          {
+            "id": "nota",
+            "label": "Lasciare cadere la prima nota"
+          }
+        ],
+        "initialOrder": ["spartito", "nota", "leva", "soffietto"],
+        "correctOrder": ["leva", "soffietto", "spartito", "nota"],
+        "hint": "Prima si prepara il meccanismo, poi si appoggia la partitura, solo alla fine si suona.",
+        "explanation": "L'organo si ricompone in una sequenza di gesti esatti.",
+        "speaker": "curator"
+      },
+      {
+        "id": "musica-hard-reveal-01",
+        "difficulty": "hard",
+        "type": "multi_stage_progressive_reveal",
+        "prompt": "Identifica chi ha trafugato il metronomo della Galleria Velata.",
+        "assets": [],
+        "stages": [
+          {
+            "id": "sigillo",
+            "title": "Primo indizio",
+            "body": "Il responsabile ha lasciato cera nera su una custodia di rame."
+          },
+          {
+            "id": "passo",
+            "title": "Secondo indizio",
+            "body": "Le impronte si interrompono davanti alla scala che porta ai palchi chiusi."
+          },
+          {
+            "id": "odore",
+            "title": "Terzo indizio",
+            "body": "Nell'aria resta un profumo di tabacco dolce e carta antica."
+          }
+        ],
+        "initialVisibleStages": 1,
+        "solution": {
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "custode",
+              "text": "Il Custode dei Palchi"
+            },
+            {
+              "id": "curatore",
+              "text": "Il Curatore"
+            },
+            {
+              "id": "critico",
+              "text": "Il Critico"
+            }
+          ],
+          "correctChoiceId": "custode"
+        },
+        "scoring": {
+          "maxScore": 5,
+          "revealPenalty": 1,
+          "minScore": 1
+        },
+        "hint": "Chi conosce bene i palchi li attraversa senza lasciare rumore.",
+        "explanation": "Il furto era un gesto tecnico, non teatrale: il colpevole conosceva il percorso di servizio.",
+        "successMessage": "La sala restituisce il metronomo e una porzione di partitura nascosta.",
+        "failureMessage": "Il Critico sfrutta gli indizi rivelati, ma la firma del furto resta opaca.",
+        "speaker": "neutral"
+      },
+      {
+        "id": "musica-med-intruder-01",
+        "difficulty": "medium",
+        "type": "intruder",
+        "prompt": "Individua l'elemento intruso nel quartetto di presenze musicali.",
+        "assets": [],
+        "items": [
+          {
+            "id": "fuga",
+            "text": "Fuga"
+          },
+          {
+            "id": "corale",
+            "text": "Corale"
+          },
+          {
+            "id": "timpano",
+            "text": "Timpano"
+          },
+          {
+            "id": "notturno",
+            "text": "Notturno"
+          }
+        ],
+        "intruderId": "timpano",
+        "hint": "Tre elementi sono forme o scritture musicali. Uno e uno strumento.",
+        "explanation": "L'intruso risuona da solo: non e una forma, ma un corpo che produce suono.",
+        "speaker": "critic"
+      },
+      {
+        "id": "musica-hard-sequence-01",
+        "difficulty": "hard",
+        "type": "sequence_reconstruction",
+        "prompt": "Ricomponi il frammento di partitura spezzato in quattro tessere.",
+        "assets": [],
+        "segments": [
+          {
+            "id": "p1",
+            "label": "Silenzio teso prima dell'arco"
+          },
+          {
+            "id": "p2",
+            "label": "Un colpo lieve sul legno scuro"
+          },
+          {
+            "id": "p3",
+            "label": "La corda si desta e vibra"
+          },
+          {
+            "id": "p4",
+            "label": "La sala restituisce luce" 
+          }
+        ],
+        "initialOrder": ["p3", "p1", "p4", "p2"],
+        "correctOrder": ["p1", "p2", "p3", "p4"],
+        "hint": "Prima attesa, poi gesto, poi suono, infine risposta della sala.",
+        "explanation": "Le tessere tornano al loro posto e la frase musicale si richiude.",
+        "speaker": "curator"
+      }
+    ]
+  }
+]
