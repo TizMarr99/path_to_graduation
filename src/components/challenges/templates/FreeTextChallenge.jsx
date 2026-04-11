@@ -1,7 +1,7 @@
 import ChallengeAssetGallery from '../common/ChallengeAssetGallery.jsx'
 import ChallengeSubmitButton from '../common/ChallengeSubmitButton.jsx'
 
-function FreeTextChallenge({ challenge, draftAnswer, onDraftAnswerChange, onSubmit, disabled }) {
+function FreeTextChallenge({ challenge, draftAnswer, onDraftAnswerChange, onSubmit, disabled, onAudioPlay }) {
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
       <div className="space-y-4">
@@ -9,7 +9,7 @@ function FreeTextChallenge({ challenge, draftAnswer, onDraftAnswerChange, onSubm
           {challenge.prompt}
         </label>
 
-        <ChallengeAssetGallery assets={challenge.assets} />
+        <ChallengeAssetGallery assets={challenge.assets} onAudioPlay={onAudioPlay} />
 
         <input
           autoComplete="off"

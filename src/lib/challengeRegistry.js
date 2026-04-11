@@ -1,12 +1,23 @@
 import { createElement } from 'react'
 import ChallengeTemplateFallback from '../components/challenges/common/ChallengeTemplateFallback.jsx'
+import FaceMorphChallenge from '../components/challenges/templates/FaceMorphChallenge.jsx'
+import FillLyricsChallenge from '../components/challenges/templates/FillLyricsChallenge.jsx'
 import FreeTextChallenge from '../components/challenges/templates/FreeTextChallenge.jsx'
+import GuessTitleAuthorChallenge from '../components/challenges/templates/GuessTitleAuthorChallenge.jsx'
+import HitsterChallenge from '../components/challenges/templates/HitsterChallenge.jsx'
 import IntruderChallenge from '../components/challenges/templates/IntruderChallenge.jsx'
 import MultiStageProgressiveRevealChallenge from '../components/challenges/templates/MultiStageProgressiveRevealChallenge.jsx'
+import MusicalChainChallenge from '../components/challenges/templates/MusicalChainChallenge.jsx'
 import MultipleChoiceChallenge from '../components/challenges/templates/MultipleChoiceChallenge.jsx'
 import OrderingChallenge from '../components/challenges/templates/OrderingChallenge.jsx'
 import SequenceReconstructionChallenge from '../components/challenges/templates/SequenceReconstructionChallenge.jsx'
-import { matchesAcceptedAnswer } from './answerNormalization'
+import {
+  countCorrectPlacements,
+  evaluateFaceMorphAnswers,
+  evaluateLyricsWordMatch,
+  evaluateTitleAuthorMatch,
+  matchesAcceptedAnswer,
+} from './answerNormalization'
 
 export const challengeTypeLabels = {
   multiple_choice: 'Scelta multipla',
@@ -15,6 +26,11 @@ export const challengeTypeLabels = {
   multi_stage_progressive_reveal: 'Rivelazione progressiva',
   intruder: 'Intruso',
   sequence_reconstruction: 'Ricostruzione sequenza',
+  guess_title_author: 'Titolo e autore',
+  face_morph: 'Face morph',
+  fill_lyrics: 'Completa il testo',
+  musical_chain: 'Catena musicale',
+  hitster: 'Hitster',
 }
 
 function renderMultipleChoiceChallenge(props) {
@@ -39,6 +55,26 @@ function renderIntruderChallenge(props) {
 
 function renderSequenceReconstructionChallenge(props) {
   return createElement(SequenceReconstructionChallenge, props)
+}
+
+function renderGuessTitleAuthorChallenge(props) {
+  return createElement(GuessTitleAuthorChallenge, props)
+}
+
+function renderFaceMorphChallenge(props) {
+  return createElement(FaceMorphChallenge, props)
+}
+
+function renderFillLyricsChallenge(props) {
+  return createElement(FillLyricsChallenge, props)
+}
+
+function renderMusicalChainChallenge(props) {
+  return createElement(MusicalChainChallenge, props)
+}
+
+function renderHitsterChallenge(props) {
+  return createElement(HitsterChallenge, props)
 }
 
 /**
@@ -111,6 +147,93 @@ function resolveFeedbackMessage(challenge, isCorrect) {
 
 /**
  * @param {import('../types/challenge').Challenge} challenge
+ * @returns {string[]}
+ */
+function resolveSolutionLines(challenge) {
+  if (challenge.type === 'multiple_choice') {
+    const correctChoice = challenge.choices.find((choice) => choice.id === challenge.correctChoiceId)
+    return correctChoice ? [`Risposta corretta: ${correctChoice.text}`] : []
+  }
+
+  if (challenge.type === 'free_text') {
+    return challenge.acceptedAnswers.length
+      ? [`Risposta corretta: ${challenge.acceptedAnswers[0]}`]
+      : []
+  }
+
+  if (challenge.type === 'ordering') {
+    const labelsById = new Map(challenge.items.map((item) => [item.id, item.label]))
+    return [
+      `Ordine corretto: ${challenge.correctOrder
+        .map((itemId) => labelsById.get(itemId) ?? itemId)
+        .join(' → ')}`,
+    ]
+  }
+
+  if (challenge.type === 'multi_stage_progressive_reveal') {
+    if (challenge.solution.mode === 'multiple_choice') {
+      const correctChoice = challenge.solution.choices.find(
+        (choice) => choice.id === challenge.solution.correctChoiceId,
+      )
+      return correctChoice ? [`Soluzione finale: ${correctChoice.text}`] : []
+    }
+
+    return challenge.solution.acceptedAnswers.length
+      ? [`Soluzione finale: ${challenge.solution.acceptedAnswers[0]}`]
+      : []
+  }
+
+  if (challenge.type === 'intruder') {
+    const intruder = challenge.items.find((item) => item.id === challenge.intruderId)
+    return intruder ? [`Elemento intruso: ${intruder.text}`] : []
+  }
+
+  if (challenge.type === 'sequence_reconstruction') {
+    const labelsById = new Map(challenge.segments.map((segment) => [segment.id, segment.label]))
+    return [
+      `Sequenza corretta: ${challenge.correctOrder
+        .map((segmentId) => labelsById.get(segmentId) ?? segmentId)
+        .join(' → ')}`,
+    ]
+  }
+
+  if (challenge.type === 'guess_title_author') {
+    return [
+      `Titolo: ${challenge.acceptedTitleAnswers[0] ?? 'n/d'}`,
+      `Autore: ${challenge.acceptedAuthorAnswers[0] ?? 'n/d'}`,
+    ]
+  }
+
+  if (challenge.type === 'face_morph') {
+    return [
+      `Cantanti: ${challenge.singerGroups
+        .map((group) => group.acceptedAnswers[0])
+        .filter(Boolean)
+        .join(' · ')}`,
+    ]
+  }
+
+  if (challenge.type === 'fill_lyrics') {
+    return [`Verso corretto: ${challenge.solutionText}`]
+  }
+
+  if (challenge.type === 'musical_chain') {
+    return challenge.acceptedAnswers.length
+      ? [`Brano corretto: ${challenge.acceptedAnswers[0]}`]
+      : []
+  }
+
+  if (challenge.type === 'hitster') {
+    return challenge.tracks.map(
+      (track) => `${track.year} · ${track.artist} · ${track.title}`,
+    )
+  }
+
+  return []
+}
+
+/**
+ * @param {import('../types/challenge').Challenge} challenge
  * @param {boolean} isCorrect
  * @param {import('../types/challenge').Category | null} category
  * @returns {import('../types/challenge').ChallengeFeedback}
@@ -124,6 +247,7 @@ function buildChallengeFeedback(challenge, isCorrect, category) {
     categoryTitle: category?.title ?? '',
     speaker: resolveFeedbackSpeaker(challenge, isCorrect),
     tone: isCorrect ? 'success' : 'failure',
+    solutionLines: resolveSolutionLines(challenge),
   }
 }
 
@@ -242,6 +366,106 @@ export const challengeTypeRegistry = {
       )
 
       return buildFeedback(challenge, isCorrect, category)
+    },
+  },
+  guess_title_author: {
+    render: renderGuessTitleAuthorChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateTitleAuthorMatch(
+        draftAnswer.titleAnswer,
+        challenge.acceptedTitleAnswers,
+        draftAnswer.authorAnswer,
+        challenge.acceptedAuthorAnswers,
+      )
+      const isCorrect = result.matchedCount >= challenge.scoring.passThreshold
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned:
+          result.matchedCount === 2
+            ? challenge.scoring.fullMatchRatio
+            : result.matchedCount === 1
+              ? challenge.scoring.partialMatchRatio
+              : 0,
+        maxScore: challenge.scoring.fullMatchRatio,
+        metadata: result,
+      })
+    },
+  },
+  face_morph: {
+    render: renderFaceMorphChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateFaceMorphAnswers(
+        draftAnswer.faceMorphAnswers,
+        challenge.singerGroups,
+      )
+      const isCorrect = result.matchedCount >= challenge.minimumCorrectGroups
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: result.matchedCount,
+        maxScore: challenge.singerGroups.length,
+        metadata: result,
+      })
+    },
+  },
+  fill_lyrics: {
+    render: renderFillLyricsChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateLyricsWordMatch(
+        draftAnswer.textAnswer,
+        challenge.solutionText,
+        challenge.scoring.minimumWordMatchRatio,
+      )
+
+      return buildFeedback(challenge, result.isMatch, category, {
+        scoreEarned: result.matchedWordCount,
+        maxScore: challenge.solutionText
+          .split(/[^A-Za-z0-9]+/)
+          .map((word) => word.trim())
+          .filter(Boolean).length,
+        metadata: result,
+      })
+    },
+  },
+  musical_chain: {
+    render: renderMusicalChainChallenge,
+    evaluate: ({ challenge, draftAnswer, challengeState, category }) => {
+      const isCorrect = matchesAcceptedAnswer(draftAnswer.textAnswer, challenge.acceptedAnswers)
+      const revealsUsed = challengeState.musicalChainStageIndex
+      const isFinalStage = challengeState.musicalChainStageIndex >= challenge.stages.length - 1
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: isCorrect
+          ? Math.max(
+              challenge.scoring.minScore,
+              challenge.scoring.maxScore - revealsUsed * challenge.scoring.revealPenalty,
+            )
+          : isFinalStage
+            ? 0
+            : undefined,
+        maxScore: challenge.scoring.maxScore,
+        metadata: {
+          stageIndex: challengeState.musicalChainStageIndex,
+          isFinalStage,
+        },
+      })
+    },
+  },
+  hitster: {
+    render: renderHitsterChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const correctPlacements = countCorrectPlacements(
+        draftAnswer.hitsterTrackOrderIds,
+        challenge.correctOrder,
+      )
+      const isCorrect = correctPlacements >= challenge.scoring.minimumCorrectPlacements
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: correctPlacements,
+        maxScore: challenge.correctOrder.length,
+        metadata: {
+          correctPlacements,
+        },
+      })
     },
   },
 }

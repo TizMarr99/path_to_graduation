@@ -1,19 +1,41 @@
 import { Link } from 'react-router-dom'
 
-function ChallengeCompleted({ category, totalChallenges, onRestart }) {
+function ChallengeCompleted({
+  category,
+  totalChallenges,
+  onRestart,
+  passedRoom,
+  sessionCorrectCount,
+  sessionWrongCount,
+  unlockedCategoryIds,
+}) {
   return (
     <section className="space-y-6 rounded-[2rem] border border-amber-300/20 bg-slate-950/75 p-8 shadow-[0_0_90px_rgba(8,145,178,0.08)] backdrop-blur-xl sm:p-10">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-amber-300/80">
-          Sala rischiarata
+          {passedRoom ? 'Sala rischiarata' : 'Sala incompleta'}
         </p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          Hai attraversato {category.title}
+          {passedRoom ? `Hai attraversato ${category.title}` : `Hai esplorato ${category.title}`}
         </h2>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-          Le ombre si sono ricomposte. Hai superato tutte le {totalChallenges} prove attive di questa sala.
+          Hai chiuso {totalChallenges} prove: {sessionCorrectCount} corrette e {sessionWrongCount} errate.
+          {passedRoom
+            ? ' Hai raggiunto la soglia di 8/12, quindi i due giochi successivi risultano subito sbloccati e il premio resta valido.'
+            : ' Non hai raggiunto la soglia di 8/12. Se hai completato tutte le 12 prove, dalla mappa potrai sbloccare insieme le due sale successive usando i crediti.'}
         </p>
       </div>
+
+      {unlockedCategoryIds.length ? (
+        <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/8 px-5 py-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
+            Giochi sbloccati
+          </p>
+          <p className="mt-2 text-sm leading-7 text-cyan-50">
+            {unlockedCategoryIds.join(' · ')}
+          </p>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <button

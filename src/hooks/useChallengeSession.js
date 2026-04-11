@@ -18,16 +18,52 @@ function createFeedback(category) {
     categoryTitle: category?.title ?? '',
     speaker: 'neutral',
     tone: 'idle',
+    solutionLines: [],
   }
+}
+
+function createChallengeResultMap() {
+  return {}
+}
+
+function findChallengeById(challenges, challengeId) {
+  return challenges.find((challenge) => challenge.id === challengeId) ?? null
+}
+
+function resolveInitialChallengeId(challenges, preferredChallengeId) {
+  if (preferredChallengeId && findChallengeById(challenges, preferredChallengeId)) {
+    return preferredChallengeId
+  }
+
+  return challenges[0]?.id ?? ''
+}
+
+function findNextUnresolvedChallengeId(challenges, resolvedChallengeIds, currentChallengeId) {
+  if (!challenges.length) {
+    return ''
+  }
+
+  const currentIndex = challenges.findIndex((challenge) => challenge.id === currentChallengeId)
+  const orderedChallenges =
+    currentIndex >= 0
+      ? [...challenges.slice(currentIndex + 1), ...challenges.slice(0, currentIndex + 1)]
+      : challenges
+
+  return (
+    orderedChallenges.find((challenge) => !resolvedChallengeIds.includes(challenge.id))?.id ?? ''
+  )
 }
 
 /**
  * @param {import('../types/challenge').Category | null} category
+ * @param {string} [preferredChallengeId]
  */
-export function useChallengeSession(category) {
+export function useChallengeSession(category, preferredChallengeId = '') {
   const challenges = category?.challenges ?? []
-  const initialChallenge = challenges[0] ?? null
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const initialChallengeId = resolveInitialChallengeId(challenges, preferredChallengeId)
+  const initialChallenge = findChallengeById(challenges, initialChallengeId)
+  const [currentChallengeId, setCurrentChallengeId] = useState(initialChallengeId)
+  const [challengeResults, setChallengeResults] = useState(createChallengeResultMap)
   const [draftAnswer, setDraftAnswer] = useState(() =>
     createInitialDraftAnswerForChallenge(initialChallenge),
   )
@@ -37,31 +73,40 @@ export function useChallengeSession(category) {
   const [isHintVisible, setIsHintVisible] = useState(false)
   const [feedback, setFeedback] = useState(() => createFeedback(category))
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [sessionCorrectCount, setSessionCorrectCount] = useState(0)
+  const [sessionWrongCount, setSessionWrongCount] = useState(0)
 
-  const currentChallenge = challenges[currentIndex] ?? null
+  const currentChallenge = findChallengeById(challenges, currentChallengeId)
   const totalChallenges = challenges.length
-  const challengeNumber = currentChallenge ? currentIndex + 1 : totalChallenges
-  const isComplete = totalChallenges > 0 && currentIndex >= totalChallenges
+  const currentIndex = challenges.findIndex((challenge) => challenge.id === currentChallengeId)
+  const challengeNumber = currentIndex >= 0 ? currentIndex + 1 : 0
+  const resolvedChallengeIds = Object.keys(challengeResults)
+  const resolvedChallengeCount = resolvedChallengeIds.length
+  const allChallengesResolved = totalChallenges > 0 && resolvedChallengeCount >= totalChallenges
   const hasFeedback = Boolean(feedback.attemptedChallengeId)
+  const isCurrentChallengeResolved = Boolean(currentChallenge && challengeResults[currentChallenge.id])
+  const isComplete = allChallengesResolved && !hasFeedback
 
   const progressLabel = useMemo(() => {
     if (!totalChallenges) {
-      return 'Prova 0 di 0'
+      return 'Quiz risolti 0 di 0'
     }
 
-    if (isComplete) {
-      return `Prova ${totalChallenges} di ${totalChallenges}`
-    }
-
-    return `Prova ${challengeNumber} di ${totalChallenges}`
-  }, [challengeNumber, isComplete, totalChallenges])
+    return `Quiz risolti ${resolvedChallengeCount} di ${totalChallenges}`
+  }, [resolvedChallengeCount, totalChallenges])
 
   function resetChallengeState() {
-    setDraftAnswer(createInitialDraftAnswerForChallenge(challenges[0] ?? null))
-    setChallengeState(createInitialRuntimeStateForChallenge(challenges[0] ?? null))
+    const nextInitialChallenge = findChallengeById(challenges, initialChallengeId)
+
+    setCurrentChallengeId(initialChallengeId)
+    setChallengeResults(createChallengeResultMap())
+    setDraftAnswer(createInitialDraftAnswerForChallenge(nextInitialChallenge))
+    setChallengeState(createInitialRuntimeStateForChallenge(nextInitialChallenge))
     setIsHintVisible(false)
     setFeedback(createFeedback(category))
     setIsSubmitting(false)
+    setSessionCorrectCount(0)
+    setSessionWrongCount(0)
   }
 
   function updateDraftAnswer(partialDraft) {
@@ -78,35 +123,76 @@ export function useChallengeSession(category) {
     }))
   }
 
+  function selectChallenge(challengeId) {
+    const nextChallenge = findChallengeById(challenges, challengeId)
+
+    if (!nextChallenge) {
+      return
+    }
+
+    setCurrentChallengeId(nextChallenge.id)
+    setDraftAnswer(createInitialDraftAnswerForChallenge(nextChallenge))
+    setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
+    setIsHintVisible(false)
+    setFeedback(challengeResults[nextChallenge.id] ?? createFeedback(category))
+    setIsSubmitting(false)
+  }
+
   function revealHint() {
     setIsHintVisible(true)
   }
 
   function submitChallenge() {
-    if (!currentChallenge || isSubmitting || hasFeedback) {
+    if (!currentChallenge || isSubmitting || hasFeedback || isCurrentChallengeResolved) {
       return
     }
 
     setIsSubmitting(true)
-    setFeedback(
-      evaluateChallenge({
-        challenge: currentChallenge,
-        draftAnswer,
-        challengeState,
-        category,
-      }),
-    )
+    const nextFeedback = evaluateChallenge({
+      challenge: currentChallenge,
+      draftAnswer,
+      challengeState,
+      category,
+    })
+
+    setChallengeResults((currentResults) => ({
+      ...currentResults,
+      [currentChallenge.id]: nextFeedback,
+    }))
+    setFeedback(nextFeedback)
+    if (nextFeedback.isCorrect) {
+      setSessionCorrectCount((count) => count + 1)
+    } else {
+      setSessionWrongCount((count) => count + 1)
+    }
     setIsSubmitting(false)
   }
 
   function goToNextChallenge() {
-    if (!currentChallenge) {
+    if (!currentChallenge || !hasFeedback) {
       return
     }
 
-    const nextChallenge = challenges[currentIndex + 1] ?? null
+    if (resolvedChallengeCount >= totalChallenges) {
+      setFeedback(createFeedback(category))
+      setIsSubmitting(false)
+      return
+    }
 
-    setCurrentIndex((index) => index + 1)
+    const nextChallengeId = findNextUnresolvedChallengeId(
+      challenges,
+      resolvedChallengeIds,
+      currentChallenge.id,
+    )
+    const nextChallenge = findChallengeById(challenges, nextChallengeId)
+
+    if (!nextChallenge) {
+      setFeedback(createFeedback(category))
+      setIsSubmitting(false)
+      return
+    }
+
+    setCurrentChallengeId(nextChallenge.id)
     setDraftAnswer(createInitialDraftAnswerForChallenge(nextChallenge))
     setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
     setIsHintVisible(false)
@@ -120,17 +206,26 @@ export function useChallengeSession(category) {
   }
 
   return {
+    allChallengesResolved,
     challengeNumber,
+    challengeResults,
     currentChallenge,
     currentIndex,
+    currentChallengeId,
     challengeState,
     draftAnswer,
     feedback,
     hasFeedback,
     isComplete,
+    isCurrentChallengeResolved,
     isHintVisible,
     isSubmitting,
     progressLabel,
+    resolvedChallengeCount,
+    resolvedChallengeIds,
+    selectChallenge,
+    sessionCorrectCount,
+    sessionWrongCount,
     revealHint,
     goToNextChallenge,
     restartSession,

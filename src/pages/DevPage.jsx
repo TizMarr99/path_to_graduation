@@ -1,4 +1,7 @@
+import { useMemo, useState } from 'react'
 import { getCategories } from '../lib/challengeData'
+import { usePlayerState } from '../hooks/usePlayerState'
+import { isDevToolsEnabled } from '../lib/runtimeFlags.js'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
 
 const difficultyOrder = ['easy', 'medium', 'hard']
@@ -9,6 +12,11 @@ const templateOrder = [
   'multi_stage_progressive_reveal',
   'intruder',
   'sequence_reconstruction',
+  'guess_title_author',
+  'face_morph',
+  'fill_lyrics',
+  'musical_chain',
+  'hitster',
 ]
 
 const difficultyLabels = {
@@ -33,6 +41,13 @@ function getDifficultyCounts(challenges = []) {
 }
 
 function DevPage() {
+  const [resetMessage, setResetMessage] = useState('')
+  const {
+    playerState,
+    resetDailyCounters,
+    resetPlayerState,
+    resetMusicRoomIntro,
+  } = usePlayerState()
   const templateTotals = templateOrder.reduce((counts, type) => {
     counts[type] = 0
     return counts
@@ -50,6 +65,25 @@ function DevPage() {
       return counts
     }, {}),
   }))
+  const unlockedRooms = useMemo(
+    () => playerState.unlockedCategoryIds.length,
+    [playerState.unlockedCategoryIds],
+  )
+
+  function handleResetDailyCounters() {
+    resetDailyCounters()
+    setResetMessage('Contatori sessione azzerati.')
+  }
+
+  function handleResetAll() {
+    resetPlayerState()
+    setResetMessage('Stato giocatore azzerato completamente.')
+  }
+
+  function handleResetMusicIntro() {
+    resetMusicRoomIntro()
+    setResetMessage('Intro della sala musica ripristinata.')
+  }
 
   return (
     <section className="space-y-6">
@@ -92,6 +126,72 @@ function DevPage() {
                 )
               })}
             </div>
+          </div>
+
+          <div className="mt-5 rounded-[1.5rem] border border-slate-800 bg-slate-900/70 p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/80">
+                  Player state
+                </p>
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
+                  Strumenti di reset per lavorare in locale senza toccare la persistenza della versione deployata.
+                </p>
+              </div>
+
+              {isDevToolsEnabled ? (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
+                    onClick={handleResetDailyCounters}
+                    type="button"
+                  >
+                    Azzera contatori sessione
+                  </button>
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-amber-300/35 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-200/60 hover:bg-amber-300/18"
+                    onClick={handleResetMusicIntro}
+                    type="button"
+                  >
+                    Reset intro musica
+                  </button>
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-rose-300/35 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:border-rose-200/60 hover:bg-rose-400/18"
+                    onClick={handleResetAll}
+                    type="button"
+                  >
+                    Reset totale giocatore
+                  </button>
+                </div>
+              ) : (
+                <span className="inline-flex rounded-full border border-slate-700 bg-slate-950/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                  Reset disponibile solo in dev
+                </span>
+              )}
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/8 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Crediti</p>
+                <p className="mt-2 text-2xl font-semibold text-cyan-100">{playerState.credits}</p>
+              </div>
+              <div className="rounded-2xl border border-amber-300/15 bg-amber-300/8 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.3em] text-amber-100/75">Quiz tentati</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-50">{playerState.stats.quizzesAttempted}</p>
+              </div>
+              <div className="rounded-2xl border border-rose-300/15 bg-rose-300/8 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.3em] text-rose-100/75">Errori oggi</p>
+                <p className="mt-2 text-2xl font-semibold text-rose-50">{playerState.stats.wrongAnswersToday}</p>
+              </div>
+              <div className="rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Sale sbloccate</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{unlockedRooms}</p>
+              </div>
+            </div>
+
+            {resetMessage ? (
+              <p className="mt-4 text-sm font-medium text-emerald-300">{resetMessage}</p>
+            ) : null}
           </div>
 
           <div className="mt-5 grid gap-3 lg:grid-cols-3">

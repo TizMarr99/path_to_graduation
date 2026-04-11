@@ -6,192 +6,531 @@
     "ghost": "Il Silenzio dei film horror",
     "description": "Una sala di risonanze, archivi sonori e tracce trattenute. Il Curatore custodisce gli indizi; il Critico li piega in echi contraddittori.",
     "unlockCost": 0,
+    "buyAccessCost": 60,
+    "characters": {
+      "curator": {
+        "id": "achille-lauro",
+        "name": "Achille Lauro",
+        "role": "Il Curatore",
+        "imageSrc": "/images/achille-lauro.png",
+        "fallbackImageSrc": "/images/achille-lauro.png",
+        "tone": "gold"
+      },
+      "critic": {
+        "id": "sal-da-vinci",
+        "name": "Sal Da Vinci",
+        "role": "Il Critico",
+        "imageSrc": "/images/sal-da-vinci.png",
+        "fallbackImageSrc": "/images/sal-da-vinci.png",
+        "tone": "silver"
+      }
+    },
+    "introNarrative": {
+      "curator": {
+        "name": "Achille Lauro",
+        "message": "Benvenuto nella Sala delle Frequenze. Ogni nota racconta una storia... se sai ascoltare. Io saro la tua guida tra gli indizi sonori."
+      },
+      "critic": {
+        "name": "Sal Da Vinci",
+        "message": "Ah, un altro aspirante intenditore. Qui le canzoni non si regalano, si conquistano. Vediamo se le tue orecchie valgono qualcosa..."
+      }
+    },
+    "characterComments": {
+      "onCorrect": [
+        { "speaker": "curator", "text": "Eccellente! Le frequenze ti riconoscono." },
+        { "speaker": "curator", "text": "Il Curatore annuisce: questa nota era perfetta." },
+        { "speaker": "curator", "text": "Bravo! La sala risuona della tua risposta." },
+        { "speaker": "curator", "text": "Hai un orecchio notevole. Prosegui cosi." },
+        { "speaker": "curator", "text": "La melodia ti guida bene. Continua." }
+      ],
+      "onWrong": [
+        { "speaker": "critic", "text": "Stonato. Decisamente stonato." },
+        { "speaker": "critic", "text": "Il Critico scuote la testa: non ci siamo proprio." },
+        { "speaker": "critic", "text": "Forse la musica non fa per te... o forse si, chi lo sa." },
+        { "speaker": "critic", "text": "Questa risposta fa piangere anche il pianoforte." },
+        { "speaker": "critic", "text": "Hmm, no. Prova a usare le orecchie la prossima volta." }
+      ],
+      "onHintUsed": [
+        { "speaker": "curator", "text": "Un piccolo aiuto dal Curatore. Usalo bene." },
+        { "speaker": "curator", "text": "Ecco un indizio... ma ti costera qualche credito." },
+        { "speaker": "curator", "text": "Il Curatore sussurra un suggerimento. Ascolta attentamente." },
+        { "speaker": "curator", "text": "Un frammento per orientarti. Il resto tocca a te." }
+      ],
+      "onHesitation": [
+        { "speaker": "critic", "text": "Stai ascoltando o stai dormendo?" },
+        { "speaker": "critic", "text": "Il play non si consuma, ma la mia pazienza si." },
+        { "speaker": "critic", "text": "Quante volte ancora? Anche il giradischi si sta annoiando." },
+        { "speaker": "critic", "text": "Prendi una decisione, il tempo non e tuo amico qui." },
+        { "speaker": "critic", "text": "Il Critico sbadiglia vistosamente." }
+      ]
+    },
     "challenges": [
       {
-        "id": "musica-easy-mc-01",
+        "id": "musica-guess-title-author-01",
         "difficulty": "easy",
-        "type": "multiple_choice",
-        "prompt": "Quale oggetto vibra ancora dietro il velluto della teca centrale?",
-        "assets": [],
-        "choices": [
+        "type": "guess_title_author",
+        "title": "Titolo e autore",
+        "prompt": "Ascolta il frammento e indovina sia il titolo sia l'autore del brano.",
+        "assets": [
           {
-            "id": "a",
-            "text": "Un diapason inciso in argento"
-          },
-          {
-            "id": "b",
-            "text": "Un ventaglio di carta laccata"
-          },
-          {
-            "id": "c",
-            "text": "Una chiave d'ambra opaca"
+            "kind": "audio",
+            "src": "/src/data/musica/guess_title_author1.mp3",
+            "caption": "Puoi avviare e fermare la traccia quante volte vuoi."
           }
         ],
-        "correctChoiceId": "a",
-        "introNarration": "Il Curatore lascia una nota sospesa nell'aria e indica una teca coperta di polvere sottile.",
-        "hint": "Non e un oggetto decorativo: serve ad accordare, non a ornare.",
-        "explanation": "La vibrazione torna nitida: la teca custodiva davvero il diapason.",
-        "successMessage": "La frequenza giusta riaccende il corridoio laterale.",
-        "failureMessage": "Il Critico mescola gli oggetti e spegne la risonanza.",
-        "speaker": "curator"
+        "acceptedTitleAnswers": ["Back to Friends"],
+        "acceptedAuthorAnswers": ["Sombr"],
+        "titlePlaceholder": "Titolo del brano",
+        "authorPlaceholder": "Autore o artista",
+        "hint": "Il brano ha un tono indie-pop malinconico. Il titolo parla di un ritorno.",
+        "explanation": "'Back to Friends' di Sombr: un pezzo indie-pop uscito come singolo, riconoscibile dal synth sognante e dal ritornello sussurrato.",
+        "speaker": "curator",
+        "creditReward": 10,
+        "hintCost": 15,
+        "scoring": {
+          "passThreshold": 2,
+          "fullMatchRatio": 1,
+          "partialMatchRatio": 0.5
+        }
       },
       {
-        "id": "musica-easy-ft-01",
+        "id": "musica-guess-title-author-02",
+        "difficulty": "easy",
+        "type": "guess_title_author",
+        "title": "Titolo e autore",
+        "prompt": "Riconosci il pezzo: servono titolo e autore insieme per chiudere la prova.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/src/data/musica/guess_title_author2.mp3",
+            "caption": "Puoi riascoltare il frammento liberamente."
+          }
+        ],
+        "acceptedTitleAnswers": ["Stargazing"],
+        "acceptedAuthorAnswers": ["Myles Smith", "Smith"],
+        "titlePlaceholder": "Titolo del brano",
+        "authorPlaceholder": "Autore o artista",
+        "hint": "L'artista e britannico e il brano parla di guardare le stelle. Pensa al cielo notturno.",
+        "explanation": "'Stargazing' di Myles Smith: un successo virale del 2024, con chitarra acustica e un ritornello che cita letteralmente le stelle.",
+        "speaker": "curator",
+        "creditReward": 10,
+        "hintCost": 15,
+        "scoring": {
+          "passThreshold": 2,
+          "fullMatchRatio": 1,
+          "partialMatchRatio": 0.5
+        }
+      },
+      {
+        "id": "musica-face-morph-01",
+        "difficulty": "medium",
+        "type": "face_morph",
+        "title": "Face morph",
+        "prompt": "Osserva il morph e inserisci i tre cantanti presenti. L'ordine non conta.",
+        "assets": [
+          {
+            "kind": "image",
+            "src": "/src/data/musica/face_morph1.jpg",
+            "alt": "Face morph 1"
+          }
+        ],
+        "singerGroups": [
+          {
+            "id": "adele",
+            "acceptedAnswers": ["Adele"]
+          },
+          {
+            "id": "sia",
+            "acceptedAnswers": ["Sia"]
+          },
+          {
+            "id": "joe-keery",
+            "acceptedAnswers": ["Joe Keery", "Keery"]
+          }
+        ],
+        "answerSlots": 3,
+        "minimumCorrectGroups": 2,
+        "placeholder": "Inserisci un cantante",
+        "hint": "Una delle tre e famosa per cantare con una parrucca bionda che le copre gli occhi. Un altro ha recitato in Stranger Things.",
+        "explanation": "I tre volti fusi sono Adele (vincitrice di Grammy), Sia (nota per la parrucca) e Joe Keery (attore e musicista, Steve in Stranger Things).",
+        "speaker": "neutral",
+        "creditReward": 10,
+        "hintCost": 15
+      },
+      {
+        "id": "musica-face-morph-02",
+        "difficulty": "medium",
+        "type": "face_morph",
+        "title": "Face morph",
+        "prompt": "Individua almeno due dei tre artisti nascosti nell'immagine fusa.",
+        "assets": [
+          {
+            "kind": "image",
+            "src": "/src/data/musica/face_morph2.jpg",
+            "alt": "Face morph 2"
+          }
+        ],
+        "singerGroups": [
+          {
+            "id": "lewis-capaldi",
+            "acceptedAnswers": ["Lewis Capaldi", "Capaldi"]
+          },
+          {
+            "id": "rkomi",
+            "acceptedAnswers": ["Rkomi"]
+          },
+          {
+            "id": "ed-sheeran",
+            "acceptedAnswers": ["Ed Sheeran", "Sheeran"]
+          }
+        ],
+        "answerSlots": 3,
+        "minimumCorrectGroups": 2,
+        "placeholder": "Inserisci un cantante",
+        "hint": "Uno dei tre e scozzese ed e noto per brani strappalacrime. Un altro e un rapper italiano. Il terzo e un cantautore dai capelli rossi.",
+        "explanation": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
+        "speaker": "neutral",
+        "creditReward": 10,
+        "hintCost": 15
+      },
+      {
+        "id": "musica-fill-lyrics-01",
+        "difficulty": "medium",
+        "type": "fill_lyrics",
+        "title": "Completa il testo",
+        "prompt": "Ascolta il frammento e completa il verso nel modo piu fedele possibile.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/src/data/musica/fill_lyrics1.mp3",
+            "caption": "Scrivi il verso in un'unica casella di testo."
+          }
+        ],
+        "solutionText": "Anche se ti mancano, non ti mancano come ti manco io",
+        "placeholder": "Completa qui il verso",
+        "hint": "Il verso gioca su un doppio significato della parola 'mancano'. Pensa a qualcuno che sente la mancanza piu di altri.",
+        "explanation": "Il verso completo e 'Anche se ti mancano, non ti mancano come ti manco io' — un gioco di parole tra assenza e desiderio.",
+        "speaker": "critic",
+        "creditReward": 10,
+        "hintCost": 15,
+        "scoring": {
+          "minimumWordMatchRatio": 0.7
+        }
+      },
+      {
+        "id": "musica-fill-lyrics-02",
+        "difficulty": "medium",
+        "type": "fill_lyrics",
+        "title": "Completa il testo",
+        "prompt": "Ricostruisci il verso cantato: basta arrivare alla soglia minima di parole corrette.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/src/data/musica/fill_lyrics2.mp3",
+            "caption": "Conta il contenuto del verso, non la punteggiatura."
+          }
+        ],
+        "solutionText": "Che piacevo a tua mamma?",
+        "placeholder": "Completa qui il verso",
+        "hint": "E una frase breve, quasi una domanda retorica. Si parla di una mamma e di fare colpo.",
+        "explanation": "'Che piacevo a tua mamma?' — un verso ironico e diretto, tipico del rap italiano contemporaneo.",
+        "speaker": "critic",
+        "creditReward": 10,
+        "hintCost": 15,
+        "scoring": {
+          "minimumWordMatchRatio": 0.7
+        }
+      },
+      {
+        "id": "musica-fill-lyrics-03",
+        "difficulty": "hard",
+        "type": "fill_lyrics",
+        "title": "Completa il testo",
+        "prompt": "Trascrivi il verso in inglese mantenendo almeno il 70% delle parole corrette.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/src/data/musica/fill_lyrics3.mp3",
+            "caption": "Maiuscole e punteggiatura non contano."
+          }
+        ],
+        "solutionText": "Please, don't forget about me",
+        "placeholder": "Completa qui il verso",
+        "hint": "E una frase di cinque parole in inglese. Qualcuno chiede di non essere dimenticato.",
+        "explanation": "'Please, don't forget about me' — un verso che esprime la paura dell'oblio, comune nel pop-rock emotivo.",
+        "speaker": "critic",
+        "creditReward": 15,
+        "hintCost": 15,
+        "scoring": {
+          "minimumWordMatchRatio": 0.7
+        }
+      },
+      {
+        "id": "musica-reverse-song-01",
         "difficulty": "easy",
         "type": "free_text",
-        "prompt": "Completa il sigillo sonoro con una sola parola: quando il rumore si ritrae, resta solo l'...",
-        "assets": [],
-        "acceptedAnswers": ["eco"],
-        "placeholder": "Una parola essenziale",
-        "introNarration": "Il Critico ha abraso l'ultima parola sul margine del registro.",
-        "hint": "E una risposta breve che ritorna dalle pareti.",
-        "explanation": "La parola corre sulla pietra e torna esattamente al punto di partenza.",
-        "successMessage": "Il sigillo si richiude in una vibrazione perfetta.",
-        "failureMessage": "La sala restituisce una sillaba incompleta.",
-        "speaker": "critic"
-      },
-      {
-        "id": "musica-med-order-01",
-        "difficulty": "medium",
-        "type": "ordering",
-        "prompt": "Ricostruisci l'ordine con cui il Curatore ha riaperto l'organo della sala.",
-        "assets": [],
-        "items": [
+        "title": "Canzone al contrario",
+        "prompt": "La canzone e riprodotta al contrario: indovina il titolo.",
+        "assets": [
           {
-            "id": "leva",
-            "label": "Sollevare la leva di ottone"
-          },
-          {
-            "id": "soffietto",
-            "label": "Distendere il soffietto interno"
-          },
-          {
-            "id": "spartito",
-            "label": "Allineare lo spartito sul leggio"
-          },
-          {
-            "id": "nota",
-            "label": "Lasciare cadere la prima nota"
+            "kind": "audio",
+            "src": "/src/data/musica/reverse_song1.mp3",
+            "caption": "Puoi ascoltare il brano al contrario quante volte vuoi."
           }
         ],
-        "initialOrder": ["spartito", "nota", "leva", "soffietto"],
-        "correctOrder": ["leva", "soffietto", "spartito", "nota"],
-        "hint": "Prima si prepara il meccanismo, poi si appoggia la partitura, solo alla fine si suona.",
-        "explanation": "L'organo si ricompone in una sequenza di gesti esatti.",
-        "speaker": "curator"
+        "acceptedAnswers": ["Demons"],
+        "placeholder": "Titolo del brano",
+        "hint": "Il titolo ha a che fare con creature oscure interiori.",
+        "explanation": "'Demons' degli Imagine Dragons (2012): il brano parla dei propri demoni interiori. Riconoscibile anche al contrario per il ritmo della batteria.",
+        "speaker": "curator",
+        "creditReward": 10,
+        "hintCost": 15
       },
       {
-        "id": "musica-hard-reveal-01",
-        "difficulty": "hard",
-        "type": "multi_stage_progressive_reveal",
-        "prompt": "Identifica chi ha trafugato il metronomo della Galleria Velata.",
+        "id": "musica-reverse-song-02",
+        "difficulty": "easy",
+        "type": "free_text",
+        "title": "Canzone al contrario",
+        "prompt": "Riconosci il titolo del pezzo invertito.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/src/data/musica/reverse_song2.mp3",
+            "caption": "Il player resta libero per tutto il quiz."
+          }
+        ],
+        "acceptedAnswers": ["Ordinary"],
+        "placeholder": "Titolo del brano",
+        "hint": "Il titolo e una singola parola inglese. L'artista non e mainstream.",
+        "explanation": "'Ordinary' — un brano dal tono rilassato. Invertito, il ritmo della voce resta il miglior indizio per riconoscerlo.",
+        "speaker": "curator",
+        "creditReward": 10,
+        "hintCost": 15
+      },
+      {
+        "id": "musica-chain-01",
+        "difficulty": "medium",
+        "type": "musical_chain",
+        "title": "Catena musicale",
+        "prompt": "La catena musicale aggiunge strumenti a ogni tentativo. Indovina il brano prima dell'ultima rivelazione.",
         "assets": [],
         "stages": [
           {
-            "id": "sigillo",
-            "title": "Primo indizio",
-            "body": "Il responsabile ha lasciato cera nera su una custodia di rame."
+            "id": "catena-1-stage-1",
+            "title": "Primo ascolto",
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/catena_musicale1_1.mp3"
+              }
+            ]
           },
           {
-            "id": "passo",
-            "title": "Secondo indizio",
-            "body": "Le impronte si interrompono davanti alla scala che porta ai palchi chiusi."
+            "id": "catena-1-stage-2",
+            "title": "Secondo ascolto",
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/catena_musicale1_2.mp3"
+              }
+            ]
           },
           {
-            "id": "odore",
-            "title": "Terzo indizio",
-            "body": "Nell'aria resta un profumo di tabacco dolce e carta antica."
+            "id": "catena-1-stage-3",
+            "title": "Versione completa",
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/catena_musicale1_3.mp3"
+              }
+            ]
           }
         ],
-        "initialVisibleStages": 1,
-        "solution": {
-          "mode": "multiple_choice",
-          "choices": [
-            {
-              "id": "custode",
-              "text": "Il Custode dei Palchi"
-            },
-            {
-              "id": "curatore",
-              "text": "Il Curatore"
-            },
-            {
-              "id": "critico",
-              "text": "Il Critico"
-            }
-          ],
-          "correctChoiceId": "custode"
-        },
+        "acceptedAnswers": ["Don't Start Now", "Dont Start Now"],
+        "hint": "E un successo disco-pop di Dua Lipa.",
+        "explanation": "'Don't Start Now' di Dua Lipa (2019): il bassline funky e inconfondibile gia dal primo strumento isolato.",
+        "speaker": "curator",
+        "creditReward": 10,
+        "hintCost": 15,
         "scoring": {
-          "maxScore": 5,
+          "maxScore": 3,
           "revealPenalty": 1,
-          "minScore": 1
-        },
-        "hint": "Chi conosce bene i palchi li attraversa senza lasciare rumore.",
-        "explanation": "Il furto era un gesto tecnico, non teatrale: il colpevole conosceva il percorso di servizio.",
-        "successMessage": "La sala restituisce il metronomo e una porzione di partitura nascosta.",
-        "failureMessage": "Il Critico sfrutta gli indizi rivelati, ma la firma del furto resta opaca.",
-        "speaker": "neutral"
+          "minScore": 0
+        }
       },
       {
-        "id": "musica-med-intruder-01",
+        "id": "musica-chain-02",
         "difficulty": "medium",
-        "type": "intruder",
-        "prompt": "Individua l'elemento intruso nel quartetto di presenze musicali.",
+        "type": "musical_chain",
+        "title": "Catena musicale",
+        "prompt": "Ogni nuovo ascolto aggiunge strumenti. Il quiz fallisce solo se non indovini neppure alla terza traccia.",
         "assets": [],
-        "items": [
+        "stages": [
           {
-            "id": "fuga",
-            "text": "Fuga"
+            "id": "catena-2-stage-1",
+            "title": "Primo ascolto",
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/catena_musicale2_1.mp3"
+              }
+            ]
           },
           {
-            "id": "corale",
-            "text": "Corale"
+            "id": "catena-2-stage-2",
+            "title": "Secondo ascolto",
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/catena_musicale2_2.mp3"
+              }
+            ]
           },
           {
-            "id": "timpano",
-            "text": "Timpano"
-          },
-          {
-            "id": "notturno",
-            "text": "Notturno"
+            "id": "catena-2-stage-3",
+            "title": "Versione completa",
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/catena_musicale2_3.mp3"
+              }
+            ]
           }
         ],
-        "intruderId": "timpano",
-        "hint": "Tre elementi sono forme o scritture musicali. Uno e uno strumento.",
-        "explanation": "L'intruso risuona da solo: non e una forma, ma un corpo che produce suono.",
-        "speaker": "critic"
+        "acceptedAnswers": ["Faro di te un uomo", "Faro di te un Uomo", "Faro di te unUomo", "Farò di te un uomo"],
+        "hint": "Luca, Giuseppe e Tiziano.",
+        "explanation": "'Faro di te un uomo' — un evergreen italiano sull'educazione e la crescita, spesso associato a momenti solenni.",
+        "speaker": "curator",
+        "creditReward": 10,
+        "hintCost": 15,
+        "scoring": {
+          "maxScore": 3,
+          "revealPenalty": 1,
+          "minScore": 0
+        }
       },
       {
-        "id": "musica-hard-sequence-01",
+        "id": "musica-hitster-01",
         "difficulty": "hard",
-        "type": "sequence_reconstruction",
-        "prompt": "Ricomponi il frammento di partitura spezzato in quattro tessere.",
+        "type": "hitster",
+        "title": "Hitster",
+        "prompt": "Ascolta una traccia alla volta, indovina se vuoi autore e titolo bonus, poi trascina ogni carta nella posizione cronologica corretta e conferma l'ordine finale.",
         "assets": [],
-        "segments": [
+        "tracks": [
           {
-            "id": "p1",
-            "label": "Silenzio teso prima dell'arco"
+            "id": "hitster-track-1",
+            "year": 2008,
+            "title": "Viva La Vida",
+            "titleAcceptedAnswers": ["Viva La Vida"],
+            "artist": "Coldplay",
+            "artistAcceptedAnswers": ["Coldplay"],
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/hitster1.mp3"
+              }
+            ]
           },
           {
-            "id": "p2",
-            "label": "Un colpo lieve sul legno scuro"
+            "id": "hitster-track-2",
+            "year": 2015,
+            "title": "7 years",
+            "titleAcceptedAnswers": ["7 years", "7 Years"],
+            "artist": "Lukas Graham",
+            "artistAcceptedAnswers": ["Lukas Graham", "Graham"],
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/hitster2.mp3"
+              }
+            ]
           },
           {
-            "id": "p3",
-            "label": "La corda si desta e vibra"
+            "id": "hitster-track-3",
+            "year": 2016,
+            "title": "That's what I like",
+            "titleAcceptedAnswers": ["That's what I like", "Thats what I like"],
+            "artist": "Bruno Mars",
+            "artistAcceptedAnswers": ["Bruno Mars", "Mars"],
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/hitster3.mp3"
+              }
+            ]
           },
           {
-            "id": "p4",
-            "label": "La sala restituisce luce" 
+            "id": "hitster-track-4",
+            "year": 2019,
+            "title": "Bad Guy",
+            "titleAcceptedAnswers": ["Bad Guy"],
+            "artist": "Billie Eilish",
+            "artistAcceptedAnswers": ["Billie Eilish", "Eilish"],
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/hitster4.mp3"
+              }
+            ]
+          },
+          {
+            "id": "hitster-track-5",
+            "year": 2010,
+            "title": "Rolling in the deep",
+            "titleAcceptedAnswers": ["Rolling in the deep", "Rolling in the Deep"],
+            "artist": "Adele",
+            "artistAcceptedAnswers": ["Adele"],
+            "assets": [
+              {
+                "kind": "audio",
+                "src": "/src/data/musica/hitster5.mp3"
+              }
+            ]
           }
         ],
-        "initialOrder": ["p3", "p1", "p4", "p2"],
-        "correctOrder": ["p1", "p2", "p3", "p4"],
-        "hint": "Prima attesa, poi gesto, poi suono, infine risposta della sala.",
-        "explanation": "Le tessere tornano al loro posto e la frase musicale si richiude.",
-        "speaker": "curator"
+        "initialOrder": [
+          "hitster-track-3",
+          "hitster-track-1",
+          "hitster-track-5",
+          "hitster-track-4",
+          "hitster-track-2"
+        ],
+        "correctOrder": [
+          "hitster-track-1",
+          "hitster-track-5",
+          "hitster-track-2",
+          "hitster-track-3",
+          "hitster-track-4"
+        ],
+        "hint": "Metti i brani in ordine dal piu vecchio al piu recente. Il pezzo dei Coldplay e precedente al 2010.",
+        "explanation": "L'ordine corretto e: Viva La Vida (2008), Rolling in the Deep (2010), 7 Years (2015), That's What I Like (2016), Bad Guy (2019).",
+        "speaker": "neutral",
+        "creditReward": 15,
+        "hintCost": 15,
+        "scoring": {
+          "minimumCorrectPlacements": 3
+        }
       }
     ]
+  },
+  {
+    "id": "ritratto-spezzato",
+    "kind": "side_game",
+    "title": "Ritratto Spezzato",
+    "ghost": "La Curatrice delle Cornici",
+    "description": "Gioco sbloccabile dopo la Sala delle Frequenze. Placeholder in attesa di design e contenuti reali.",
+    "unlockCost": 0,
+    "buyAccessCost": 60,
+    "challenges": []
+  },
+  {
+    "id": "archivio-vivente",
+    "kind": "side_game",
+    "title": "Archivio Vivente",
+    "ghost": "Il Copista senza volto",
+    "description": "Secondo gioco sbloccabile dalla stanza musica. Placeholder per il futuro flusso di gioco.",
+    "unlockCost": 0,
+    "buyAccessCost": 60,
+    "challenges": []
   }
 ]

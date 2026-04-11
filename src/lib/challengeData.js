@@ -68,6 +68,8 @@ function createChallengeBase(rawChallenge) {
     successMessage: rawChallenge.successMessage ?? '',
     failureMessage: rawChallenge.failureMessage ?? '',
     speaker: normalizeSpeaker(rawChallenge),
+    creditReward: rawChallenge.creditReward ?? 10,
+    hintCost: rawChallenge.hintCost ?? 15,
   }
 }
 
@@ -93,6 +95,45 @@ function normalizeOrder(ids = [], fallbackIds = []) {
 function normalizeChallenge(rawChallenge) {
   const baseChallenge = createChallengeBase(rawChallenge)
   const challengeType = resolveChallengeType(rawChallenge)
+
+  if (challengeType === 'guess_title_author') {
+    return {
+      ...baseChallenge,
+      type: 'guess_title_author',
+      acceptedTitleAnswers: rawChallenge.acceptedTitleAnswers ?? [],
+      acceptedAuthorAnswers: rawChallenge.acceptedAuthorAnswers ?? [],
+      titlePlaceholder: rawChallenge.titlePlaceholder ?? '',
+      authorPlaceholder: rawChallenge.authorPlaceholder ?? '',
+      scoring: {
+        passThreshold: rawChallenge.scoring?.passThreshold ?? 2,
+        fullMatchRatio: rawChallenge.scoring?.fullMatchRatio ?? 1,
+        partialMatchRatio: rawChallenge.scoring?.partialMatchRatio ?? 0.5,
+      },
+    }
+  }
+
+  if (challengeType === 'face_morph') {
+    return {
+      ...baseChallenge,
+      type: 'face_morph',
+      singerGroups: rawChallenge.singerGroups ?? [],
+      answerSlots: rawChallenge.answerSlots ?? 3,
+      minimumCorrectGroups: rawChallenge.minimumCorrectGroups ?? 2,
+      placeholder: rawChallenge.placeholder ?? '',
+    }
+  }
+
+  if (challengeType === 'fill_lyrics') {
+    return {
+      ...baseChallenge,
+      type: 'fill_lyrics',
+      solutionText: rawChallenge.solutionText ?? '',
+      placeholder: rawChallenge.placeholder ?? '',
+      scoring: {
+        minimumWordMatchRatio: rawChallenge.scoring?.minimumWordMatchRatio ?? 0.7,
+      },
+    }
+  }
 
   if (challengeType === 'multiple_choice') {
     return {
@@ -163,6 +204,48 @@ function normalizeChallenge(rawChallenge) {
     }
   }
 
+  if (challengeType === 'musical_chain') {
+    return {
+      ...baseChallenge,
+      type: 'musical_chain',
+      stages: (rawChallenge.stages ?? []).map((stage) => ({
+        id: stage.id,
+        title: stage.title ?? '',
+        assets: normalizeAssets(stage.assets),
+      })),
+      acceptedAnswers: rawChallenge.acceptedAnswers ?? [],
+      scoring: {
+        maxScore: rawChallenge.scoring?.maxScore ?? 3,
+        revealPenalty: rawChallenge.scoring?.revealPenalty ?? 1,
+        minScore: rawChallenge.scoring?.minScore ?? 0,
+      },
+    }
+  }
+
+  if (challengeType === 'hitster') {
+    const tracks = rawChallenge.tracks ?? []
+    const trackIds = tracks.map((track) => track.id)
+
+    return {
+      ...baseChallenge,
+      type: 'hitster',
+      tracks: tracks.map((track) => ({
+        id: track.id,
+        year: track.year,
+        title: track.title,
+        titleAcceptedAnswers: track.titleAcceptedAnswers ?? [track.title],
+        artist: track.artist,
+        artistAcceptedAnswers: track.artistAcceptedAnswers ?? [track.artist],
+        assets: normalizeAssets(track.assets),
+      })),
+      initialOrder: normalizeOrder(rawChallenge.initialOrder, trackIds),
+      correctOrder: normalizeOrder(rawChallenge.correctOrder, trackIds),
+      scoring: {
+        minimumCorrectPlacements: rawChallenge.scoring?.minimumCorrectPlacements ?? 3,
+      },
+    }
+  }
+
   return {
     ...baseChallenge,
     type: 'free_text',
@@ -183,6 +266,11 @@ function normalizeCategory(rawCategory) {
     ghost: rawCategory.ghost,
     description: rawCategory.description,
     unlockCost: rawCategory.unlockCost ?? 0,
+    buyAccessCost: rawCategory.buyAccessCost ?? 0,
+    backgroundImage: rawCategory.backgroundImage ?? '',
+    characters: rawCategory.characters ?? null,
+    introNarrative: rawCategory.introNarrative ?? null,
+    characterComments: rawCategory.characterComments ?? null,
     challenges: (rawCategory.challenges ?? rawCategory.questions ?? []).map(normalizeChallenge),
   }
 }

@@ -5,6 +5,11 @@ export type ChallengeType =
   | 'multi_stage_progressive_reveal'
   | 'intruder'
   | 'sequence_reconstruction'
+  | 'guess_title_author'
+  | 'face_morph'
+  | 'fill_lyrics'
+  | 'musical_chain'
+  | 'hitster'
 
 export type ChallengeDifficulty = 'easy' | 'medium' | 'hard'
 export type ChallengeSpeaker = 'curator' | 'critic' | 'neutral'
@@ -17,6 +22,11 @@ export interface ChallengeAsset {
   src: string
   alt?: string
   caption?: string
+}
+
+export interface AcceptedAnswerGroup {
+  id?: string
+  acceptedAnswers: string[]
 }
 
 export interface ChoiceItem {
@@ -65,6 +75,42 @@ export interface ProgressiveRevealScoring {
   minScore: number
 }
 
+export interface GuessTitleAuthorScoring {
+  passThreshold: number
+  fullMatchRatio: number
+  partialMatchRatio: number
+}
+
+export interface FillLyricsScoring {
+  minimumWordMatchRatio: number
+}
+
+export interface MusicalChainScoring {
+  maxScore: number
+  revealPenalty: number
+  minScore: number
+}
+
+export interface HitsterScoring {
+  minimumCorrectPlacements: number
+}
+
+export interface MusicalChainStage {
+  id: string
+  title?: string
+  assets: ChallengeAsset[]
+}
+
+export interface HitsterTrack {
+  id: string
+  year: number
+  title: string
+  titleAcceptedAnswers: string[]
+  artist: string
+  artistAcceptedAnswers: string[]
+  assets: ChallengeAsset[]
+}
+
 export interface ChallengeBase<T extends ChallengeType> {
   id: string
   difficulty: ChallengeDifficulty
@@ -78,6 +124,8 @@ export interface ChallengeBase<T extends ChallengeType> {
   successMessage?: string
   failureMessage?: string
   speaker: ChallengeSpeaker
+  creditReward?: number
+  hintCost?: number
 }
 
 export interface MultipleChoiceChallenge extends ChallengeBase<'multiple_choice'> {
@@ -116,6 +164,41 @@ export interface SequenceReconstructionChallenge
   initialOrder: string[]
 }
 
+export interface GuessTitleAuthorChallenge
+  extends ChallengeBase<'guess_title_author'> {
+  acceptedTitleAnswers: string[]
+  acceptedAuthorAnswers: string[]
+  titlePlaceholder?: string
+  authorPlaceholder?: string
+  scoring: GuessTitleAuthorScoring
+}
+
+export interface FaceMorphChallenge extends ChallengeBase<'face_morph'> {
+  singerGroups: AcceptedAnswerGroup[]
+  answerSlots: number
+  minimumCorrectGroups: number
+  placeholder?: string
+}
+
+export interface FillLyricsChallenge extends ChallengeBase<'fill_lyrics'> {
+  solutionText: string
+  placeholder?: string
+  scoring: FillLyricsScoring
+}
+
+export interface MusicalChainChallenge extends ChallengeBase<'musical_chain'> {
+  stages: MusicalChainStage[]
+  acceptedAnswers: string[]
+  scoring: MusicalChainScoring
+}
+
+export interface HitsterChallenge extends ChallengeBase<'hitster'> {
+  tracks: HitsterTrack[]
+  initialOrder: string[]
+  correctOrder: string[]
+  scoring: HitsterScoring
+}
+
 export type Challenge =
   | MultipleChoiceChallenge
   | FreeTextChallenge
@@ -123,6 +206,11 @@ export type Challenge =
   | ProgressiveRevealChallenge
   | IntruderChallenge
   | SequenceReconstructionChallenge
+  | GuessTitleAuthorChallenge
+  | FaceMorphChallenge
+  | FillLyricsChallenge
+  | MusicalChainChallenge
+  | HitsterChallenge
 
 export interface ChallengeDraftAnswer {
   selectedChoiceId: string
@@ -130,10 +218,17 @@ export interface ChallengeDraftAnswer {
   textAnswer: string
   orderedItemIds: string[]
   sequenceOrderIds: string[]
+  titleAnswer: string
+  authorAnswer: string
+  faceMorphAnswers: string[]
+  hitsterTrackAnswers: Record<string, { titleAnswer: string; artistAnswer: string }>
+  hitsterTrackOrderIds: string[]
 }
 
 export interface ChallengeRuntimeState {
   revealedStageCount: number
+  musicalChainStageIndex: number
+  hitsterRevealedTrackCount: number
 }
 
 export interface ChallengeFeedback {
@@ -146,6 +241,8 @@ export interface ChallengeFeedback {
   tone: 'idle' | 'success' | 'failure'
   scoreEarned?: number
   maxScore?: number
+  solutionLines?: string[]
+  metadata?: Record<string, unknown>
 }
 
 export interface Category {
@@ -155,7 +252,48 @@ export interface Category {
   ghost: string
   description: string
   unlockCost: number
+  buyAccessCost?: number
+  backgroundImage?: string
+  characters?: CategoryCharacters
+  introNarrative?: CategoryIntroNarrative
+  characterComments?: CategoryCharacterComments
   challenges: Challenge[]
+}
+
+export interface CategoryCharacterInfo {
+  id: string
+  name: string
+  role: string
+  imageSrc: string
+  fallbackImageSrc?: string
+  tone: 'gold' | 'silver'
+}
+
+export interface CategoryCharacters {
+  curator?: CategoryCharacterInfo
+  critic?: CategoryCharacterInfo
+}
+
+export interface CategoryNarrativeMessage {
+  name: string
+  message: string
+}
+
+export interface CategoryIntroNarrative {
+  curator?: CategoryNarrativeMessage
+  critic?: CategoryNarrativeMessage
+}
+
+export interface CharacterComment {
+  speaker: ChallengeSpeaker
+  text: string
+}
+
+export interface CategoryCharacterComments {
+  onCorrect?: CharacterComment[]
+  onWrong?: CharacterComment[]
+  onHintUsed?: CharacterComment[]
+  onHesitation?: CharacterComment[]
 }
 
 export interface RawChallengeBase {
@@ -218,6 +356,61 @@ export interface RawSequenceReconstructionChallenge extends RawChallengeBase {
   initialOrder?: string[]
 }
 
+export interface RawGuessTitleAuthorChallenge extends RawChallengeBase {
+  type: 'guess_title_author'
+  acceptedTitleAnswers?: string[]
+  acceptedAuthorAnswers?: string[]
+  titlePlaceholder?: string
+  authorPlaceholder?: string
+  scoring?: Partial<GuessTitleAuthorScoring>
+}
+
+export interface RawFaceMorphChallenge extends RawChallengeBase {
+  type: 'face_morph'
+  singerGroups?: AcceptedAnswerGroup[]
+  answerSlots?: number
+  minimumCorrectGroups?: number
+  placeholder?: string
+}
+
+export interface RawFillLyricsChallenge extends RawChallengeBase {
+  type: 'fill_lyrics'
+  solutionText?: string
+  placeholder?: string
+  scoring?: Partial<FillLyricsScoring>
+}
+
+export interface RawMusicalChainStage {
+  id: string
+  title?: string
+  assets?: Array<string | ChallengeAsset>
+}
+
+export interface RawMusicalChainChallenge extends RawChallengeBase {
+  type: 'musical_chain'
+  stages?: RawMusicalChainStage[]
+  acceptedAnswers?: string[]
+  scoring?: Partial<MusicalChainScoring>
+}
+
+export interface RawHitsterTrack {
+  id: string
+  year: number
+  title: string
+  titleAcceptedAnswers?: string[]
+  artist: string
+  artistAcceptedAnswers?: string[]
+  assets?: Array<string | ChallengeAsset>
+}
+
+export interface RawHitsterChallenge extends RawChallengeBase {
+  type: 'hitster'
+  tracks?: RawHitsterTrack[]
+  initialOrder?: string[]
+  correctOrder?: string[]
+  scoring?: Partial<HitsterScoring>
+}
+
 export type RawChallenge =
   | RawMultipleChoiceChallenge
   | RawFreeTextChallenge
@@ -225,6 +418,49 @@ export type RawChallenge =
   | RawProgressiveRevealChallenge
   | RawIntruderChallenge
   | RawSequenceReconstructionChallenge
+  | RawGuessTitleAuthorChallenge
+  | RawFaceMorphChallenge
+  | RawFillLyricsChallenge
+  | RawMusicalChainChallenge
+  | RawHitsterChallenge
+
+export interface DailyStats {
+  date: string
+  quizzesStarted: number
+  quizzesAttempted: number
+  wrongAnswers: number
+  wrongAnswersToday: number
+  lastResetAt: number
+}
+
+export interface RoomSessionSummary {
+  categoryId: string
+  startedAt: number
+  completedAt: number
+  correctCount: number
+  wrongCount: number
+  passed: boolean
+  unlockedCategoryIds: string[]
+  prizeAwarded: boolean
+}
+
+export interface RoomProgress {
+  categoryId: string
+  sessions: RoomSessionSummary[]
+  unlockedByScore: boolean
+  prizeWon: boolean
+  buyAccessAvailable: boolean
+}
+
+export interface PlayerState {
+  version: 1
+  createdAt: number
+  credits: number
+  hasSeenMusicRoomIntro: boolean
+  stats: DailyStats
+  roomProgress: Record<string, RoomProgress>
+  unlockedCategoryIds: string[]
+}
 
 export interface RawCategory {
   id: string
@@ -233,6 +469,11 @@ export interface RawCategory {
   ghost: string
   description: string
   unlockCost?: number
+  buyAccessCost?: number
+  backgroundImage?: string
+  characters?: CategoryCharacters
+  introNarrative?: CategoryIntroNarrative
+  characterComments?: CategoryCharacterComments
   challenges?: RawChallenge[]
   questions?: Array<RawMultipleChoiceChallenge | RawFreeTextChallenge>
 }

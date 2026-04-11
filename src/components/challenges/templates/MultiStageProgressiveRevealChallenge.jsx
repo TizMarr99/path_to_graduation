@@ -56,6 +56,7 @@ function MultiStageProgressiveRevealChallenge({
   onChallengeStateChange,
   onSubmit,
   disabled,
+  onAudioPlay,
 }) {
   const revealedStageCount = Math.max(
     challenge.initialVisibleStages,
@@ -91,7 +92,7 @@ function MultiStageProgressiveRevealChallenge({
           </p>
         </div>
 
-        <ChallengeAssetGallery assets={challenge.assets} />
+        <ChallengeAssetGallery assets={challenge.assets} onAudioPlay={onAudioPlay} />
 
         <div className="rounded-2xl border border-amber-300/20 bg-amber-300/8 px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-100/75">
@@ -115,7 +116,7 @@ function MultiStageProgressiveRevealChallenge({
                 <h4 className="mt-2 text-lg font-semibold text-white">{stage.title}</h4>
               ) : null}
               <p className="mt-2 text-sm leading-7 text-slate-300">{stage.body}</p>
-              <ChallengeAssetGallery assets={stage.assets ?? []} />
+              <ChallengeAssetGallery assets={stage.assets ?? []} onAudioPlay={onAudioPlay} />
             </article>
           ))}
         </div>
