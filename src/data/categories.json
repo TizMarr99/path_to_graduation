@@ -74,7 +74,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/guess_title_author1.mp3",
+            "src": "/musica/guess_title_author1.mp3",
             "caption": "Puoi avviare e fermare la traccia quante volte vuoi."
           }
         ],
@@ -102,7 +102,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/guess_title_author2.mp3",
+            "src": "/musica/guess_title_author2.mp3",
             "caption": "Puoi riascoltare il frammento liberamente."
           }
         ],
@@ -130,7 +130,7 @@
         "assets": [
           {
             "kind": "image",
-            "src": "/src/data/musica/face_morph1.jpg",
+            "src": "/musica/face_morph1.jpg",
             "alt": "Face morph 1"
           }
         ],
@@ -166,7 +166,7 @@
         "assets": [
           {
             "kind": "image",
-            "src": "/src/data/musica/face_morph2.jpg",
+            "src": "/musica/face_morph2.jpg",
             "alt": "Face morph 2"
           }
         ],
@@ -202,7 +202,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/fill_lyrics1.mp3",
+            "src": "/musica/fill_lyrics1.mp3",
             "caption": "Scrivi il verso in un'unica casella di testo."
           }
         ],
@@ -226,7 +226,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/fill_lyrics2.mp3",
+            "src": "/musica/fill_lyrics2.mp3",
             "caption": "Conta il contenuto del verso, non la punteggiatura."
           }
         ],
@@ -250,7 +250,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/fill_lyrics3.mp3",
+            "src": "/musica/fill_lyrics3.mp3",
             "caption": "Maiuscole e punteggiatura non contano."
           }
         ],
@@ -274,7 +274,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/reverse_song1.mp3",
+            "src": "/musica/reverse_song1.mp3",
             "caption": "Puoi ascoltare il brano al contrario quante volte vuoi."
           }
         ],
@@ -295,7 +295,7 @@
         "assets": [
           {
             "kind": "audio",
-            "src": "/src/data/musica/reverse_song2.mp3",
+            "src": "/musica/reverse_song2.mp3",
             "caption": "Il player resta libero per tutto il quiz."
           }
         ],
@@ -321,7 +321,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/catena_musicale1_1.mp3"
+                "src": "/musica/catena_musicale1_1.mp3"
               }
             ]
           },
@@ -331,7 +331,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/catena_musicale1_2.mp3"
+                "src": "/musica/catena_musicale1_2.mp3"
               }
             ]
           },
@@ -341,7 +341,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/catena_musicale1_3.mp3"
+                "src": "/musica/catena_musicale1_3.mp3"
               }
             ]
           }
@@ -372,7 +372,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/catena_musicale2_1.mp3"
+                "src": "/musica/catena_musicale2_1.mp3"
               }
             ]
           },
@@ -382,7 +382,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/catena_musicale2_2.mp3"
+                "src": "/musica/catena_musicale2_2.mp3"
               }
             ]
           },
@@ -392,7 +392,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/catena_musicale2_3.mp3"
+                "src": "/musica/catena_musicale2_3.mp3"
               }
             ]
           }
@@ -427,7 +427,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/hitster1.mp3"
+                "src": "/musica/hitster1.mp3"
               }
             ]
           },
@@ -441,7 +441,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/hitster2.mp3"
+                "src": "/musica/hitster2.mp3"
               }
             ]
           },
@@ -455,7 +455,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/hitster3.mp3"
+                "src": "/musica/hitster3.mp3"
               }
             ]
           },
@@ -469,7 +469,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/hitster4.mp3"
+                "src": "/musica/hitster4.mp3"
               }
             ]
           },
@@ -483,7 +483,7 @@
             "assets": [
               {
                 "kind": "audio",
-                "src": "/src/data/musica/hitster5.mp3"
+                "src": "/musica/hitster5.mp3"
               }
             ]
           }

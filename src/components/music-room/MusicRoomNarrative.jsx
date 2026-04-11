@@ -4,8 +4,6 @@ import '../../components/home/vip-home.css'
 
 const HOLD_AFTER_TYPEWRITER_MS = 2200
 const CROSSFADE_DURATION_MS = 700
-const ROOM_CURATOR_LABEL = 'Voce del Curatore'
-const ROOM_CRITIC_LABEL = 'Voce del Critico'
 
 function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role, tone = 'gold' }) {
   const [src, setSrc] = useState(imageSrc)
@@ -73,7 +71,6 @@ function MusicRoomNarrative({ category, onComplete }) {
   }, [])
 
   const isCuratorBoxVisible = scene === 'curator'
-  const isCuratorShifted = scene !== 'curator'
   const isCriticVisible = scene === 'curator-leaving' || scene === 'critic' || scene === 'critic-complete'
   const isCriticBoxVisible = scene === 'critic'
   const isCtaVisible = scene === 'critic-complete'
@@ -120,26 +117,20 @@ function MusicRoomNarrative({ category, onComplete }) {
         </div>
 
         {/* Desktop layout */}
-        <div className="relative mt-2 flex flex-1 items-center overflow-hidden pb-24 sm:mt-3 sm:pb-28">
-          <div className="mx-auto hidden h-full w-full max-w-7xl lg:grid lg:grid-cols-[minmax(16rem,1fr)_minmax(18rem,26rem)_minmax(16rem,1fr)] lg:gap-6">
-            <div className="flex h-full items-start pt-[8%]">
+        <div className="relative mt-2 flex flex-1 items-start overflow-hidden pb-24 pt-4 sm:mt-3 sm:pb-28 sm:pt-6">
+          <div className="mx-auto hidden h-full w-full max-w-7xl lg:grid lg:grid-cols-[minmax(17rem,1fr)_minmax(20rem,27rem)_minmax(17rem,1fr)] lg:gap-8">
+            <div className="flex h-full items-start pt-[24%] xl:pt-[22%]">
               <div
                 className={[
-                  'w-full max-w-[23rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-6 py-5 backdrop-blur-xl transition-all duration-700 ease-out',
+                  'w-full max-w-[25rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
                   isCuratorBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : '-translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
                 ].join(' ')}
               >
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.38em] text-amber-200/78">
-                  {ROOM_CURATOR_LABEL}
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[0.04em] text-amber-50">
-                  {curator?.name ?? 'Curatore'}
-                </h2>
                 <TypewriterText
                   alignment="left"
-                  className="mt-5 max-w-[27ch] text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
+                  className="w-full text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
                   isActive={scene === 'curator'}
                   isComplete={scene !== 'curator'}
                   onComplete={handleCuratorComplete}
@@ -152,10 +143,7 @@ function MusicRoomNarrative({ category, onComplete }) {
               {curator ? (
                 <div
                   className={[
-                    'absolute left-1/2 top-[14%] transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                    isCuratorShifted
-                      ? '-translate-x-[88%] translate-y-1 scale-[0.88]'
-                      : '-translate-x-[68%] scale-[0.96]',
+                    'absolute left-1/2 top-[-5%] z-10 -translate-x-[92%] scale-[0.92] pointer-events-none',
                   ].join(' ')}
                 >
                   <NarrativePortrait
@@ -171,10 +159,10 @@ function MusicRoomNarrative({ category, onComplete }) {
               {critic ? (
                 <div
                   className={[
-                    'absolute left-1/2 top-[18%] transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]',
+                    'absolute left-1/2 top-[-5%] z-10 translate-x-[14%] scale-[0.92] pointer-events-none transition-opacity duration-700 ease-out',
                     isCriticVisible
-                      ? 'translate-x-[4%] opacity-100 scale-[0.88]'
-                      : 'translate-x-[28%] opacity-0 scale-[0.88] pointer-events-none',
+                      ? 'opacity-100'
+                      : 'opacity-0 pointer-events-none',
                   ].join(' ')}
                 >
                   <NarrativePortrait
@@ -188,24 +176,18 @@ function MusicRoomNarrative({ category, onComplete }) {
               ) : null}
             </div>
 
-            <div className="flex h-full items-start justify-end pt-[16%]">
+            <div className="flex h-full items-start justify-end pt-[24%] xl:pt-[22%]">
               <div
                 className={[
-                  'w-full max-w-[22rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-6 py-5 backdrop-blur-xl transition-all duration-700 ease-out',
+                  'w-full max-w-[25rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
                   isCriticBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : 'translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
                 ].join(' ')}
               >
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.38em] text-stone-300">
-                  {ROOM_CRITIC_LABEL}
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[0.04em] text-amber-50">
-                  {critic?.name ?? 'Critico'}
-                </h2>
                 <TypewriterText
                   alignment="left"
-                  className="mt-5 max-w-[24ch] text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
+                  className="w-full text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
                   isActive={scene === 'critic'}
                   isComplete={scene === 'critic-complete'}
                   onComplete={handleCriticComplete}
@@ -235,15 +217,9 @@ function MusicRoomNarrative({ category, onComplete }) {
                 isCuratorBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
               ].join(' ')}
             >
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.38em] text-amber-200/78">
-                {ROOM_CURATOR_LABEL}
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[0.04em] text-amber-50">
-                {curator?.name ?? 'Curatore'}
-              </h2>
               <TypewriterText
                 alignment="left"
-                className="mt-4 text-[0.95rem] leading-6 text-stone-100"
+                className="text-[0.95rem] leading-6 text-stone-100"
                 isActive={scene === 'curator'}
                 isComplete={scene !== 'curator'}
                 onComplete={handleCuratorComplete}
@@ -270,15 +246,9 @@ function MusicRoomNarrative({ category, onComplete }) {
                 isCriticBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
               ].join(' ')}
             >
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.38em] text-stone-300">
-                {ROOM_CRITIC_LABEL}
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[0.04em] text-amber-50">
-                {critic?.name ?? 'Critico'}
-              </h2>
               <TypewriterText
                 alignment="left"
-                className="mt-4 text-[0.95rem] leading-6 text-stone-100"
+                className="text-[0.95rem] leading-6 text-stone-100"
                 isActive={scene === 'critic'}
                 isComplete={scene === 'critic-complete'}
                 onComplete={handleCriticComplete}

@@ -1,5 +1,19 @@
 import rawCategories from '../data/categories.json'
 
+const STATIC_ASSET_PREFIXES = new Map([
+  ['/src/data/musica/', '/musica/'],
+])
+
+function resolveStaticAssetPath(src = '') {
+  for (const [sourcePrefix, publicPrefix] of STATIC_ASSET_PREFIXES.entries()) {
+    if (src.startsWith(sourcePrefix)) {
+      return src.replace(sourcePrefix, publicPrefix)
+    }
+  }
+
+  return src
+}
+
 /**
  * @param {import('../types/challenge').RawChallenge} rawChallenge
  * @returns {import('../types/challenge').ChallengeType}
@@ -24,14 +38,14 @@ function normalizeAssets(rawAssets = []) {
       return {
         id: `asset-${index}`,
         kind: 'image',
-        src: asset,
+        src: resolveStaticAssetPath(asset),
       }
     }
 
     return {
       id: asset.id ?? `asset-${index}`,
       kind: asset.kind ?? asset.type ?? 'image',
-      src: asset.src,
+      src: resolveStaticAssetPath(asset.src),
       alt: asset.alt ?? '',
       caption: asset.caption ?? '',
     }
