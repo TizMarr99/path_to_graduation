@@ -13,6 +13,7 @@ import { useCharacterComments } from '../hooks/useCharacterComments'
 import { useChallengeSession } from '../hooks/useChallengeSession'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
+import { resolveChallengeCreditReward } from '../lib/challengeRewards'
 
 const roomUnlockTargets = {
   musica: ['ritratto-spezzato', 'archivio-vivente'],
@@ -73,23 +74,29 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const audioPlayCountRef = useRef(0)
   const hesitationFiredRef = useRef(false)
   const {
+    clearActiveSession,
+    applyChallengeFeedbackOutcome,
     playerState,
     getRoomProgress,
     registerRoomOutcome,
     unlockCategories,
-    addCredits,
     spendCredits,
     registerQuizAttempt,
-    registerWrongAnswer,
     markMusicRoomIntroSeen,
     canAttemptQuiz,
     getCredits,
+    isRoomIntroPending,
+    syncActiveSessionSnapshot,
   } = usePlayerState()
   const { activeToast, showComment, dismissToast } = useCharacterComments(
     category.characterComments,
     category.characters,
   )
+  const persistedSession = playerState.activeSession?.categoryId === category.id
+    ? playerState.activeSession
+    : null
   const {
+    challengeResults,
     challengeNumber,
     currentChallengeId,
     challengeState,
@@ -114,7 +121,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     totalChallenges,
     updateChallengeState,
     updateDraftAnswer,
-  } = useChallengeSession(category, preferredChallengeId)
+  } = useChallengeSession(category, preferredChallengeId, persistedSession)
   const hasPersistedOutcomeRef = useRef(false)
   const immediateUnlockTargets = useMemo(
     () => roomUnlockTargets[category.id] ?? [],
@@ -169,27 +176,28 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   function handleSubmit(event) {
     event.preventDefault()
-    registerQuizAttempt()
-    submitChallenge()
-  }
+    const nextFeedback = submitChallenge()
 
-  // React to feedback changes for credits & character comments
-  const prevFeedbackIdRef = useRef('')
-  useEffect(() => {
-    if (!feedback.attemptedChallengeId || feedback.attemptedChallengeId === prevFeedbackIdRef.current) {
+    if (!nextFeedback) {
       return
     }
-    prevFeedbackIdRef.current = feedback.attemptedChallengeId
 
-    if (feedback.isCorrect) {
-      const reward = currentChallenge?.creditReward ?? 10
-      addCredits(reward)
+    registerQuizAttempt()
+    const feedbackChallenge =
+      category.challenges.find((challenge) => challenge.id === nextFeedback.attemptedChallengeId) ?? currentChallenge
+    const awardedCredits = resolveChallengeCreditReward(feedbackChallenge, nextFeedback)
+
+    applyChallengeFeedbackOutcome({
+      awardedCredits,
+      consumeLife: !nextFeedback.isCorrect,
+    })
+
+    if (nextFeedback.isCorrect) {
       showComment('onCorrect')
     } else {
-      registerWrongAnswer()
       showComment('onWrong')
     }
-  }, [feedback.attemptedChallengeId, feedback.isCorrect, currentChallenge, addCredits, registerWrongAnswer, showComment])
+  }
 
   // Reset audio-play hesitation counter when challenge changes
   useEffect(() => {
@@ -217,8 +225,51 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     restartSession()
   }
 
+  const shouldShowMusicIntro = category.id === 'musica' && isRoomIntroPending('musica')
+
+  useEffect(() => {
+    if (isComplete) {
+      clearActiveSession()
+      return
+    }
+
+    if (!currentChallenge || shouldShowMusicIntro) {
+      return
+    }
+
+    syncActiveSessionSnapshot(
+      {
+        categoryId: category.id,
+        currentChallengeId,
+        challengeResults,
+        draftAnswer,
+        challengeState,
+        isHintVisible,
+        resolvedChallengeIds,
+        sessionCorrectCount,
+        sessionWrongCount,
+      },
+      { debounced: true },
+    )
+  }, [
+    category.id,
+    challengeResults,
+    challengeState,
+    clearActiveSession,
+    currentChallenge,
+    currentChallengeId,
+    draftAnswer,
+    isComplete,
+    isHintVisible,
+    resolvedChallengeIds,
+    sessionCorrectCount,
+    sessionWrongCount,
+    shouldShowMusicIntro,
+    syncActiveSessionSnapshot,
+  ])
+
   // Music room intro narrative gate (shown once)
-  if (category.id === 'musica' && !playerState.hasSeenMusicRoomIntro) {
+  if (shouldShowMusicIntro) {
     return (
       <MusicRoomNarrative
         category={category}
@@ -227,7 +278,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     )
   }
 
-  const dailyLimitReached = !canAttemptQuiz() && !isComplete
+  const challengeMapLocked = !canAttemptQuiz() && !isComplete
+  const currentChallengeLocked =
+    challengeMapLocked &&
+    !hasFeedback &&
+    !isCurrentChallengeResolved
 
   if (isComplete) {
     const passedRoom = sessionCorrectCount >= 8
@@ -258,7 +313,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     )
   }
 
-  const controlsDisabled = isSubmitting || hasFeedback || isCurrentChallengeResolved || dailyLimitReached
+  const controlsDisabled =
+    isSubmitting ||
+    hasFeedback ||
+    isCurrentChallengeResolved ||
+    currentChallengeLocked
   const credits = getCredits()
   const attemptsRemaining = 3 - (playerState.stats?.quizzesAttempted ?? 0)
   const livesRemaining = 2 - (playerState.stats?.wrongAnswersToday ?? 0)
@@ -288,7 +347,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               <ChallengeSelectorGrid
                 category={category}
                 currentChallengeId={currentChallengeId}
-                interactionDisabled={dailyLimitReached}
+                interactionDisabled={challengeMapLocked}
                 onSelect={selectChallenge}
                 resolvedChallengeIds={resolvedChallengeIds}
               />
@@ -304,7 +363,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           />
 
           <div className="relative space-y-4 rounded-[1.75rem] border border-slate-800 bg-slate-950/55 p-5 sm:p-6">
-            {dailyLimitReached ? <DailyLimitOverlay /> : null}
+            {currentChallengeLocked ? <DailyLimitOverlay /> : null}
             <ChallengeRenderer
               challenge={currentChallenge}
               challengeState={challengeState}
@@ -327,6 +386,10 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
             {hasFeedback ? (
               <ChallengeFeedback
+                awardedCredits={resolveChallengeCreditReward(
+                  category.challenges.find((challenge) => challenge.id === feedback.attemptedChallengeId) ?? currentChallenge,
+                  feedback,
+                )}
                 creditReward={currentChallenge.creditReward}
                 feedback={feedback}
                 onContinue={goToNextChallenge}

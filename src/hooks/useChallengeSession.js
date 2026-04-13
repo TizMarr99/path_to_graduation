@@ -30,7 +30,11 @@ function findChallengeById(challenges, challengeId) {
   return challenges.find((challenge) => challenge.id === challengeId) ?? null
 }
 
-function resolveInitialChallengeId(challenges, preferredChallengeId) {
+function resolveInitialChallengeId(challenges, preferredChallengeId, persistedChallengeId = '') {
+  if (persistedChallengeId && findChallengeById(challenges, persistedChallengeId)) {
+    return persistedChallengeId
+  }
+
   if (preferredChallengeId && findChallengeById(challenges, preferredChallengeId)) {
     return preferredChallengeId
   }
@@ -57,24 +61,35 @@ function findNextUnresolvedChallengeId(challenges, resolvedChallengeIds, current
 /**
  * @param {import('../types/challenge').Category | null} category
  * @param {string} [preferredChallengeId]
+ * @param {object | null} [persistedSession]
  */
-export function useChallengeSession(category, preferredChallengeId = '') {
+export function useChallengeSession(category, preferredChallengeId = '', persistedSession = null) {
   const challenges = category?.challenges ?? []
-  const initialChallengeId = resolveInitialChallengeId(challenges, preferredChallengeId)
+  const initialChallengeId = resolveInitialChallengeId(
+    challenges,
+    preferredChallengeId,
+    persistedSession?.currentChallengeId ?? '',
+  )
   const initialChallenge = findChallengeById(challenges, initialChallengeId)
   const [currentChallengeId, setCurrentChallengeId] = useState(initialChallengeId)
-  const [challengeResults, setChallengeResults] = useState(createChallengeResultMap)
+  const [challengeResults, setChallengeResults] = useState(
+    () => persistedSession?.challengeResults ?? createChallengeResultMap(),
+  )
   const [draftAnswer, setDraftAnswer] = useState(() =>
-    createInitialDraftAnswerForChallenge(initialChallenge),
+    persistedSession?.draftAnswer ?? createInitialDraftAnswerForChallenge(initialChallenge),
   )
   const [challengeState, setChallengeState] = useState(() =>
-    createInitialRuntimeStateForChallenge(initialChallenge),
+    persistedSession?.challengeState ?? createInitialRuntimeStateForChallenge(initialChallenge),
   )
-  const [isHintVisible, setIsHintVisible] = useState(false)
+  const [isHintVisible, setIsHintVisible] = useState(persistedSession?.isHintVisible ?? false)
   const [feedback, setFeedback] = useState(() => createFeedback(category))
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [sessionCorrectCount, setSessionCorrectCount] = useState(0)
-  const [sessionWrongCount, setSessionWrongCount] = useState(0)
+  const [sessionCorrectCount, setSessionCorrectCount] = useState(
+    persistedSession?.sessionCorrectCount ?? 0,
+  )
+  const [sessionWrongCount, setSessionWrongCount] = useState(
+    persistedSession?.sessionWrongCount ?? 0,
+  )
 
   const currentChallenge = findChallengeById(challenges, currentChallengeId)
   const totalChallenges = challenges.length
@@ -144,7 +159,7 @@ export function useChallengeSession(category, preferredChallengeId = '') {
 
   function submitChallenge() {
     if (!currentChallenge || isSubmitting || hasFeedback || isCurrentChallengeResolved) {
-      return
+      return null
     }
 
     setIsSubmitting(true)
@@ -166,6 +181,8 @@ export function useChallengeSession(category, preferredChallengeId = '') {
       setSessionWrongCount((count) => count + 1)
     }
     setIsSubmitting(false)
+
+    return nextFeedback
   }
 
   function goToNextChallenge() {
@@ -201,7 +218,6 @@ export function useChallengeSession(category, preferredChallengeId = '') {
   }
 
   function restartSession() {
-    setCurrentIndex(0)
     resetChallengeState()
   }
 

@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import VipIntroVideo from '../components/home/VipIntroVideo.jsx'
 import VipLoginScreen from '../components/home/VipLoginScreen.jsx'
 import VipNarrative from '../components/home/VipNarrative.jsx'
-import { useVipAccess } from '../hooks/useVipAccess'
+import { usePlayerState } from '../hooks/usePlayerState'
 
-const ACCESS_CODE = '310119'
 const LOGIN_FADE_DURATION_MS = 700
 const VIDEO_FADE_DURATION_MS = 700
 const CHARACTER_HOLD_AFTER_TYPEWRITER_MS = 2200
@@ -14,12 +13,20 @@ const AMANDA_BOX_EXIT_DURATION_MS = 380
 
 function HomePage() {
   const navigate = useNavigate()
-  const { grantVipAccess, hasVipAccess } = useVipAccess()
+  const {
+    authError,
+    clearAuthFeedback,
+    getResumePath,
+    hasVipAccess,
+    isHydrating,
+    isLoggingIn,
+    login,
+    shouldShowHomeIntro,
+  } = usePlayerState()
   const timeoutIdsRef = useRef([])
   const [stage, setStage] = useState('login')
   const [narrativeScene, setNarrativeScene] = useState('andrea')
   const [personalCode, setPersonalCode] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
   const [isLoginLeaving, setIsLoginLeaving] = useState(false)
   const [isVideoLeaving, setIsVideoLeaving] = useState(false)
 
@@ -41,25 +48,10 @@ function HomePage() {
 
   function handleCodeChange(nextCode) {
     setPersonalCode(nextCode)
-
-    if (errorMessage) {
-      setErrorMessage('')
-    }
+    clearAuthFeedback()
   }
 
-  function handleLoginSubmit(event) {
-    event.preventDefault()
-
-    if (!hasVipAccess && personalCode.trim() !== ACCESS_CODE) {
-      setErrorMessage('Il codice personale non e corretto.')
-      return
-    }
-
-    if (!hasVipAccess) {
-      grantVipAccess()
-    }
-
-    setErrorMessage('')
+  function startIntroFlow() {
     setIsLoginLeaving(true)
 
     scheduleTimeout(() => {
@@ -67,6 +59,32 @@ function HomePage() {
       setIsLoginLeaving(false)
       setPersonalCode('')
     }, LOGIN_FADE_DURATION_MS)
+  }
+
+  async function handleLoginSubmit(event) {
+    event.preventDefault()
+
+    if (hasVipAccess && !personalCode.trim()) {
+      if (shouldShowHomeIntro()) {
+        startIntroFlow()
+      } else {
+        navigate(getResumePath())
+      }
+      return
+    }
+
+    const result = await login(personalCode)
+
+    if (!result.ok) {
+      return
+    }
+
+    if (result.shouldShowHomeIntro) {
+      startIntroFlow()
+      return
+    }
+
+    navigate(result.resumePath)
   }
 
   function handleVideoEnded() {
@@ -112,8 +130,9 @@ function HomePage() {
       {stage === 'login' ? (
         <VipLoginScreen
           code={personalCode}
-          errorMessage={errorMessage}
+          errorMessage={authError}
           hasVipAccess={hasVipAccess}
+          isLoading={isHydrating || isLoggingIn}
           isLeaving={isLoginLeaving}
           onCodeChange={handleCodeChange}
           onSubmit={handleLoginSubmit}

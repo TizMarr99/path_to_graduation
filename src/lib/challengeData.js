@@ -64,11 +64,25 @@ function normalizeSpeaker(rawChallenge) {
   return 'curator'
 }
 
+function normalizeHintCost(rawHintCost, creditReward) {
+  const safeReward = Math.max(1, creditReward)
+  const fallbackHintCost = Math.max(1, Math.floor(safeReward * 0.5))
+  const maxHintCost = Math.max(1, Math.min(safeReward - 1, Math.floor(safeReward * 0.6)))
+
+  if (typeof rawHintCost !== 'number' || Number.isNaN(rawHintCost)) {
+    return fallbackHintCost
+  }
+
+  return Math.max(1, Math.min(rawHintCost, maxHintCost))
+}
+
 /**
  * @param {import('../types/challenge').RawChallengeBase} rawChallenge
  * @returns {import('../types/challenge').ChallengeBase}
  */
 function createChallengeBase(rawChallenge) {
+  const creditReward = rawChallenge.creditReward ?? 10
+
   return {
     id: rawChallenge.id,
     difficulty: rawChallenge.difficulty,
@@ -82,8 +96,8 @@ function createChallengeBase(rawChallenge) {
     successMessage: rawChallenge.successMessage ?? '',
     failureMessage: rawChallenge.failureMessage ?? '',
     speaker: normalizeSpeaker(rawChallenge),
-    creditReward: rawChallenge.creditReward ?? 10,
-    hintCost: rawChallenge.hintCost ?? 15,
+    creditReward,
+    hintCost: normalizeHintCost(rawChallenge.hintCost, creditReward),
   }
 }
 

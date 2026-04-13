@@ -4,7 +4,9 @@ const speakerLabels = {
   neutral: 'La Sala',
 }
 
-function ChallengeFeedback({ feedback, onContinue, creditReward }) {
+function ChallengeFeedback({ feedback, onContinue, creditReward, awardedCredits }) {
+  const hasAwardedCredits = typeof awardedCredits === 'number'
+
   return (
     <section
       aria-live="polite"
@@ -20,9 +22,9 @@ function ChallengeFeedback({ feedback, onContinue, creditReward }) {
       </p>
       <h3 className="mt-2 text-xl font-semibold text-white">{feedback.title}</h3>
       <p className="mt-3 text-sm leading-7 text-slate-100/90">{feedback.message}</p>
-      {feedback.isCorrect && typeof creditReward === 'number' && creditReward > 0 ? (
+      {hasAwardedCredits && awardedCredits > 0 ? (
         <p className="mt-2 text-sm font-semibold text-amber-300">
-          +{creditReward} crediti 🪙
+          +{awardedCredits} {typeof creditReward === 'number' && awardedCredits < creditReward ? 'crediti parziali' : 'crediti'} 🪙
         </p>
       ) : null}
       {feedback.solutionLines?.length ? (

@@ -4,12 +4,14 @@ function CharacterToast({ toast, onDismiss }) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
+    let frameId = 0
+
     if (!toast) {
-      setIsVisible(false)
-      return
+      frameId = requestAnimationFrame(() => setIsVisible(false))
+      return () => cancelAnimationFrame(frameId)
     }
 
-    const frameId = requestAnimationFrame(() => setIsVisible(true))
+    frameId = requestAnimationFrame(() => setIsVisible(true))
     return () => cancelAnimationFrame(frameId)
   }, [toast])
 

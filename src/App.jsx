@@ -1,16 +1,19 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom'
+import { usePlayerState } from './hooks/usePlayerState'
 import DashboardPage from './pages/DashboardPage.jsx'
 import DevPage from './pages/DevPage.jsx'
 import { isDevToolsEnabled } from './lib/runtimeFlags.js'
 import HomePage from './pages/HomePage.jsx'
 import PlayPage from './pages/PlayPage.jsx'
 
-const navItems = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/map', label: 'Mappa' },
-]
-
 function AppShell() {
+  const { isAuthenticated, role } = usePlayerState()
+  const navItems = [
+    { to: '/', label: 'Home', end: true },
+    ...(isAuthenticated ? [{ to: '/map', label: 'Mappa' }] : []),
+    ...(role === 'admin' && isDevToolsEnabled ? [{ to: '/dev', label: 'Dev' }] : []),
+  ]
+
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(8,145,178,0.18),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#111827_45%,_#020617_100%)] text-slate-100">
       <header className="border-b border-cyan-400/15 bg-slate-950/70 backdrop-blur-xl">
@@ -48,18 +51,71 @@ function AppShell() {
   )
 }
 
+function RouteLoadingState() {
+  return (
+    <section className="rounded-[2rem] border border-slate-800 bg-slate-950/70 p-8 text-center shadow-[0_0_80px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-10">
+      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/80">
+        Sessione in caricamento
+      </p>
+      <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
+        Sto ripristinando il profilo e il progresso salvato.
+      </p>
+    </section>
+  )
+}
+
+function ProtectedRoute({ children, requireAdmin = false }) {
+  const { isAuthenticated, isHydrating, role } = usePlayerState()
+
+  if (isHydrating) {
+    return <RouteLoadingState />
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate replace to="/" />
+  }
+
+  if (requireAdmin && role !== 'admin') {
+    return <Navigate replace to="/map" />
+  }
+
+  return children
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route element={<AppShell />}>
-          <Route path="/map" element={<DashboardPage />} />
+          <Route
+            path="/map"
+            element={(
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            )}
+          />
           <Route
             path="/dev"
-            element={isDevToolsEnabled ? <DevPage /> : <Navigate replace to="/" />}
+            element={
+              isDevToolsEnabled ? (
+                <ProtectedRoute requireAdmin>
+                  <DevPage />
+                </ProtectedRoute>
+              ) : (
+                <Navigate replace to="/" />
+              )
+            }
           />
-          <Route path="/play/:categoryId" element={<PlayPage />} />
+          <Route
+            path="/play/:categoryId"
+            element={(
+              <ProtectedRoute>
+                <PlayPage />
+              </ProtectedRoute>
+            )}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

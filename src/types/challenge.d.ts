@@ -446,6 +446,7 @@ export interface RoomSessionSummary {
 
 export interface RoomProgress {
   categoryId: string
+  startedAt: number | string | null
   sessions: RoomSessionSummary[]
   unlockedByScore: boolean
   prizeWon: boolean
@@ -456,10 +457,13 @@ export interface PlayerState {
   version: 1
   createdAt: number
   credits: number
-  hasSeenMusicRoomIntro: boolean
   stats: DailyStats
   roomProgress: Record<string, RoomProgress>
   unlockedCategoryIds: string[]
+  currentRoom: string | null
+  currentChallengeId: string
+  activeSession: Record<string, unknown> | null
+  lastPlayedAt: string | null
 }
 
 export interface RawCategory {

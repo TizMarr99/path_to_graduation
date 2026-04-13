@@ -2,6 +2,7 @@ function VipLoginScreen({
   code,
   errorMessage,
   hasVipAccess,
+  isLoading,
   isLeaving,
   onCodeChange,
   onSubmit,
@@ -42,6 +43,7 @@ function VipLoginScreen({
             <input
               autoComplete="off"
               className="mt-3 w-full rounded-full border border-amber-300/45 bg-black/65 px-6 py-4 text-center text-lg font-medium tracking-[0.35em] text-amber-50 outline-none transition placeholder:text-amber-100/25 focus:border-amber-200 focus:ring-2 focus:ring-amber-300/20"
+              disabled={isLoading}
               id="vip-code"
               inputMode="numeric"
               maxLength={6}
@@ -59,10 +61,11 @@ function VipLoginScreen({
           ) : null}
 
           <button
-            className="w-full rounded-full border border-amber-300/55 bg-amber-300/10 px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] text-amber-50 transition hover:border-amber-200 hover:bg-amber-300/18 focus:outline-none focus:ring-2 focus:ring-amber-300/25"
+            className="w-full rounded-full border border-amber-300/55 bg-amber-300/10 px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] text-amber-50 transition hover:border-amber-200 hover:bg-amber-300/18 focus:outline-none focus:ring-2 focus:ring-amber-300/25 disabled:cursor-wait disabled:opacity-70"
+            disabled={isLoading}
             type="submit"
           >
-            Entra
+            {isLoading ? 'Verifica in corso...' : 'Entra'}
           </button>
 
           <p
