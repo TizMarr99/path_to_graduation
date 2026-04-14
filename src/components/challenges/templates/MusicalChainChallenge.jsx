@@ -42,12 +42,9 @@ function MusicalChainChallenge({
   return (
     <form className="space-y-5" onSubmit={handleAttempt}>
       <div className="space-y-4">
-        <div>
-          <h3 className="text-xl font-semibold leading-8 text-white">{challenge.prompt}</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            Se sbagli prima dell'ultima traccia, la catena si espande e puoi riprovare senza chiudere subito il quiz.
-          </p>
-        </div>
+        <p className="text-sm leading-6 text-slate-300">
+          Se sbagli prima dell'ultima traccia, la catena si espande e puoi riprovare senza chiudere subito il quiz.
+        </p>
 
         <div className="rounded-2xl border border-amber-300/20 bg-amber-300/8 px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-100/75">

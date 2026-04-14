@@ -16,10 +16,6 @@ function GuessTitleAuthorChallenge({
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
       <div className="space-y-4">
-        <label className="block text-xl font-semibold leading-8 text-white" htmlFor={`${challenge.id}-title`}>
-          {challenge.prompt}
-        </label>
-
         <ChallengeAssetGallery assets={challenge.assets} onAudioPlay={onAudioPlay} />
 
         <div className="grid gap-4 md:grid-cols-2">

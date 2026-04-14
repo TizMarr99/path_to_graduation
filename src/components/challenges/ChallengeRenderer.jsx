@@ -15,10 +15,23 @@ function ChallengeRenderer({
   onChallengeStateChange,
   onDraftAnswerChange,
   onSubmit,
+  showHeader = true,
 }) {
   return (
     <div className="space-y-5">
-      {challenge.introNarration ? (
+      {showHeader ? (
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/80">
+            {speakerLabels[challenge.speaker ?? 'curator']}
+          </p>
+          <h2 className="mt-3 text-xl font-semibold leading-8 text-white sm:text-2xl">
+            {challenge.title || 'Prova della sala'}
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-slate-200/92">{challenge.prompt}</p>
+        </div>
+      ) : null}
+
+      {showHeader && challenge.introNarration ? (
         <section className="rounded-2xl border border-amber-300/20 bg-amber-300/8 px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-100/75">
             {speakerLabels[challenge.speaker ?? 'curator']}

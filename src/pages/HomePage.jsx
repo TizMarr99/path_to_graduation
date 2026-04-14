@@ -118,7 +118,7 @@ function HomePage() {
   }
 
   function handleGoToMap() {
-    navigate('/map')
+    navigate('/shadows')
   }
 
   function handleEnterMusicRoom() {

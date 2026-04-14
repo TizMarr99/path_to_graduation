@@ -15,6 +15,7 @@ export type ChallengeDifficulty = 'easy' | 'medium' | 'hard'
 export type ChallengeSpeaker = 'curator' | 'critic' | 'neutral'
 export type CategoryKind = 'room' | 'side_game' | 'final_path'
 export type ChallengeAssetKind = 'image' | 'audio' | 'video'
+export type RewardArtifactType = 'hint' | 'shield' | 'light_key'
 
 export interface ChallengeAsset {
   id?: string
@@ -22,6 +23,31 @@ export interface ChallengeAsset {
   src: string
   alt?: string
   caption?: string
+}
+
+export interface CategoryFear {
+  id: string
+  name: string
+  icon?: string
+  description: string
+  sfxSrc?: string
+}
+
+export interface RewardArtifact {
+  type: RewardArtifactType
+  label: string
+  description: string
+}
+
+export interface CategoryMapHotspot {
+  id: string
+  label: string
+  description?: string
+  icon?: string
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
 export interface AcceptedAnswerGroup {
@@ -113,6 +139,7 @@ export interface HitsterTrack {
 
 export interface ChallengeBase<T extends ChallengeType> {
   id: string
+  zoneId?: string
   difficulty: ChallengeDifficulty
   type: T
   title?: string
@@ -254,6 +281,10 @@ export interface Category {
   unlockCost: number
   buyAccessCost?: number
   backgroundImage?: string
+  mapImage?: string
+  mapHotspots?: CategoryMapHotspot[]
+  fear?: CategoryFear | null
+  rewardArtifact?: RewardArtifact | null
   characters?: CategoryCharacters
   introNarrative?: CategoryIntroNarrative
   characterComments?: CategoryCharacterComments
@@ -298,6 +329,7 @@ export interface CategoryCharacterComments {
 
 export interface RawChallengeBase {
   id: string
+  zoneId?: string
   difficulty: ChallengeDifficulty
   type?: ChallengeType
   mode?: 'multiple_choice' | 'free_text'
@@ -475,6 +507,10 @@ export interface RawCategory {
   unlockCost?: number
   buyAccessCost?: number
   backgroundImage?: string
+  mapImage?: string
+  mapHotspots?: CategoryMapHotspot[]
+  fear?: CategoryFear | null
+  rewardArtifact?: RewardArtifact | null
   characters?: CategoryCharacters
   introNarrative?: CategoryIntroNarrative
   characterComments?: CategoryCharacterComments

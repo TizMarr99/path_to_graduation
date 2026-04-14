@@ -1,16 +1,16 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom'
 import { usePlayerState } from './hooks/usePlayerState'
-import DashboardPage from './pages/DashboardPage.jsx'
 import DevPage from './pages/DevPage.jsx'
 import { isDevToolsEnabled } from './lib/runtimeFlags.js'
 import HomePage from './pages/HomePage.jsx'
 import PlayPage from './pages/PlayPage.jsx'
+import ShadowHallPage from './pages/ShadowHallPage.jsx'
 
 function AppShell() {
   const { isAuthenticated, role } = usePlayerState()
   const navItems = [
     { to: '/', label: 'Home', end: true },
-    ...(isAuthenticated ? [{ to: '/map', label: 'Mappa' }] : []),
+    ...(isAuthenticated ? [{ to: '/shadows', label: 'Sala Ombre' }] : []),
     ...(role === 'admin' && isDevToolsEnabled ? [{ to: '/dev', label: 'Dev' }] : []),
   ]
 
@@ -76,7 +76,7 @@ function ProtectedRoute({ children, requireAdmin = false }) {
   }
 
   if (requireAdmin && role !== 'admin') {
-    return <Navigate replace to="/map" />
+    return <Navigate replace to="/shadows" />
   }
 
   return children
@@ -87,15 +87,16 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route
+          path="/shadows"
+          element={(
+            <ProtectedRoute>
+              <ShadowHallPage />
+            </ProtectedRoute>
+          )}
+        />
         <Route element={<AppShell />}>
-          <Route
-            path="/map"
-            element={(
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            )}
-          />
+          <Route path="/map" element={<Navigate replace to="/shadows" />} />
           <Route
             path="/dev"
             element={

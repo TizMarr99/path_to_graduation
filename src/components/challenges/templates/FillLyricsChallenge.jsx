@@ -5,10 +5,6 @@ function FillLyricsChallenge({ challenge, draftAnswer, onDraftAnswerChange, onSu
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
       <div className="space-y-4">
-        <label className="block text-xl font-semibold leading-8 text-white" htmlFor={challenge.id}>
-          {challenge.prompt}
-        </label>
-
         <ChallengeAssetGallery assets={challenge.assets} onAudioPlay={onAudioPlay} />
 
         <textarea

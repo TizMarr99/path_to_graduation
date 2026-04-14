@@ -72,7 +72,7 @@ function MusicRoomNarrative({ category, onComplete }) {
 
   const isCuratorBoxVisible = scene === 'curator'
   const isCriticVisible = scene === 'curator-leaving' || scene === 'critic' || scene === 'critic-complete'
-  const isCriticBoxVisible = scene === 'critic'
+  const isCriticBoxVisible = scene === 'critic' || scene === 'critic-complete'
   const isCtaVisible = scene === 'critic-complete'
 
   function handleCuratorComplete() {
@@ -83,7 +83,7 @@ function MusicRoomNarrative({ category, onComplete }) {
 
   function handleCriticComplete() {
     if (scene !== 'critic') return
-    scheduleTimeout(() => setScene('critic-complete'), 380)
+    setScene('critic-complete')
   }
 
   const backgroundImage = category.backgroundImage || null
@@ -143,7 +143,7 @@ function MusicRoomNarrative({ category, onComplete }) {
               {curator ? (
                 <div
                   className={[
-                    'absolute left-1/2 top-[-5%] z-10 -translate-x-[92%] scale-[0.92] pointer-events-none',
+                    'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none',
                   ].join(' ')}
                 >
                   <NarrativePortrait
@@ -152,25 +152,6 @@ function MusicRoomNarrative({ category, onComplete }) {
                     name={curator.name}
                     role={curator.role}
                     tone={curator.tone}
-                  />
-                </div>
-              ) : null}
-
-              {critic ? (
-                <div
-                  className={[
-                    'absolute left-1/2 top-[-5%] z-10 translate-x-[14%] scale-[0.92] pointer-events-none transition-opacity duration-700 ease-out',
-                    isCriticVisible
-                      ? 'opacity-100'
-                      : 'opacity-0 pointer-events-none',
-                  ].join(' ')}
-                >
-                  <NarrativePortrait
-                    imageSrc={critic.imageSrc}
-                    fallbackSrc={critic.fallbackImageSrc}
-                    name={critic.name}
-                    role={critic.role}
-                    tone={critic.tone}
                   />
                 </div>
               ) : null}
@@ -185,6 +166,19 @@ function MusicRoomNarrative({ category, onComplete }) {
                     : 'translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
                 ].join(' ')}
               >
+                {critic ? (
+                  <div className="mb-4 flex items-center gap-3">
+                    <img
+                      alt={critic.name}
+                      className="h-11 w-11 shrink-0 rounded-full border border-stone-300/25 object-cover object-top"
+                      src={critic.imageSrc}
+                    />
+                    <div>
+                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.32em] text-stone-400">{critic.role}</p>
+                      <p className="text-sm font-semibold text-stone-200">{critic.name}</p>
+                    </div>
+                  </div>
+                ) : null}
                 <TypewriterText
                   alignment="left"
                   className="w-full text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
@@ -227,25 +221,25 @@ function MusicRoomNarrative({ category, onComplete }) {
               />
             </div>
 
-            {isCriticVisible && critic ? (
-              <div className="mx-auto">
-                <NarrativePortrait
-                  compact
-                  imageSrc={critic.imageSrc}
-                  fallbackSrc={critic.fallbackImageSrc}
-                  name={critic.name}
-                  role={critic.role}
-                  tone={critic.tone}
-                />
-              </div>
-            ) : null}
-
             <div
               className={[
                 'rounded-[2rem] border border-stone-300/16 bg-black/54 p-5 backdrop-blur-xl transition-all duration-700 ease-out',
                 isCriticBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
               ].join(' ')}
             >
+              {critic ? (
+                <div className="mb-3 flex items-center gap-3">
+                  <img
+                    alt={critic.name}
+                    className="h-10 w-10 shrink-0 rounded-full border border-stone-300/25 object-cover object-top"
+                    src={critic.imageSrc}
+                  />
+                  <div>
+                    <p className="text-[0.6rem] font-semibold uppercase tracking-[0.32em] text-stone-400">{critic.role}</p>
+                    <p className="text-sm font-semibold text-stone-200">{critic.name}</p>
+                  </div>
+                </div>
+              ) : null}
               <TypewriterText
                 alignment="left"
                 className="text-[0.95rem] leading-6 text-stone-100"

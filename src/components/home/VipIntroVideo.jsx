@@ -1,4 +1,24 @@
+import { useEffect, useRef } from 'react'
+
 function VipIntroVideo({ isLeaving, onEnded }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = false
+    const playPromise = video.play()
+
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay with audio blocked — fall back to muted
+        video.muted = true
+        void video.play().catch(() => {})
+      })
+    }
+  }, [])
+
   return (
     <section
       className={[
@@ -13,7 +33,7 @@ function VipIntroVideo({ isLeaving, onEnded }) {
       />
 
       <video
-        autoPlay
+        ref={videoRef}
         className="absolute inset-0 h-full w-full bg-black object-contain"
         muted
         onEnded={onEnded}

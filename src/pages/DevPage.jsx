@@ -44,6 +44,9 @@ function DevPage() {
   const [resetMessage, setResetMessage] = useState('')
   const [targetCode, setTargetCode] = useState('')
   const [isAdminActionRunning, setIsAdminActionRunning] = useState(false)
+  const [adminCredits, setAdminCredits] = useState('')
+  const [adminAttempts, setAdminAttempts] = useState('')
+  const [adminErrors, setAdminErrors] = useState('')
   const {
     accessCode,
     playerState,
@@ -54,6 +57,7 @@ function DevPage() {
     resetPlayerState,
     resetPlayerStateForCode,
     resetMusicRoomIntro,
+    setAdminStats,
     syncError,
   } = usePlayerState()
   const templateTotals = templateOrder.reduce((counts, type) => {
@@ -245,6 +249,69 @@ function DevPage() {
                 <p className="mt-2 text-2xl font-semibold text-white">{unlockedRooms}</p>
               </div>
             </div>
+
+            {isDevToolsEnabled ? (
+              <div className="mt-4 rounded-[1.25rem] border border-cyan-300/15 bg-cyan-400/5 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200/75 mb-3">
+                  Imposta valori
+                </p>
+                <div className="flex flex-wrap items-end gap-3">
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-cyan-100/70">Crediti</span>
+                    <input
+                      className="w-24 rounded-full border border-cyan-300/30 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-cyan-50 outline-none focus:border-cyan-300/60"
+                      inputMode="numeric"
+                      min={0}
+                      onChange={(e) => setAdminCredits(e.target.value)}
+                      placeholder={String(playerState.credits)}
+                      type="number"
+                      value={adminCredits}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-amber-100/70">Tentativi usati</span>
+                    <input
+                      className="w-24 rounded-full border border-amber-300/30 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-amber-50 outline-none focus:border-amber-300/60"
+                      inputMode="numeric"
+                      min={0}
+                      onChange={(e) => setAdminAttempts(e.target.value)}
+                      placeholder={String(playerState.stats.quizzesAttempted)}
+                      type="number"
+                      value={adminAttempts}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-rose-100/70">Errori oggi</span>
+                    <input
+                      className="w-24 rounded-full border border-rose-300/30 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-rose-50 outline-none focus:border-rose-300/60"
+                      inputMode="numeric"
+                      min={0}
+                      onChange={(e) => setAdminErrors(e.target.value)}
+                      placeholder={String(playerState.stats.wrongAnswersToday)}
+                      type="number"
+                      value={adminErrors}
+                    />
+                  </label>
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-5 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
+                    onClick={() => {
+                      setAdminStats({
+                        credits: adminCredits !== '' ? Number(adminCredits) : undefined,
+                        quizzesAttempted: adminAttempts !== '' ? Number(adminAttempts) : undefined,
+                        wrongAnswersToday: adminErrors !== '' ? Number(adminErrors) : undefined,
+                      })
+                      setAdminCredits('')
+                      setAdminAttempts('')
+                      setAdminErrors('')
+                      setResetMessage('Valori aggiornati.')
+                    }}
+                    type="button"
+                  >
+                    Applica
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             {resetMessage ? (
               <p className="mt-4 text-sm font-medium text-emerald-300">{resetMessage}</p>

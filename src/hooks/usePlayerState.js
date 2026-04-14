@@ -180,7 +180,7 @@ function getResumePathForState(playerState) {
     return `/play/${activeSession.categoryId}${queryString ? `?${queryString}` : ''}`
   }
 
-  return '/map'
+  return '/shadows'
 }
 
 function shouldShowHomeIntroForState(playerState) {
@@ -794,6 +794,27 @@ export function PlayerStateProvider({ children }) {
     }
   }
 
+  function setAdminStats({ credits, quizzesAttempted, wrongAnswersToday }) {
+    updatePlayerState(
+      (currentState) => ({
+        ...currentState,
+        credits: typeof credits === 'number' ? Math.max(0, credits) : currentState.credits,
+        stats: {
+          ...currentState.stats,
+          quizzesAttempted:
+            typeof quizzesAttempted === 'number'
+              ? Math.max(0, quizzesAttempted)
+              : currentState.stats.quizzesAttempted,
+          wrongAnswersToday:
+            typeof wrongAnswersToday === 'number'
+              ? Math.max(0, wrongAnswersToday)
+              : currentState.stats.wrongAnswersToday,
+        },
+      }),
+      { persist: 'immediate' },
+    )
+  }
+
   const value = {
     accessCode,
     accessCodeId,
@@ -829,6 +850,7 @@ export function PlayerStateProvider({ children }) {
     buyRoomAccess,
     buyCategoryBundle,
     syncActiveSessionSnapshot,
+    setAdminStats,
     isCategoryUnlocked(categoryId) {
       return playerState.unlockedCategoryIds.includes(categoryId)
     },

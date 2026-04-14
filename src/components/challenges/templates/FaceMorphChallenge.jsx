@@ -21,10 +21,6 @@ function FaceMorphChallenge({
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
       <div className="space-y-4">
-        <label className="block text-xl font-semibold leading-8 text-white" htmlFor={`${challenge.id}-slot-0`}>
-          {challenge.prompt}
-        </label>
-
         <ChallengeAssetGallery assets={challenge.assets} onAudioPlay={onAudioPlay} />
 
         <div className="grid gap-3 md:grid-cols-3">

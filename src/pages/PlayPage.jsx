@@ -7,12 +7,19 @@ import ChallengeLayout from '../components/challenges/ChallengeLayout.jsx'
 import ChallengeProgress from '../components/challenges/ChallengeProgress.jsx'
 import ChallengeRenderer from '../components/challenges/ChallengeRenderer.jsx'
 import ChallengeSelectorGrid from '../components/challenges/ChallengeSelectorGrid.jsx'
-import CharacterToast from '../components/music-room/CharacterToast.jsx'
+import CharacterPanel from '../components/music-room/CharacterPanel.jsx'
+import HintModal from '../components/music-room/HintModal.jsx'
+import MusicChallengeIntro from '../components/music-room/MusicChallengeIntro.jsx'
 import MusicRoomNarrative from '../components/music-room/MusicRoomNarrative.jsx'
+import ResultModal from '../components/music-room/ResultModal.jsx'
+import RoomMapModal from '../components/music-room/RoomMapModal.jsx'
+import RoomPlayLayout from '../components/music-room/RoomPlayLayout.jsx'
 import { useCharacterComments } from '../hooks/useCharacterComments'
 import { useChallengeSession } from '../hooks/useChallengeSession'
+import { useFearEffects } from '../hooks/useFearEffects'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
+import { challengeTypeLabels } from '../lib/challengeRegistry'
 import { resolveChallengeCreditReward } from '../lib/challengeRewards'
 
 const roomUnlockTargets = {
@@ -34,7 +41,7 @@ function NotFoundState({ categoryId }) {
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link
           className="inline-flex items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/12 px-5 py-3 text-sm font-semibold text-cyan-50 transition hover:border-cyan-200/60 hover:bg-cyan-400/20"
-          to="/map"
+          to="/shadows"
         >
           Vai alla mappa
         </Link>
@@ -50,6 +57,12 @@ function NotFoundState({ categoryId }) {
 }
 
 const HESITATION_AUDIO_PLAY_THRESHOLD = 3
+const HESITATION_CLEAR_THRESHOLD = 2
+const HESITATION_TIME_THRESHOLDS_MS = {
+  hitster: 30_000,
+  musical_chain: 40_000,
+  default: 50_000,
+}
 
 function DailyLimitOverlay() {
   return (
@@ -71,8 +84,13 @@ function DailyLimitOverlay() {
 
 function PlayCategorySession({ category, preferredChallengeId }) {
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
+  const [isHintModalOpen, setIsHintModalOpen] = useState(false)
+  const [shownIntroChallengeIds, setShownIntroChallengeIds] = useState(() => new Set())
   const audioPlayCountRef = useRef(0)
   const hesitationFiredRef = useRef(false)
+  const clearCountRef = useRef(0)
+  const prevTextAnswerRef = useRef('')
+  const hesitationTimerRef = useRef(null)
   const {
     clearActiveSession,
     applyChallengeFeedbackOutcome,
@@ -88,10 +106,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isRoomIntroPending,
     syncActiveSessionSnapshot,
   } = usePlayerState()
-  const { activeToast, showComment, dismissToast } = useCharacterComments(
+  const { activePanel, resultComment, showComment, dismissPanel, clearResultComment } = useCharacterComments(
     category.characterComments,
     category.characters,
   )
+  const { isFearActive, triggerWrongAnswerEffect } = useFearEffects(category)
   const persistedSession = playerState.activeSession?.categoryId === category.id
     ? playerState.activeSession
     : null
@@ -131,6 +150,23 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const hasUnlockedByScore = roomProgress?.unlockedByScore ?? false
   const hasUnlockedTargets = immediateUnlockTargets.every((categoryId) =>
     playerState.unlockedCategoryIds.includes(categoryId),
+  )
+  const isMusicRoom = category.id === 'musica'
+  const zoneChallengeMap = useMemo(
+    () =>
+      category.challenges.reduce((accumulator, challenge) => {
+        if (!challenge.zoneId) {
+          return accumulator
+        }
+
+        if (!accumulator[challenge.zoneId]) {
+          accumulator[challenge.zoneId] = []
+        }
+
+        accumulator[challenge.zoneId].push(challenge.id)
+        return accumulator
+      }, {}),
+    [category.challenges],
   )
 
   useEffect(() => {
@@ -195,15 +231,35 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     if (nextFeedback.isCorrect) {
       showComment('onCorrect')
     } else {
+      triggerWrongAnswerEffect()
       showComment('onWrong')
     }
   }
 
-  // Reset audio-play hesitation counter when challenge changes
+  // Scope key: resets per track/stage for hitster/musical_chain, per question otherwise.
+  const hesitationScopeKey = useMemo(() => {
+    const type = currentChallenge?.type
+    if (type === 'hitster') {
+      return `${currentChallengeId ?? ''}-t${challengeState.hitsterRevealedTrackCount ?? 0}`
+    }
+    if (type === 'musical_chain') {
+      return `${currentChallengeId ?? ''}-s${challengeState.musicalChainStageIndex ?? 0}`
+    }
+    return currentChallengeId ?? ''
+  }, [
+    currentChallengeId,
+    currentChallenge?.type,
+    challengeState.hitsterRevealedTrackCount,
+    challengeState.musicalChainStageIndex,
+  ])
+
+  // Reset all hesitation counters when scope changes (new question / new track / new stage).
   useEffect(() => {
     audioPlayCountRef.current = 0
     hesitationFiredRef.current = false
-  }, [currentChallengeId])
+    clearCountRef.current = 0
+    prevTextAnswerRef.current = ''
+  }, [hesitationScopeKey])
 
   const handleAudioPlay = useCallback(() => {
     audioPlayCountRef.current += 1
@@ -213,11 +269,42 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     }
   }, [showComment])
 
+  // Trigger hesitation when user blanks the answer field HESITATION_CLEAR_THRESHOLD times.
+  useEffect(() => {
+    const currentText = draftAnswer?.textAnswer ?? ''
+    if (prevTextAnswerRef.current.trim() !== '' && currentText.trim() === '') {
+      clearCountRef.current += 1
+      if (clearCountRef.current >= HESITATION_CLEAR_THRESHOLD && !hesitationFiredRef.current) {
+        hesitationFiredRef.current = true
+        showComment('onHesitation')
+      }
+    }
+    prevTextAnswerRef.current = currentText
+  }, [draftAnswer?.textAnswer, showComment])
+
+  // Trigger hesitation after a time threshold if the user hasn't answered yet.
+  useEffect(() => {
+    if (!currentChallenge || hasFeedback || isComplete) {
+      if (hesitationTimerRef.current) clearTimeout(hesitationTimerRef.current)
+      return
+    }
+    const delay = HESITATION_TIME_THRESHOLDS_MS[currentChallenge.type] ?? HESITATION_TIME_THRESHOLDS_MS.default
+    const id = setTimeout(() => {
+      if (!hesitationFiredRef.current) {
+        hesitationFiredRef.current = true
+        showComment('onHesitation')
+      }
+    }, delay)
+    hesitationTimerRef.current = id
+    return () => clearTimeout(id)
+  }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, showComment])
+
   function handleHintReveal() {
     const cost = currentChallenge?.hintCost ?? 15
     if (!spendCredits(cost)) return
     revealHint()
     showComment('onHintUsed')
+    setIsHintModalOpen(false)
   }
 
   function handleRestart() {
@@ -226,6 +313,19 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }
 
   const shouldShowMusicIntro = category.id === 'musica' && isRoomIntroPending('musica')
+
+  useEffect(() => {
+    setIsHintModalOpen(false)
+  }, [currentChallengeId])
+
+  useEffect(() => {
+    if (!hasFeedback) {
+      return
+    }
+
+    setIsRoomMapVisible(false)
+    setIsHintModalOpen(false)
+  }, [hasFeedback])
 
   useEffect(() => {
     if (isComplete) {
@@ -321,87 +421,261 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const credits = getCredits()
   const attemptsRemaining = 3 - (playerState.stats?.quizzesAttempted ?? 0)
   const livesRemaining = 2 - (playerState.stats?.wrongAnswersToday ?? 0)
+  const currentZoneId = currentChallenge.zoneId ?? ''
+  const activeZoneIds = Object.keys(zoneChallengeMap)
+  const feedbackChallenge =
+    category.challenges.find((challenge) => challenge.id === feedback.attemptedChallengeId) ?? currentChallenge
+  const awardedCredits = hasFeedback
+    ? resolveChallengeCreditReward(feedbackChallenge, feedback)
+    : 0
+  const roomInteractionsDisabled = isSubmitting || hasFeedback || challengeMapLocked
+  const hintDisabled =
+    roomInteractionsDisabled ||
+    isHintVisible ||
+    !currentChallenge.hint ||
+    credits < (currentChallenge.hintCost ?? 0)
+  const hintDisabledReason = !currentChallenge.hint
+    ? 'Nessun indizio disponibile per questa prova.'
+    : challengeMapLocked
+      ? 'Hai finito i tentativi per oggi.'
+      : isHintVisible
+        ? 'Hai gia usato l\'indizio per questa prova.'
+        : credits < (currentChallenge.hintCost ?? 0)
+          ? 'Crediti insufficienti per usare l\'indizio.'
+          : ''
+  const mapDisabled = roomInteractionsDisabled
+  const mapDisabledReason = challengeMapLocked ? 'Hai finito i tentativi per oggi.' : ''
+  const limitBanner = challengeMapLocked ? (
+    <div className="rounded-[1.4rem] border border-amber-300/25 bg-amber-300/10 px-4 py-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-100/80">
+        Limite raggiunto
+      </p>
+      <p className="mt-2 text-sm leading-6 text-amber-50/90">
+        Hai finito i tentativi per oggi.
+      </p>
+    </div>
+  ) : null
+
+  function handleSelectZone(zoneId) {
+    const zoneChallengeIds = zoneChallengeMap[zoneId] ?? []
+
+    if (!zoneChallengeIds.length) {
+      return
+    }
+
+    if (currentZoneId === zoneId) {
+      setIsRoomMapVisible(false)
+      return
+    }
+
+    const nextChallengeId =
+      zoneChallengeIds.find((challengeId) => !resolvedChallengeIds.includes(challengeId)) ??
+      zoneChallengeIds[0]
+
+    selectChallenge(nextChallengeId)
+    setIsRoomMapVisible(false)
+  }
+
+  const isChallengeIntroVisible =
+    isMusicRoom &&
+    !shownIntroChallengeIds.has(currentChallengeId) &&
+    !isCurrentChallengeResolved &&
+    !challengeMapLocked
 
   return (
     <>
-      <ChallengeLayout
-        category={category}
-        credits={credits}
-        attemptsRemaining={attemptsRemaining}
-        livesRemaining={livesRemaining}
-        progressLabel={progressLabel}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <button
-              className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
-              onClick={() => setIsRoomMapVisible((visible) => !visible)}
-              type="button"
-            >
-              {isRoomMapVisible ? 'Nascondi mappa quiz' : 'Mostra mappa quiz'}
-            </button>
-          </div>
-
-          {isRoomMapVisible ? (
-            <div>
-              <ChallengeSelectorGrid
-                category={category}
-                currentChallengeId={currentChallengeId}
-                interactionDisabled={challengeMapLocked}
-                onSelect={selectChallenge}
-                resolvedChallengeIds={resolvedChallengeIds}
+      {isMusicRoom ? (
+        <>
+          <RoomPlayLayout
+            attemptsRemaining={attemptsRemaining}
+            banner={limitBanner}
+            category={category}
+            credits={credits}
+            hintDisabled={hintDisabled}
+            hintDisabledReason={hintDisabledReason}
+            isFearActive={isFearActive}
+            livesRemaining={livesRemaining}
+            mapDisabled={mapDisabled}
+            mapDisabledReason={mapDisabledReason}
+            onHintClick={() => setIsHintModalOpen(true)}
+            onMapClick={() => setIsRoomMapVisible(true)}
+            progressLabel={progressLabel}
+          >
+            {isChallengeIntroVisible ? (
+              <MusicChallengeIntro
+                key={currentChallengeId}
+                challenge={currentChallenge}
+                character={category.characters?.curator}
+                onComplete={() => setShownIntroChallengeIds((prev) => new Set([...prev, currentChallengeId]))}
               />
-            </div>
-          ) : null}
+            ) : (
+              <div className="space-y-4">
+                {currentChallengeLocked ? <DailyLimitOverlay /> : null}
 
-          <ChallengeProgress
-            challengeNumber={challengeNumber}
-            completedChallenges={resolvedChallengeCount}
-            totalChallenges={totalChallenges}
-            title={currentChallenge.title}
-            type={currentChallenge.type}
+                {/* Achille brief panel for onHintUsed (above quiz card) */}
+                {activePanel?.eventType === 'onHintUsed' ? (
+                  <CharacterPanel
+                    autoDismissMs={0}
+                    character={activePanel.character}
+                    message={activePanel.text}
+                    mirror={false}
+                    onDismiss={dismissPanel}
+                    visible={!!activePanel}
+                  />
+                ) : null}
+
+                {/* Quiz card + optional Sal hesitation side panel */}
+                <div className={activePanel?.eventType === 'onHesitation' ? 'flex flex-col sm:flex-row items-start gap-4' : ''}>
+                  <div className={[
+                    'overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 px-5 py-5 shadow-[0_0_60px_rgba(15,23,42,0.2)] backdrop-blur-xl sm:px-6 sm:py-6',
+                    activePanel?.eventType === 'onHesitation' ? 'w-full sm:flex-1 sm:min-w-0' : '',
+                  ].join(' ')}>
+                    <div className="mb-4">
+                      <span className="inline-flex items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-100">
+                        {challengeTypeLabels[currentChallenge.type] ?? currentChallenge.type}
+                      </span>
+                    </div>
+                    <ChallengeRenderer
+                      challenge={currentChallenge}
+                      challengeState={challengeState}
+                      disabled={controlsDisabled}
+                      draftAnswer={draftAnswer}
+                      onAudioPlay={handleAudioPlay}
+                      onChallengeStateChange={updateChallengeState}
+                      onDraftAnswerChange={updateDraftAnswer}
+                      onSubmit={handleSubmit}
+                      showHeader={false}
+                    />
+                  </div>
+
+                  {/* Sal side panel for hesitation (portrait on right / mirrored) */}
+                  {activePanel?.eventType === 'onHesitation' ? (
+                    <div className="w-full sm:w-64 sm:shrink-0">
+                      <CharacterPanel
+                        autoDismissMs={0}
+                        character={activePanel.character}
+                        message={activePanel.text}
+                        mirror
+                        onDismiss={dismissPanel}
+                        visible={!!activePanel}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            )}
+          </RoomPlayLayout>
+
+          <HintModal
+            canUseHint={!hintDisabled}
+            credits={credits}
+            disabledReason={hintDisabledReason}
+            hint={currentChallenge.hint}
+            hintCost={currentChallenge.hintCost}
+            isOpen={isHintModalOpen}
+            onClose={() => setIsHintModalOpen(false)}
+            onReveal={handleHintReveal}
           />
 
-          <div className="relative space-y-4 rounded-[1.75rem] border border-slate-800 bg-slate-950/55 p-5 sm:p-6">
-            {currentChallengeLocked ? <DailyLimitOverlay /> : null}
-            <ChallengeRenderer
-              challenge={currentChallenge}
-              challengeState={challengeState}
-              disabled={controlsDisabled}
-              draftAnswer={draftAnswer}
-              onAudioPlay={handleAudioPlay}
-              onChallengeStateChange={updateChallengeState}
-              onDraftAnswerChange={updateDraftAnswer}
-              onSubmit={handleSubmit}
-            />
+          <RoomMapModal
+            activeZoneIds={activeZoneIds}
+            category={category}
+            currentChallengeId={currentChallengeId}
+            currentZoneId={currentZoneId}
+            interactionDisabled={mapDisabled}
+            isOpen={isRoomMapVisible}
+            onClose={() => setIsRoomMapVisible(false)}
+            onSelectZone={handleSelectZone}
+            resolvedChallengeIds={resolvedChallengeIds}
+          />
 
-            <ChallengeHintPanel
-              credits={credits}
-              disabled={controlsDisabled}
-              hint={currentChallenge.hint}
-              hintCost={currentChallenge.hintCost}
-              isVisible={isHintVisible}
-              onReveal={handleHintReveal}
-            />
+          <ResultModal
+            awardedCredits={awardedCredits}
+            characterComment={resultComment}
+            creditReward={feedbackChallenge.creditReward}
+            feedback={hasFeedback ? feedback : null}
+            isOpen={hasFeedback}
+            onContinue={() => {
+              clearResultComment()
+              goToNextChallenge()
+            }}
+          />
+        </>
+      ) : (
+        <ChallengeLayout
+          category={category}
+          credits={credits}
+          attemptsRemaining={attemptsRemaining}
+          livesRemaining={livesRemaining}
+          progressLabel={progressLabel}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
+                onClick={() => setIsRoomMapVisible((visible) => !visible)}
+                type="button"
+              >
+                {isRoomMapVisible ? 'Nascondi mappa quiz' : 'Mostra mappa quiz'}
+              </button>
+            </div>
 
-            {hasFeedback ? (
-              <ChallengeFeedback
-                awardedCredits={resolveChallengeCreditReward(
-                  category.challenges.find((challenge) => challenge.id === feedback.attemptedChallengeId) ?? currentChallenge,
-                  feedback,
-                )}
-                creditReward={currentChallenge.creditReward}
-                feedback={feedback}
-                onContinue={goToNextChallenge}
-              />
+            {isRoomMapVisible ? (
+              <div>
+                <ChallengeSelectorGrid
+                  category={category}
+                  currentChallengeId={currentChallengeId}
+                  interactionDisabled={challengeMapLocked}
+                  onSelect={selectChallenge}
+                  resolvedChallengeIds={resolvedChallengeIds}
+                />
+              </div>
             ) : null}
-          </div>
-        </div>
-      </ChallengeLayout>
 
-      {activeToast ? (
-        <CharacterToast toast={activeToast} onDismiss={dismissToast} />
-      ) : null}
+            <ChallengeProgress
+              challengeNumber={challengeNumber}
+              completedChallenges={resolvedChallengeCount}
+              totalChallenges={totalChallenges}
+              title={currentChallenge.title}
+              type={currentChallenge.type}
+            />
+
+            <div className="relative space-y-4 rounded-[1.75rem] border border-slate-800 bg-slate-950/55 p-5 sm:p-6">
+              {currentChallengeLocked ? <DailyLimitOverlay /> : null}
+              <ChallengeRenderer
+                challenge={currentChallenge}
+                challengeState={challengeState}
+                disabled={controlsDisabled}
+                draftAnswer={draftAnswer}
+                onAudioPlay={handleAudioPlay}
+                onChallengeStateChange={updateChallengeState}
+                onDraftAnswerChange={updateDraftAnswer}
+                onSubmit={handleSubmit}
+              />
+
+              <ChallengeHintPanel
+                credits={credits}
+                disabled={controlsDisabled}
+                hint={currentChallenge.hint}
+                hintCost={currentChallenge.hintCost}
+                isVisible={isHintVisible}
+                onReveal={handleHintReveal}
+              />
+
+              {hasFeedback ? (
+                <ChallengeFeedback
+                  awardedCredits={awardedCredits}
+                  creditReward={currentChallenge.creditReward}
+                  feedback={feedback}
+                  onContinue={goToNextChallenge}
+                />
+              ) : null}
+            </div>
+          </div>
+        </ChallengeLayout>
+      )}
+
+
     </>
   )
 }

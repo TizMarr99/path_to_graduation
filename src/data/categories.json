@@ -5,6 +5,82 @@
     "title": "Sala delle Frequenze",
     "ghost": "Il Silenzio dei film horror",
     "description": "Una sala di risonanze, archivi sonori e tracce trattenute. Il Curatore custodisce gli indizi; il Critico li piega in echi contraddittori.",
+    "backgroundImage": "/images/rooms/musica-bg.png",
+    "mapImage": "/images/rooms/musica-map.png",
+    "fear": {
+      "id": "horror-musica",
+      "name": "Ombra dell'Esorcismo",
+      "icon": "🕯️",
+      "description": "Urla lontane, croci rovesciate, rumori nel buio.",
+      "sfxSrc": "/audio/horror-scream.mp3"
+    },
+    "rewardArtifact": {
+      "type": "hint",
+      "label": "Indizio sonoro",
+      "description": "Ti concede un indizio extra nel corridoio finale."
+    },
+    "mapHotspots": [
+      {
+        "id": "guess-title-author",
+        "label": "Titolo e autore",
+        "description": "I vinili sul lato sinistro nascondono i frammenti da riconoscere.",
+        "icon": "🎙️",
+        "x": 9,
+        "y": 20,
+        "width": 12,
+        "height": 42
+      },
+      {
+        "id": "face-morph",
+        "label": "Face morph",
+        "description": "Il banco centrale mescola volti e identita da ricomporre.",
+        "icon": "🖼️",
+        "x": 18,
+        "y": 20,
+        "width": 22,
+        "height": 26
+      },
+      {
+        "id": "fill-lyrics",
+        "label": "Completa il testo",
+        "description": "Le frequenze sospese in alto custodiscono i versi spezzati.",
+        "icon": "🎼",
+        "x": 47,
+        "y": 11,
+        "width": 22,
+        "height": 18
+      },
+      {
+        "id": "reverse-song",
+        "label": "Canzone al contrario",
+        "description": "I dischi sul pavimento riportano i brani invertiti.",
+        "icon": "⏪",
+        "x": 33,
+        "y": 53,
+        "width": 22,
+        "height": 22
+      },
+      {
+        "id": "musical-chain",
+        "label": "Catena musicale",
+        "description": "La zona in basso a destra aggiunge strumenti a ogni errore.",
+        "icon": "🔗",
+        "x": 63,
+        "y": 64,
+        "width": 17,
+        "height": 14
+      },
+      {
+        "id": "hitster",
+        "label": "Hitster",
+        "description": "La parete destra ospita l'archivio cronologico finale.",
+        "icon": "🗓️",
+        "x": 77,
+        "y": 20,
+        "width": 12,
+        "height": 48
+      }
+    ],
     "unlockCost": 0,
     "buyAccessCost": 60,
     "characters": {
@@ -67,6 +143,7 @@
     "challenges": [
       {
         "id": "musica-guess-title-author-01",
+        "zoneId": "guess-title-author",
         "difficulty": "easy",
         "type": "guess_title_author",
         "title": "Titolo e autore",
@@ -95,6 +172,7 @@
       },
       {
         "id": "musica-guess-title-author-02",
+        "zoneId": "guess-title-author",
         "difficulty": "easy",
         "type": "guess_title_author",
         "title": "Titolo e autore",
@@ -123,6 +201,7 @@
       },
       {
         "id": "musica-face-morph-01",
+        "zoneId": "face-morph",
         "difficulty": "medium",
         "type": "face_morph",
         "title": "Face morph",
@@ -159,6 +238,7 @@
       },
       {
         "id": "musica-face-morph-02",
+        "zoneId": "face-morph",
         "difficulty": "medium",
         "type": "face_morph",
         "title": "Face morph",
@@ -195,6 +275,7 @@
       },
       {
         "id": "musica-fill-lyrics-01",
+        "zoneId": "fill-lyrics",
         "difficulty": "medium",
         "type": "fill_lyrics",
         "title": "Completa il testo",
@@ -219,6 +300,7 @@
       },
       {
         "id": "musica-fill-lyrics-02",
+        "zoneId": "fill-lyrics",
         "difficulty": "medium",
         "type": "fill_lyrics",
         "title": "Completa il testo",
@@ -243,6 +325,7 @@
       },
       {
         "id": "musica-fill-lyrics-03",
+        "zoneId": "fill-lyrics",
         "difficulty": "hard",
         "type": "fill_lyrics",
         "title": "Completa il testo",
@@ -267,6 +350,7 @@
       },
       {
         "id": "musica-reverse-song-01",
+        "zoneId": "reverse-song",
         "difficulty": "easy",
         "type": "free_text",
         "title": "Canzone al contrario",
@@ -288,6 +372,7 @@
       },
       {
         "id": "musica-reverse-song-02",
+        "zoneId": "reverse-song",
         "difficulty": "easy",
         "type": "free_text",
         "title": "Canzone al contrario",
@@ -309,6 +394,7 @@
       },
       {
         "id": "musica-chain-01",
+        "zoneId": "musical-chain",
         "difficulty": "medium",
         "type": "musical_chain",
         "title": "Catena musicale",
@@ -360,6 +446,7 @@
       },
       {
         "id": "musica-chain-02",
+        "zoneId": "musical-chain",
         "difficulty": "medium",
         "type": "musical_chain",
         "title": "Catena musicale",
@@ -411,6 +498,7 @@
       },
       {
         "id": "musica-hitster-01",
+        "zoneId": "hitster",
         "difficulty": "hard",
         "type": "hitster",
         "title": "Hitster",

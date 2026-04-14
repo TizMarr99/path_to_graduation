@@ -131,12 +131,9 @@ function HitsterChallenge({
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
       <div className="space-y-4">
-        <div>
-          <h3 className="text-xl font-semibold leading-8 text-white">{challenge.prompt}</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            Una traccia alla volta: provi a indovinare artista e titolo, la soluzione viene rivelata e la carta entra nel primo slot libero da sinistra. Dopo puoi trascinarla in qualunque casella: se e vuota si sposta, se e occupata avviene lo scambio.
-          </p>
-        </div>
+        <p className="text-sm leading-6 text-slate-300">
+          Una traccia alla volta: provi a indovinare artista e titolo, la soluzione viene rivelata e la carta entra nel primo slot libero da sinistra. Dopo puoi trascinarla in qualunque casella: se e vuota si sposta, se e occupata avviene lo scambio.
+        </p>
 
         {activeTrack ? (
           <article className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/70 px-5 py-5">

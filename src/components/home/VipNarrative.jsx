@@ -244,17 +244,10 @@ function VipNarrative({
         >
           <button
             className="inline-flex items-center justify-center rounded-full border border-amber-300/55 bg-amber-300/12 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-amber-50 transition hover:border-amber-200 hover:bg-amber-300/18 focus:outline-none focus:ring-2 focus:ring-amber-300/25 sm:px-7 sm:text-sm"
-            onClick={onEnterMusicRoom}
-            type="button"
-          >
-            Entra nella Sala Musica
-          </button>
-          <button
-            className="inline-flex items-center justify-center rounded-full border border-stone-400/45 bg-transparent px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-stone-100 transition hover:border-amber-300/55 hover:text-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-300/18 sm:px-7 sm:text-sm"
             onClick={onDiscoverMap}
             type="button"
           >
-            Scopri la Mappa
+            Entra nella Mostra
           </button>
         </div>
       </div>

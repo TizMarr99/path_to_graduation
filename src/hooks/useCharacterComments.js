@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-const TOAST_DURATION_MS = 4000
+/** Duration of the auto-dismissing panel for hesitation / hint-used events. */
+const PANEL_DURATION_MS = 6000
 
 function pickRandom(items) {
   if (!items || !items.length) return null
@@ -8,11 +9,40 @@ function pickRandom(items) {
 }
 
 /**
+ * Build a comment data object from a raw comment entry and the characters map.
+ * @param {{ speaker: string, text: string }} comment
+ * @param {import('../types/challenge').CategoryCharacters | null | undefined} characters
+ */
+function buildCommentData(comment, characters) {
+  const speakerKey = comment.speaker === 'critic' ? 'critic' : 'curator'
+  const character = characters?.[speakerKey] ?? null
+  return {
+    speaker: comment.speaker,
+    speakerKey,
+    text: comment.text,
+    character,
+    characterName: character?.name ?? (speakerKey === 'critic' ? 'Il Critico' : 'Il Curatore'),
+    characterImage: character?.imageSrc ?? '',
+    tone: character?.tone ?? (speakerKey === 'critic' ? 'silver' : 'gold'),
+    archetypeLabel: speakerKey === 'critic' ? 'Voce del Critico' : 'Voce del Curatore',
+  }
+}
+
+/**
  * @param {import('../types/challenge').CategoryCharacterComments | null | undefined} characterComments
  * @param {import('../types/challenge').CategoryCharacters | null | undefined} characters
  */
 export function useCharacterComments(characterComments, characters) {
-  const [activeToast, setActiveToast] = useState(null)
+  /**
+   * `activePanel`: driven by onHesitation / onHintUsed — shown as a floating panel
+   *  with an auto-dismiss timer managed here in the hook.
+   */
+  const [activePanel, setActivePanel] = useState(null)
+  /**
+   * `resultComment`: driven by onCorrect / onWrong — embedded inside ResultModal.
+   * Cleared explicitly via clearResultComment().
+   */
+  const [resultComment, setResultComment] = useState(null)
   const timerRef = useRef(null)
 
   useEffect(() => {
@@ -21,12 +51,16 @@ export function useCharacterComments(characterComments, characters) {
     }
   }, [])
 
-  const dismissToast = useCallback(() => {
-    setActiveToast(null)
+  const dismissPanel = useCallback(() => {
+    setActivePanel(null)
     if (timerRef.current) {
       clearTimeout(timerRef.current)
       timerRef.current = null
     }
+  }, [])
+
+  const clearResultComment = useCallback(() => {
+    setResultComment(null)
   }, [])
 
   const showComment = useCallback(
@@ -38,27 +72,23 @@ export function useCharacterComments(characterComments, characters) {
       const comment = pickRandom(pool)
       if (!comment) return
 
-      const speakerKey = comment.speaker === 'critic' ? 'critic' : 'curator'
-      const character = characters?.[speakerKey] ?? null
+      const data = buildCommentData(comment, characters)
 
-      if (timerRef.current) clearTimeout(timerRef.current)
-
-      setActiveToast({
-        speaker: comment.speaker,
-        text: comment.text,
-        archetypeLabel: speakerKey === 'critic' ? 'Voce del Critico' : 'Voce del Curatore',
-        characterName: character?.name ?? (speakerKey === 'critic' ? 'Il Critico' : 'Il Curatore'),
-        characterImage: character?.imageSrc ?? '',
-        tone: character?.tone ?? (speakerKey === 'critic' ? 'silver' : 'gold'),
-      })
-
-      timerRef.current = setTimeout(() => {
-        setActiveToast(null)
-        timerRef.current = null
-      }, TOAST_DURATION_MS)
+      if (eventType === 'onCorrect' || eventType === 'onWrong') {
+        // These are displayed inline inside ResultModal; no timer needed here.
+        setResultComment({ ...data, eventType })
+      } else {
+        // onHesitation | onHintUsed → auto-dismissing floating panel.
+        if (timerRef.current) clearTimeout(timerRef.current)
+        setActivePanel({ ...data, eventType })
+        timerRef.current = setTimeout(() => {
+          setActivePanel(null)
+          timerRef.current = null
+        }, PANEL_DURATION_MS)
+      }
     },
     [characterComments, characters],
   )
 
-  return { activeToast, showComment, dismissToast }
+  return { activePanel, resultComment, showComment, dismissPanel, clearResultComment }
 }

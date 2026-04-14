@@ -85,6 +85,7 @@ function createChallengeBase(rawChallenge) {
 
   return {
     id: rawChallenge.id,
+    zoneId: rawChallenge.zoneId ?? '',
     difficulty: rawChallenge.difficulty,
     type: resolveChallengeType(rawChallenge),
     title: rawChallenge.title ?? '',
@@ -114,6 +115,50 @@ function normalizeOrder(ids = [], fallbackIds = []) {
   const knownIds = new Set(fallbackIds)
 
   return ids.filter((id) => knownIds.has(id))
+}
+
+function normalizeFear(rawFear) {
+  if (!rawFear?.id) {
+    return null
+  }
+
+  const rawSfx = rawFear.sfxSrc
+  const sfxSrc = Array.isArray(rawSfx)
+    ? rawSfx.map((s) => resolveStaticAssetPath(s))
+    : resolveStaticAssetPath(rawSfx ?? '')
+
+  return {
+    id: rawFear.id,
+    name: rawFear.name ?? '',
+    icon: rawFear.icon ?? '',
+    description: rawFear.description ?? '',
+    sfxSrc,
+  }
+}
+
+function normalizeRewardArtifact(rawRewardArtifact) {
+  if (!rawRewardArtifact?.type) {
+    return null
+  }
+
+  return {
+    type: rawRewardArtifact.type,
+    label: rawRewardArtifact.label ?? '',
+    description: rawRewardArtifact.description ?? '',
+  }
+}
+
+function normalizeMapHotspots(rawMapHotspots = []) {
+  return rawMapHotspots.map((hotspot) => ({
+    id: hotspot.id,
+    label: hotspot.label ?? '',
+    description: hotspot.description ?? '',
+    icon: hotspot.icon ?? '',
+    x: hotspot.x ?? 0,
+    y: hotspot.y ?? 0,
+    width: hotspot.width ?? 0,
+    height: hotspot.height ?? 0,
+  }))
 }
 
 /**
@@ -295,7 +340,11 @@ function normalizeCategory(rawCategory) {
     description: rawCategory.description,
     unlockCost: rawCategory.unlockCost ?? 0,
     buyAccessCost: rawCategory.buyAccessCost ?? 0,
-    backgroundImage: rawCategory.backgroundImage ?? '',
+    backgroundImage: resolveStaticAssetPath(rawCategory.backgroundImage ?? ''),
+    mapImage: resolveStaticAssetPath(rawCategory.mapImage ?? ''),
+    mapHotspots: normalizeMapHotspots(rawCategory.mapHotspots),
+    fear: normalizeFear(rawCategory.fear),
+    rewardArtifact: normalizeRewardArtifact(rawCategory.rewardArtifact),
     characters: rawCategory.characters ?? null,
     introNarrative: rawCategory.introNarrative ?? null,
     characterComments: rawCategory.characterComments ?? null,
