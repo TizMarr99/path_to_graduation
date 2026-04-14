@@ -86,6 +86,3 @@ function MusicChallengeIntro({ challenge, character, onComplete }) {
 }
 
 export default MusicChallengeIntro
-
-
-export default MusicChallengeIntro
