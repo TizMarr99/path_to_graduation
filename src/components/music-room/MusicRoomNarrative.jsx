@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import TypewriterText from '../home/TypewriterText.jsx'
 import '../../components/home/vip-home.css'
+import { getRoomCharacterBySpeaker, getRoomNarrativeBySpeaker } from '../../lib/roomSpeakers'
 
 const HOLD_AFTER_TYPEWRITER_MS = 2200
 const CROSSFADE_DURATION_MS = 700
@@ -51,12 +52,12 @@ function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role,
 
 function MusicRoomNarrative({ category, onComplete }) {
   const timeoutIdsRef = useRef([])
-  const [scene, setScene] = useState('curator')
+  const [scene, setScene] = useState('guardian')
 
-  const curator = category.characters?.curator
-  const critic = category.characters?.critic
-  const curatorMsg = category.introNarrative?.curator?.message ?? ''
-  const criticMsg = category.introNarrative?.critic?.message ?? ''
+  const guardian = getRoomCharacterBySpeaker(category.characters, 'guardian')
+  const inquisitor = getRoomCharacterBySpeaker(category.characters, 'inquisitor')
+  const guardianMsg = getRoomNarrativeBySpeaker(category.introNarrative, 'guardian')?.message ?? ''
+  const inquisitorMsg = getRoomNarrativeBySpeaker(category.introNarrative, 'inquisitor')?.message ?? ''
 
   function scheduleTimeout(callback, delay) {
     const id = setTimeout(() => {
@@ -70,20 +71,21 @@ function MusicRoomNarrative({ category, onComplete }) {
     return () => timeoutIdsRef.current.forEach((id) => clearTimeout(id))
   }, [])
 
-  const isCuratorBoxVisible = scene === 'curator'
-  const isCriticVisible = scene === 'curator-leaving' || scene === 'critic' || scene === 'critic-complete'
-  const isCriticBoxVisible = scene === 'critic' || scene === 'critic-complete'
-  const isCtaVisible = scene === 'critic-complete'
+  const isGuardianBoxVisible = scene === 'guardian'
+  const isInquisitorVisible =
+    scene === 'guardian-leaving' || scene === 'inquisitor' || scene === 'inquisitor-complete'
+  const isInquisitorBoxVisible = scene === 'inquisitor' || scene === 'inquisitor-complete'
+  const isCtaVisible = scene === 'inquisitor-complete'
 
-  function handleCuratorComplete() {
-    if (scene !== 'curator') return
-    scheduleTimeout(() => setScene('curator-leaving'), HOLD_AFTER_TYPEWRITER_MS)
-    scheduleTimeout(() => setScene('critic'), HOLD_AFTER_TYPEWRITER_MS + CROSSFADE_DURATION_MS)
+  function handleGuardianComplete() {
+    if (scene !== 'guardian') return
+    scheduleTimeout(() => setScene('guardian-leaving'), HOLD_AFTER_TYPEWRITER_MS)
+    scheduleTimeout(() => setScene('inquisitor'), HOLD_AFTER_TYPEWRITER_MS + CROSSFADE_DURATION_MS)
   }
 
-  function handleCriticComplete() {
-    if (scene !== 'critic') return
-    setScene('critic-complete')
+  function handleInquisitorComplete() {
+    if (scene !== 'inquisitor') return
+    setScene('inquisitor-complete')
   }
 
   const backgroundImage = category.backgroundImage || null
@@ -111,7 +113,7 @@ function MusicRoomNarrative({ category, onComplete }) {
               Le frequenze ti accolgono.
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-amber-50/68">
-              La sala rifrange le stesse due presenze, ma con un volto diverso.
+              In questa sala ti attendono due presenze: il guardiano custodisce il passaggio, l'inquisitore ne mette alla prova il coraggio.
             </p>
           </div>
         </div>
@@ -123,7 +125,7 @@ function MusicRoomNarrative({ category, onComplete }) {
               <div
                 className={[
                   'w-full max-w-[25rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
-                  isCuratorBoxVisible
+                  isGuardianBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : '-translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
                 ].join(' ')}
@@ -131,44 +133,44 @@ function MusicRoomNarrative({ category, onComplete }) {
                 <TypewriterText
                   alignment="left"
                   className="w-full text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
-                  isActive={scene === 'curator'}
-                  isComplete={scene !== 'curator'}
-                  onComplete={handleCuratorComplete}
-                  text={curatorMsg}
+                  isActive={scene === 'guardian'}
+                  isComplete={scene !== 'guardian'}
+                  onComplete={handleGuardianComplete}
+                  text={guardianMsg}
                 />
               </div>
             </div>
 
             <div className="relative h-full min-h-0">
-              {curator ? (
+              {guardian ? (
                 <div
                   className={[
                     'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
-                    !isCriticVisible ? 'opacity-100' : 'opacity-0',
+                    !isInquisitorVisible ? 'opacity-100' : 'opacity-0',
                   ].join(' ')}
                 >
                   <NarrativePortrait
-                    imageSrc={curator.imageSrc}
-                    fallbackSrc={curator.fallbackImageSrc}
-                    name={curator.name}
-                    role={curator.role}
-                    tone={curator.tone}
+                    imageSrc={guardian.imageSrc}
+                    fallbackSrc={guardian.fallbackImageSrc}
+                    name={guardian.name}
+                    role={guardian.role}
+                    tone={guardian.tone}
                   />
                 </div>
               ) : null}
-              {critic ? (
+              {inquisitor ? (
                 <div
                   className={[
                     'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
-                    isCriticBoxVisible ? 'opacity-100' : 'opacity-0',
+                    isInquisitorBoxVisible ? 'opacity-100' : 'opacity-0',
                   ].join(' ')}
                 >
                   <NarrativePortrait
-                    imageSrc={critic.imageSrc}
-                    fallbackSrc={critic.fallbackImageSrc}
-                    name={critic.name}
-                    role={critic.role}
-                    tone={critic.tone ?? 'silver'}
+                    imageSrc={inquisitor.imageSrc}
+                    fallbackSrc={inquisitor.fallbackImageSrc}
+                    name={inquisitor.name}
+                    role={inquisitor.role}
+                    tone={inquisitor.tone ?? 'silver'}
                   />
                 </div>
               ) : null}
@@ -178,7 +180,7 @@ function MusicRoomNarrative({ category, onComplete }) {
               <div
                 className={[
                   'w-full max-w-[25rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
-                  isCriticBoxVisible
+                  isInquisitorBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : 'translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
                 ].join(' ')}
@@ -186,10 +188,10 @@ function MusicRoomNarrative({ category, onComplete }) {
                 <TypewriterText
                   alignment="left"
                   className="w-full text-base leading-7 text-stone-100 xl:text-[1.05rem] xl:leading-8"
-                  isActive={scene === 'critic' || scene === 'critic-complete'}
-                  isComplete={scene === 'critic-complete'}
-                  onComplete={handleCriticComplete}
-                  text={criticMsg}
+                  isActive={scene === 'inquisitor' || scene === 'inquisitor-complete'}
+                  isComplete={scene === 'inquisitor-complete'}
+                  onComplete={handleInquisitorComplete}
+                  text={inquisitorMsg}
                 />
               </div>
             </div>
@@ -197,35 +199,35 @@ function MusicRoomNarrative({ category, onComplete }) {
 
           {/* Mobile layout */}
           <div className="mx-auto flex h-full w-full max-w-2xl flex-col justify-center gap-5 lg:hidden">
-            {curator ? (
+            {guardian ? (
               <div
                 className={[
                   'mx-auto transition-all duration-700',
-                  !isCriticVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                  !isInquisitorVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
                 ].join(' ')}
               >
                 <NarrativePortrait
-                  imageSrc={curator.imageSrc}
-                  fallbackSrc={curator.fallbackImageSrc}
-                  name={curator.name}
-                  role={curator.role}
-                  tone={curator.tone}
+                  imageSrc={guardian.imageSrc}
+                  fallbackSrc={guardian.fallbackImageSrc}
+                  name={guardian.name}
+                  role={guardian.role}
+                  tone={guardian.tone}
                 />
               </div>
             ) : null}
-            {critic ? (
+            {inquisitor ? (
               <div
                 className={[
                   'mx-auto transition-all duration-700',
-                  isCriticBoxVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                  isInquisitorBoxVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
                 ].join(' ')}
               >
                 <NarrativePortrait
-                  imageSrc={critic.imageSrc}
-                  fallbackSrc={critic.fallbackImageSrc}
-                  name={critic.name}
-                  role={critic.role}
-                  tone={critic.tone ?? 'silver'}
+                  imageSrc={inquisitor.imageSrc}
+                  fallbackSrc={inquisitor.fallbackImageSrc}
+                  name={inquisitor.name}
+                  role={inquisitor.role}
+                  tone={inquisitor.tone ?? 'silver'}
                 />
               </div>
             ) : null}
@@ -233,32 +235,32 @@ function MusicRoomNarrative({ category, onComplete }) {
             <div
               className={[
                 'rounded-[2rem] border border-amber-300/18 bg-black/50 p-5 backdrop-blur-xl transition-all duration-700 ease-out',
-                isCuratorBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
+                isGuardianBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none',
               ].join(' ')}
             >
               <TypewriterText
                 alignment="left"
                 className="text-[0.95rem] leading-6 text-stone-100"
-                isActive={scene === 'curator'}
-                isComplete={scene !== 'curator'}
-                onComplete={handleCuratorComplete}
-                text={curatorMsg}
+                isActive={scene === 'guardian'}
+                isComplete={scene !== 'guardian'}
+                onComplete={handleGuardianComplete}
+                text={guardianMsg}
               />
             </div>
 
             <div
               className={[
                 'rounded-[2rem] border border-stone-300/16 bg-black/54 p-5 backdrop-blur-xl transition-all duration-700 ease-out',
-                isCriticBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
+                isInquisitorBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
               ].join(' ')}
             >
               <TypewriterText
                 alignment="left"
                 className="text-[0.95rem] leading-6 text-stone-100"
-                isActive={scene === 'critic' || scene === 'critic-complete'}
-                isComplete={scene === 'critic-complete'}
-                onComplete={handleCriticComplete}
-                text={criticMsg}
+                isActive={scene === 'inquisitor' || scene === 'inquisitor-complete'}
+                isComplete={scene === 'inquisitor-complete'}
+                onComplete={handleInquisitorComplete}
+                text={inquisitorMsg}
               />
             </div>
           </div>

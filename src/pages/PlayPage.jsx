@@ -20,6 +20,8 @@ import { useFearEffects } from '../hooks/useFearEffects'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
+import { getAttemptsRemaining, getLivesRemaining } from '../lib/playerStateSnapshot'
+import { getRoomCharacterBySpeaker } from '../lib/roomSpeakers'
 import { resolveChallengeCreditReward } from '../lib/challengeRewards'
 
 const roomUnlockTargets = {
@@ -84,7 +86,7 @@ function DailyLimitOverlay() {
 
 function PlayCategorySession({ category, preferredChallengeId }) {
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
-  const [isHintModalOpen, setIsHintModalOpen] = useState(false)
+  const [hintModalChallengeId, setHintModalChallengeId] = useState('')
   const [shownIntroChallengeIds, setShownIntroChallengeIds] = useState(() => new Set())
   const audioPlayCountRef = useRef(0)
   const hesitationFiredRef = useRef(false)
@@ -268,6 +270,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       showComment('onHesitation')
     }
   }, [showComment])
+  const shouldPauseHesitationTimer =
+    category.id === 'musica' &&
+    !shownIntroChallengeIds.has(currentChallengeId) &&
+    !isCurrentChallengeResolved &&
+    canAttemptQuiz() &&
+    !isComplete
 
   // Trigger hesitation when user blanks the answer field HESITATION_CLEAR_THRESHOLD times.
   useEffect(() => {
@@ -284,7 +292,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   // Trigger hesitation after a time threshold if the user hasn't answered yet.
   useEffect(() => {
-    if (!currentChallenge || hasFeedback || isComplete) {
+    if (!currentChallenge || hasFeedback || isComplete || shouldPauseHesitationTimer) {
       if (hesitationTimerRef.current) clearTimeout(hesitationTimerRef.current)
       return
     }
@@ -297,14 +305,14 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     }, delay)
     hesitationTimerRef.current = id
     return () => clearTimeout(id)
-  }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, showComment])
+  }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, shouldPauseHesitationTimer, showComment])
 
   function handleHintReveal() {
     const cost = currentChallenge?.hintCost ?? 15
     if (!spendCredits(cost)) return
     revealHint()
     showComment('onHintUsed')
-    setIsHintModalOpen(false)
+    setHintModalChallengeId('')
   }
 
   function handleRestart() {
@@ -313,19 +321,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }
 
   const shouldShowMusicIntro = category.id === 'musica' && isRoomIntroPending('musica')
-
-  useEffect(() => {
-    setIsHintModalOpen(false)
-  }, [currentChallengeId])
-
-  useEffect(() => {
-    if (!hasFeedback) {
-      return
-    }
-
-    setIsRoomMapVisible(false)
-    setIsHintModalOpen(false)
-  }, [hasFeedback])
 
   useEffect(() => {
     if (isComplete) {
@@ -419,8 +414,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isCurrentChallengeResolved ||
     currentChallengeLocked
   const credits = getCredits()
-  const attemptsRemaining = 3 - (playerState.stats?.quizzesAttempted ?? 0)
-  const livesRemaining = 2 - (playerState.stats?.wrongAnswersToday ?? 0)
+  const attemptsRemaining = getAttemptsRemaining(playerState)
+  const livesRemaining = getLivesRemaining(playerState)
   const currentZoneId = currentChallenge.zoneId ?? ''
   const activeZoneIds = Object.keys(zoneChallengeMap)
   const feedbackChallenge =
@@ -445,6 +440,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           : ''
   const mapDisabled = roomInteractionsDisabled
   const mapDisabledReason = challengeMapLocked ? 'Hai finito i tentativi per oggi.' : ''
+  const isHintModalOpen = hintModalChallengeId === currentChallengeId && !hasFeedback
+  const isRoomMapOpen = isRoomMapVisible && !hasFeedback
   const limitBanner = challengeMapLocked ? (
     <div className="rounded-[1.4rem] border border-amber-300/25 bg-amber-300/10 px-4 py-4">
       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-100/80">
@@ -481,6 +478,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     !shownIntroChallengeIds.has(currentChallengeId) &&
     !isCurrentChallengeResolved &&
     !challengeMapLocked
+  const shouldShowDefaultFloatingPanel =
+    activePanel?.eventType === 'onHesitation' || activePanel?.eventType === 'onHintUsed'
 
   return (
     <>
@@ -497,7 +496,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             livesRemaining={livesRemaining}
             mapDisabled={mapDisabled}
             mapDisabledReason={mapDisabledReason}
-            onHintClick={() => setIsHintModalOpen(true)}
+            onHintClick={() => setHintModalChallengeId(currentChallengeId)}
             onMapClick={() => setIsRoomMapVisible(true)}
             progressLabel={progressLabel}
           >
@@ -505,7 +504,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               <MusicChallengeIntro
                 key={currentChallengeId}
                 challenge={currentChallenge}
-                character={category.characters?.curator}
+                character={getRoomCharacterBySpeaker(category.characters, 'guardian')}
                 onComplete={() => setShownIntroChallengeIds((prev) => new Set([...prev, currentChallengeId]))}
               />
             ) : (
@@ -573,7 +572,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             hint={currentChallenge.hint}
             hintCost={currentChallenge.hintCost}
             isOpen={isHintModalOpen}
-            onClose={() => setIsHintModalOpen(false)}
+            onClose={() => setHintModalChallengeId('')}
             onReveal={handleHintReveal}
           />
 
@@ -583,7 +582,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             currentChallengeId={currentChallengeId}
             currentZoneId={currentZoneId}
             interactionDisabled={mapDisabled}
-            isOpen={isRoomMapVisible}
+            isOpen={isRoomMapOpen}
             onClose={() => setIsRoomMapVisible(false)}
             onSelectZone={handleSelectZone}
             resolvedChallengeIds={resolvedChallengeIds}
@@ -596,6 +595,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             feedback={hasFeedback ? feedback : null}
             isOpen={hasFeedback}
             onContinue={() => {
+              setIsRoomMapVisible(false)
+              setHintModalChallengeId('')
               clearResultComment()
               goToNextChallenge()
             }}
@@ -616,11 +617,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                 onClick={() => setIsRoomMapVisible((visible) => !visible)}
                 type="button"
               >
-                {isRoomMapVisible ? 'Nascondi mappa quiz' : 'Mostra mappa quiz'}
+                {isRoomMapOpen ? 'Nascondi mappa quiz' : 'Mostra mappa quiz'}
               </button>
             </div>
 
-            {isRoomMapVisible ? (
+            {isRoomMapOpen ? (
               <div>
                 <ChallengeSelectorGrid
                   category={category}
@@ -668,6 +669,17 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                   creditReward={currentChallenge.creditReward}
                   feedback={feedback}
                   onContinue={goToNextChallenge}
+                />
+              ) : null}
+
+              {shouldShowDefaultFloatingPanel ? (
+                <CharacterPanel
+                  autoDismissMs={0}
+                  character={activePanel.character}
+                  message={activePanel.text}
+                  mirror={activePanel.eventType === 'onHesitation'}
+                  onDismiss={dismissPanel}
+                  visible={!!activePanel}
                 />
               ) : null}
             </div>

@@ -14,7 +14,7 @@ function HintModal({ isOpen, hint, hintCost, credits, canUseHint, disabledReason
               Indizio
             </p>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-              Il Curatore puo inclinare la frequenza.
+              Il Guardiano puo concederti un varco.
             </h2>
           </div>
 

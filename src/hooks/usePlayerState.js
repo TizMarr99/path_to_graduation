@@ -6,48 +6,22 @@ import {
   appLogin,
   appSaveSnapshot,
 } from '../lib/supabaseGameApi'
+import {
+  applyAdminStateOverrides,
+  buildDailyPayload,
+  buildProgressPayload,
+  createDefaultPlayerState,
+  createDefaultRoomProgress,
+  MAX_DAILY_LIVES,
+  MAX_DAILY_QUIZ_ATTEMPTS,
+  normalizeSnapshot,
+  resetCurrentPositionInPlayerState,
+  resetMusicRoomIntroInPlayerState,
+} from '../lib/playerStateSnapshot'
 
 const PlayerStateContext = createContext(null)
 const ACCESS_CODE_STORAGE_KEY = 'path-to-graduation:access-code'
-const DEFAULT_UNLOCKED_CATEGORY_IDS = ['musica']
 const SAVE_DEBOUNCE_MS = 900
-
-function createDefaultStats() {
-  return {
-    date: '',
-    quizzesStarted: 0,
-    quizzesAttempted: 0,
-    wrongAnswers: 0,
-    wrongAnswersToday: 0,
-    lastResetAt: Date.now(),
-  }
-}
-
-function createDefaultRoomProgress(categoryId) {
-  return {
-    categoryId,
-    startedAt: null,
-    sessions: [],
-    unlockedByScore: false,
-    prizeWon: false,
-    buyAccessAvailable: false,
-  }
-}
-
-function createDefaultPlayerState() {
-  return {
-    version: 1,
-    createdAt: Date.now(),
-    credits: 0,
-    stats: createDefaultStats(),
-    roomProgress: {},
-    unlockedCategoryIds: [...DEFAULT_UNLOCKED_CATEGORY_IDS],
-    currentRoom: null,
-    currentChallengeId: '',
-    activeSession: null,
-    lastPlayedAt: null,
-  }
-}
 
 function loadStoredAccessCode() {
   if (typeof window === 'undefined') {
@@ -75,78 +49,6 @@ function clearStoredAccessCode() {
   }
 
   window.localStorage.removeItem(ACCESS_CODE_STORAGE_KEY)
-}
-
-function normalizeRoomProgress(roomProgress = {}) {
-  if (!roomProgress || typeof roomProgress !== 'object' || Array.isArray(roomProgress)) {
-    return {}
-  }
-
-  return Object.entries(roomProgress).reduce((accumulator, [categoryId, rawProgress]) => {
-    const baseProgress = createDefaultRoomProgress(categoryId)
-
-    accumulator[categoryId] = {
-      ...baseProgress,
-      ...rawProgress,
-      sessions: Array.isArray(rawProgress?.sessions) ? rawProgress.sessions : [],
-      startedAt: rawProgress?.startedAt ?? null,
-    }
-
-    return accumulator
-  }, {})
-}
-
-function normalizeSnapshot(snapshot) {
-  const progress = snapshot?.progress ?? {}
-  const dailyLimits = snapshot?.daily_limits ?? {}
-
-  return {
-    accessCodeId: snapshot?.access_code_id ?? '',
-    role: snapshot?.role ?? '',
-    playerState: {
-      version: 1,
-      createdAt: progress?.created_at ? Date.parse(progress.created_at) || Date.now() : Date.now(),
-      credits: progress?.credits ?? 0,
-      stats: {
-        date: dailyLimits?.play_date ?? '',
-        quizzesStarted: 0,
-        quizzesAttempted: dailyLimits?.quizzes_attempted ?? 0,
-        wrongAnswers: 0,
-        wrongAnswersToday: dailyLimits?.wrong_answers_today ?? 0,
-        lastResetAt: dailyLimits?.updated_at
-          ? Date.parse(dailyLimits.updated_at) || Date.now()
-          : Date.now(),
-      },
-      roomProgress: normalizeRoomProgress(progress?.room_progress ?? {}),
-      unlockedCategoryIds:
-        Array.isArray(progress?.unlocked_category_ids) && progress.unlocked_category_ids.length
-          ? progress.unlocked_category_ids
-          : [...DEFAULT_UNLOCKED_CATEGORY_IDS],
-      currentRoom: progress?.current_room ?? progress?.active_session?.categoryId ?? null,
-      currentChallengeId:
-        progress?.current_challenge_id ?? progress?.active_session?.currentChallengeId ?? '',
-      activeSession: progress?.active_session ?? null,
-      lastPlayedAt: progress?.last_played_at ?? null,
-    },
-  }
-}
-
-function buildProgressPayload(playerState) {
-  return {
-    credits: playerState.credits,
-    unlocked_category_ids: playerState.unlockedCategoryIds,
-    current_room: playerState.currentRoom,
-    current_challenge_id: playerState.currentChallengeId || null,
-    room_progress: playerState.roomProgress,
-    active_session: playerState.activeSession ?? null,
-  }
-}
-
-function buildDailyPayload(playerState) {
-  return {
-    quizzes_attempted: playerState.stats.quizzesAttempted,
-    wrong_answers_today: playerState.stats.wrongAnswersToday,
-  }
 }
 
 function areSerializableSnapshotsEqual(leftValue, rightValue) {
@@ -581,22 +483,7 @@ export function PlayerStateProvider({ children }) {
   }
 
   function resetMusicRoomIntro() {
-    updatePlayerState((currentState) => {
-      const nextRoomProgress = { ...currentState.roomProgress }
-      const roomProgress = nextRoomProgress.musica
-
-      if (roomProgress) {
-        nextRoomProgress.musica = {
-          ...roomProgress,
-          startedAt: null,
-        }
-      }
-
-      return {
-        ...currentState,
-        roomProgress: nextRoomProgress,
-      }
-    })
+    updatePlayerState((currentState) => resetMusicRoomIntroInPlayerState(currentState))
   }
 
   function markRoomStarted(categoryId, challengeId = '') {
@@ -741,19 +628,7 @@ export function PlayerStateProvider({ children }) {
   }
 
   function resetCurrentPosition() {
-    updatePlayerState((currentState) => {
-      if (!currentState.currentRoom && !currentState.currentChallengeId && !currentState.activeSession) {
-        return currentState
-      }
-
-      return {
-        ...currentState,
-        currentRoom: null,
-        currentChallengeId: '',
-        activeSession: null,
-        lastPlayedAt: new Date().toISOString(),
-      }
-    })
+    updatePlayerState((currentState) => resetCurrentPositionInPlayerState(currentState))
   }
 
   async function resetDailyCountersForCode(targetCode = accessCodeRef.current) {
@@ -794,22 +669,14 @@ export function PlayerStateProvider({ children }) {
     }
   }
 
-  function setAdminStats({ credits, quizzesAttempted, wrongAnswersToday }) {
+  function setAdminStats({ credits, attemptsRemaining, livesRemaining, quizzesAttempted, wrongAnswersToday }) {
     updatePlayerState(
-      (currentState) => ({
-        ...currentState,
-        credits: typeof credits === 'number' ? Math.max(0, credits) : currentState.credits,
-        stats: {
-          ...currentState.stats,
-          quizzesAttempted:
-            typeof quizzesAttempted === 'number'
-              ? Math.max(0, quizzesAttempted)
-              : currentState.stats.quizzesAttempted,
-          wrongAnswersToday:
-            typeof wrongAnswersToday === 'number'
-              ? Math.max(0, wrongAnswersToday)
-              : currentState.stats.wrongAnswersToday,
-        },
+      (currentState) => applyAdminStateOverrides(currentState, {
+        credits,
+        attemptsRemaining,
+        livesRemaining,
+        quizzesAttempted,
+        wrongAnswersToday,
       }),
       { persist: 'immediate' },
     )
@@ -861,7 +728,10 @@ export function PlayerStateProvider({ children }) {
       return playerState.credits
     },
     canAttemptQuiz() {
-      return playerState.stats.quizzesAttempted < 3 && playerState.stats.wrongAnswersToday < 2
+      return (
+        playerState.stats.quizzesAttempted < MAX_DAILY_QUIZ_ATTEMPTS &&
+        playerState.stats.wrongAnswersToday < MAX_DAILY_LIVES
+      )
     },
     getResumePath() {
       return getResumePathForState(playerState)

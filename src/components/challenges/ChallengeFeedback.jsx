@@ -1,8 +1,4 @@
-const speakerLabels = {
-  curator: 'Il Curatore',
-  critic: 'Il Critico',
-  neutral: 'La Sala',
-}
+import { getRoomSpeakerLabel } from '../../lib/roomSpeakers'
 
 function ChallengeFeedback({ feedback, onContinue, creditReward, awardedCredits }) {
   const hasAwardedCredits = typeof awardedCredits === 'number'
@@ -18,7 +14,7 @@ function ChallengeFeedback({ feedback, onContinue, creditReward, awardedCredits 
       ].join(' ')}
     >
       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-100/75">
-        {speakerLabels[feedback.speaker]}
+        {getRoomSpeakerLabel(feedback.speaker)}
       </p>
       <h3 className="mt-2 text-xl font-semibold text-white">{feedback.title}</h3>
       <p className="mt-3 text-sm leading-7 text-slate-100/90">{feedback.message}</p>

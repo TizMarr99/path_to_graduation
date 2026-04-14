@@ -1,7 +1,17 @@
 import { useMemo, useState } from 'react'
 import { getCategories } from '../lib/challengeData'
 import { usePlayerState } from '../hooks/usePlayerState'
-import { isDevToolsEnabled } from '../lib/runtimeFlags.js'
+import {
+  applyAdminStateOverrides,
+  buildDailyPayload,
+  buildProgressPayload,
+  getAttemptsRemaining,
+  getLivesRemaining,
+  normalizeSnapshot,
+  resetCurrentPositionInPlayerState,
+  resetMusicRoomIntroInPlayerState,
+} from '../lib/playerStateSnapshot'
+import { appGetSnapshot, appSaveSnapshot } from '../lib/supabaseGameApi'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
 
 const difficultyOrder = ['easy', 'medium', 'hard']
@@ -40,13 +50,72 @@ function getDifficultyCounts(challenges = []) {
   )
 }
 
+function parseOptionalWholeNumber(value) {
+  const normalizedValue = value.trim()
+
+  if (!normalizedValue) {
+    return undefined
+  }
+
+  const parsedValue = Number(normalizedValue)
+
+  if (!Number.isFinite(parsedValue)) {
+    return undefined
+  }
+
+  return Math.max(0, Math.trunc(parsedValue))
+}
+
+function getErrorMessage(error, fallbackMessage) {
+  return error?.userMessage ?? error?.message ?? fallbackMessage
+}
+
+function StatCard({ accentClassName, detail, label, value }) {
+  return (
+    <div className={accentClassName}>
+      <p className="text-xs uppercase tracking-[0.3em]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      {detail ? <p className="mt-2 text-xs tracking-[0.16em] opacity-75">{detail}</p> : null}
+    </div>
+  )
+}
+
+function NumericField({ accentClassName, id, label, onChange, placeholder, value }) {
+  return (
+    <label className="flex flex-col gap-1.5" htmlFor={id}>
+      <span className={`text-[0.68rem] font-semibold uppercase tracking-[0.28em] ${accentClassName}`}>
+        {label}
+      </span>
+      <input
+        className="w-28 rounded-full border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-slate-50 outline-none transition focus:border-cyan-300/60"
+        id={id}
+        inputMode="numeric"
+        min={0}
+        onChange={onChange}
+        placeholder={placeholder}
+        type="number"
+        value={value}
+      />
+    </label>
+  )
+}
+
 function DevPage() {
-  const [resetMessage, setResetMessage] = useState('')
-  const [targetCode, setTargetCode] = useState('')
+  const [currentMessage, setCurrentMessage] = useState('')
+  const [targetCodeInput, setTargetCodeInput] = useState('')
+  const [loadedTargetCode, setLoadedTargetCode] = useState('')
+  const [targetMessage, setTargetMessage] = useState('')
   const [isAdminActionRunning, setIsAdminActionRunning] = useState(false)
-  const [adminCredits, setAdminCredits] = useState('')
-  const [adminAttempts, setAdminAttempts] = useState('')
-  const [adminErrors, setAdminErrors] = useState('')
+  const [isTargetLoading, setIsTargetLoading] = useState(false)
+  const [isTargetSaving, setIsTargetSaving] = useState(false)
+  const [currentCreditsInput, setCurrentCreditsInput] = useState('')
+  const [currentAttemptsRemainingInput, setCurrentAttemptsRemainingInput] = useState('')
+  const [currentLivesRemainingInput, setCurrentLivesRemainingInput] = useState('')
+  const [targetCreditsInput, setTargetCreditsInput] = useState('')
+  const [targetAttemptsRemainingInput, setTargetAttemptsRemainingInput] = useState('')
+  const [targetLivesRemainingInput, setTargetLivesRemainingInput] = useState('')
+  const [targetPlayerState, setTargetPlayerState] = useState(null)
+  const [targetRole, setTargetRole] = useState('')
   const {
     accessCode,
     playerState,
@@ -60,6 +129,7 @@ function DevPage() {
     setAdminStats,
     syncError,
   } = usePlayerState()
+
   const templateTotals = templateOrder.reduce((counts, type) => {
     counts[type] = 0
     return counts
@@ -77,63 +147,231 @@ function DevPage() {
       return counts
     }, {}),
   }))
+
   const unlockedRooms = useMemo(
     () => playerState.unlockedCategoryIds.length,
     [playerState.unlockedCategoryIds],
   )
+  const currentAttemptsRemaining = getAttemptsRemaining(playerState)
+  const currentLivesRemaining = getLivesRemaining(playerState)
+  const targetUnlockedRooms = targetPlayerState?.unlockedCategoryIds.length ?? 0
+  const targetAttemptsRemaining = targetPlayerState ? getAttemptsRemaining(targetPlayerState) : 0
+  const targetLivesRemaining = targetPlayerState ? getLivesRemaining(targetPlayerState) : 0
+  const targetControlsDisabled =
+    !targetPlayerState || isTargetLoading || isTargetSaving || isAdminActionRunning
+
+  function resetCurrentInputs() {
+    setCurrentCreditsInput('')
+    setCurrentAttemptsRemainingInput('')
+    setCurrentLivesRemainingInput('')
+  }
+
+  function resetTargetInputs() {
+    setTargetCreditsInput('')
+    setTargetAttemptsRemainingInput('')
+    setTargetLivesRemainingInput('')
+  }
+
+  async function loadTargetPlayer(code, successMessage = '') {
+    setIsTargetLoading(true)
+    setTargetMessage('')
+
+    try {
+      const snapshot = await appGetSnapshot(code)
+      const normalized = normalizeSnapshot(snapshot)
+
+      setLoadedTargetCode(code)
+      setTargetRole(normalized.role)
+      setTargetPlayerState(normalized.playerState)
+      resetTargetInputs()
+      setTargetMessage(successMessage || `Profilo ${code} caricato.`)
+
+      return { ok: true, normalized }
+    } catch (error) {
+      setLoadedTargetCode('')
+      setTargetRole('')
+      setTargetPlayerState(null)
+      setTargetMessage(getErrorMessage(error, 'Impossibile caricare il player selezionato.'))
+      return { ok: false, error }
+    } finally {
+      setIsTargetLoading(false)
+    }
+  }
+
+  async function saveTargetPlayer(nextPlayerState, successMessage) {
+    if (!loadedTargetCode) {
+      return { ok: false }
+    }
+
+    setIsTargetSaving(true)
+    setTargetMessage('')
+
+    try {
+      await appSaveSnapshot(
+        loadedTargetCode,
+        buildProgressPayload(nextPlayerState),
+        buildDailyPayload(nextPlayerState),
+      )
+      setTargetPlayerState(nextPlayerState)
+      resetTargetInputs()
+      setTargetMessage(successMessage)
+
+      return { ok: true }
+    } catch (error) {
+      setTargetMessage(getErrorMessage(error, 'Impossibile salvare il player selezionato.'))
+      return { ok: false, error }
+    } finally {
+      setIsTargetSaving(false)
+    }
+  }
 
   function handleResetDailyCounters() {
     resetDailyCounters()
-    setResetMessage('Contatori sessione azzerati.')
+    setCurrentMessage('Contatori giornalieri del tuo profilo azzerati.')
   }
 
   function handleResetAll() {
     resetPlayerState()
-    setResetMessage('Stato giocatore azzerato completamente.')
+    setCurrentMessage('Profilo corrente azzerato completamente.')
   }
 
   function handleResetCurrentPosition() {
     resetCurrentPosition()
-    setResetMessage('Posizione corrente azzerata. Il profilo ripartira dalla mappa.')
+    setCurrentMessage('Posizione corrente azzerata. Il profilo ripartira dalla mappa.')
   }
 
   function handleResetMusicIntro() {
     resetMusicRoomIntro()
-    setResetMessage('Intro della sala musica ripristinata.')
+    setCurrentMessage('Intro della sala musica ripristinata sul tuo profilo.')
+  }
+
+  function handleApplyCurrentValues() {
+    const credits = parseOptionalWholeNumber(currentCreditsInput)
+    const attemptsRemaining = parseOptionalWholeNumber(currentAttemptsRemainingInput)
+    const livesRemaining = parseOptionalWholeNumber(currentLivesRemainingInput)
+
+    if (
+      typeof credits !== 'number' &&
+      typeof attemptsRemaining !== 'number' &&
+      typeof livesRemaining !== 'number'
+    ) {
+      setCurrentMessage('Inserisci almeno un valore da aggiornare.')
+      return
+    }
+
+    setAdminStats({
+      credits,
+      attemptsRemaining,
+      livesRemaining,
+    })
+    resetCurrentInputs()
+    setCurrentMessage('Valori del tuo profilo aggiornati.')
+  }
+
+  async function handleLoadTargetPlayer() {
+    const normalizedTargetCode = targetCodeInput.trim()
+
+    if (!normalizedTargetCode) {
+      setTargetMessage('Inserisci il codice del player da caricare.')
+      return
+    }
+
+    if (normalizedTargetCode === accessCode) {
+      setLoadedTargetCode('')
+      setTargetRole('')
+      setTargetPlayerState(null)
+      setTargetMessage('Per il tuo profilo usa il pannello Player state sopra.')
+      return
+    }
+
+    await loadTargetPlayer(normalizedTargetCode)
   }
 
   async function handleAdminDailyReset() {
-    const normalizedTargetCode = targetCode.trim()
-
-    if (!normalizedTargetCode) {
-      setResetMessage('Inserisci il codice del player da resettare.')
+    if (!loadedTargetCode) {
+      setTargetMessage('Carica prima un player target.')
       return
     }
 
     setIsAdminActionRunning(true)
-    const result = await resetDailyCountersForCode(normalizedTargetCode)
+    const result = await resetDailyCountersForCode(loadedTargetCode)
     setIsAdminActionRunning(false)
 
     if (result.ok) {
-      setResetMessage(`Contatori giornalieri azzerati per il codice ${normalizedTargetCode}.`)
+      await loadTargetPlayer(
+        loadedTargetCode,
+        `Contatori giornalieri azzerati per il codice ${loadedTargetCode}.`,
+      )
     }
   }
 
   async function handleAdminFullReset() {
-    const normalizedTargetCode = targetCode.trim()
-
-    if (!normalizedTargetCode) {
-      setResetMessage('Inserisci il codice del player da resettare.')
+    if (!loadedTargetCode) {
+      setTargetMessage('Carica prima un player target.')
       return
     }
 
     setIsAdminActionRunning(true)
-    const result = await resetPlayerStateForCode(normalizedTargetCode)
+    const result = await resetPlayerStateForCode(loadedTargetCode)
     setIsAdminActionRunning(false)
 
     if (result.ok) {
-      setResetMessage(`Profilo azzerato per il codice ${normalizedTargetCode}.`)
+      await loadTargetPlayer(loadedTargetCode, `Profilo azzerato per il codice ${loadedTargetCode}.`)
     }
+  }
+
+  async function handleTargetResetCurrentPosition() {
+    if (!targetPlayerState || !loadedTargetCode) {
+      setTargetMessage('Carica prima un player target.')
+      return
+    }
+
+    const nextPlayerState = resetCurrentPositionInPlayerState(targetPlayerState)
+    await saveTargetPlayer(
+      nextPlayerState,
+      `Posizione corrente azzerata per il codice ${loadedTargetCode}.`,
+    )
+  }
+
+  async function handleTargetResetMusicIntro() {
+    if (!targetPlayerState || !loadedTargetCode) {
+      setTargetMessage('Carica prima un player target.')
+      return
+    }
+
+    const nextPlayerState = resetMusicRoomIntroInPlayerState(targetPlayerState)
+    await saveTargetPlayer(
+      nextPlayerState,
+      `Intro musica ripristinata per il codice ${loadedTargetCode}.`,
+    )
+  }
+
+  async function handleApplyTargetValues() {
+    if (!targetPlayerState || !loadedTargetCode) {
+      setTargetMessage('Carica prima un player target.')
+      return
+    }
+
+    const credits = parseOptionalWholeNumber(targetCreditsInput)
+    const attemptsRemaining = parseOptionalWholeNumber(targetAttemptsRemainingInput)
+    const livesRemaining = parseOptionalWholeNumber(targetLivesRemainingInput)
+
+    if (
+      typeof credits !== 'number' &&
+      typeof attemptsRemaining !== 'number' &&
+      typeof livesRemaining !== 'number'
+    ) {
+      setTargetMessage('Inserisci almeno un valore da aggiornare sul player target.')
+      return
+    }
+
+    const nextPlayerState = applyAdminStateOverrides(targetPlayerState, {
+      credits,
+      attemptsRemaining,
+      livesRemaining,
+    })
+
+    await saveTargetPlayer(nextPlayerState, `Valori aggiornati per il codice ${loadedTargetCode}.`)
   }
 
   return (
@@ -146,10 +384,10 @@ function DevPage() {
                 DevPage
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Verifica locale di categories.json
+                Portale admin per dataset e player state
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
-                Questa vista importa il JSON locale, lo normalizza nel dominio challenge e riassume ogni sala per controllare rapidamente struttura, metadati e distribuzione delle prove.
+                La pagina e disponibile per l&apos;utenza admin autenticata. Qui puoi controllare il dataset locale e intervenire sia sul tuo profilo sia su un player target caricato per codice.
               </p>
             </div>
 
@@ -186,157 +424,133 @@ function DevPage() {
                   Player state
                 </p>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
-                  Strumenti di reset sul profilo corrente autenticato. In questa prima integrazione le azioni agiscono sullo snapshot associato al codice con cui hai effettuato l'accesso.
+                  Strumenti sul profilo admin autenticato. Tentativi e vite vengono impostati in termini di risorse rimaste oggi, non di consumi gia registrati.
                 </p>
                 <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-500">
                   Ruolo attivo: {role || 'non disponibile'}
                 </p>
               </div>
 
-              {isDevToolsEnabled ? (
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
-                    onClick={handleResetDailyCounters}
-                    type="button"
-                  >
-                    Azzera contatori sessione
-                  </button>
-                  <button
-                    className="inline-flex items-center justify-center rounded-full border border-violet-300/35 bg-violet-400/10 px-4 py-2 text-sm font-semibold text-violet-100 transition hover:border-violet-200/60 hover:bg-violet-400/18"
-                    onClick={handleResetCurrentPosition}
-                    type="button"
-                  >
-                    Reset posizione corrente
-                  </button>
-                  <button
-                    className="inline-flex items-center justify-center rounded-full border border-amber-300/35 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-200/60 hover:bg-amber-300/18"
-                    onClick={handleResetMusicIntro}
-                    type="button"
-                  >
-                    Reset intro musica
-                  </button>
-                  <button
-                    className="inline-flex items-center justify-center rounded-full border border-rose-300/35 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:border-rose-200/60 hover:bg-rose-400/18"
-                    onClick={handleResetAll}
-                    type="button"
-                  >
-                    Reset totale giocatore
-                  </button>
-                </div>
-              ) : (
-                <span className="inline-flex rounded-full border border-slate-700 bg-slate-950/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                  Reset disponibile solo in dev
-                </span>
-              )}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
+                  onClick={handleResetDailyCounters}
+                  type="button"
+                >
+                  Reset giornaliero
+                </button>
+                <button
+                  className="inline-flex items-center justify-center rounded-full border border-violet-300/35 bg-violet-400/10 px-4 py-2 text-sm font-semibold text-violet-100 transition hover:border-violet-200/60 hover:bg-violet-400/18"
+                  onClick={handleResetCurrentPosition}
+                  type="button"
+                >
+                  Reset posizione corrente
+                </button>
+                <button
+                  className="inline-flex items-center justify-center rounded-full border border-amber-300/35 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-200/60 hover:bg-amber-300/18"
+                  onClick={handleResetMusicIntro}
+                  type="button"
+                >
+                  Reset intro musica
+                </button>
+                <button
+                  className="inline-flex items-center justify-center rounded-full border border-rose-300/35 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:border-rose-200/60 hover:bg-rose-400/18"
+                  onClick={handleResetAll}
+                  type="button"
+                >
+                  Reset totale profilo
+                </button>
+              </div>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/8 px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.3em] text-cyan-200/80">Crediti</p>
-                <p className="mt-2 text-2xl font-semibold text-cyan-100">{playerState.credits}</p>
-              </div>
-              <div className="rounded-2xl border border-amber-300/15 bg-amber-300/8 px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.3em] text-amber-100/75">Quiz tentati</p>
-                <p className="mt-2 text-2xl font-semibold text-amber-50">{playerState.stats.quizzesAttempted}</p>
-              </div>
-              <div className="rounded-2xl border border-rose-300/15 bg-rose-300/8 px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.3em] text-rose-100/75">Errori oggi</p>
-                <p className="mt-2 text-2xl font-semibold text-rose-50">{playerState.stats.wrongAnswersToday}</p>
-              </div>
-              <div className="rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Sale sbloccate</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{unlockedRooms}</p>
+              <StatCard
+                accentClassName="rounded-2xl border border-cyan-400/20 bg-cyan-400/8 px-4 py-3 text-cyan-100"
+                label="Crediti"
+                value={playerState.credits}
+              />
+              <StatCard
+                accentClassName="rounded-2xl border border-amber-300/15 bg-amber-300/8 px-4 py-3 text-amber-50"
+                detail={`usati ${playerState.stats.quizzesAttempted}`}
+                label="Tentativi rimasti"
+                value={currentAttemptsRemaining}
+              />
+              <StatCard
+                accentClassName="rounded-2xl border border-rose-300/15 bg-rose-300/8 px-4 py-3 text-rose-50"
+                detail={`consumate ${playerState.stats.wrongAnswersToday}`}
+                label="Vite rimaste"
+                value={currentLivesRemaining}
+              />
+              <StatCard
+                accentClassName="rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-white"
+                label="Sale sbloccate"
+                value={unlockedRooms}
+              />
+            </div>
+
+            <div className="mt-4 rounded-[1.25rem] border border-cyan-300/15 bg-cyan-400/5 p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200/75">
+                Imposta valori profilo corrente
+              </p>
+              <div className="flex flex-wrap items-end gap-3">
+                <NumericField
+                  accentClassName="text-cyan-100/70"
+                  id="current-credits"
+                  label="Crediti"
+                  onChange={(event) => setCurrentCreditsInput(event.target.value)}
+                  placeholder={String(playerState.credits)}
+                  value={currentCreditsInput}
+                />
+                <NumericField
+                  accentClassName="text-amber-100/70"
+                  id="current-attempts-remaining"
+                  label="Tentativi rimasti"
+                  onChange={(event) => setCurrentAttemptsRemainingInput(event.target.value)}
+                  placeholder={String(currentAttemptsRemaining)}
+                  value={currentAttemptsRemainingInput}
+                />
+                <NumericField
+                  accentClassName="text-rose-100/70"
+                  id="current-lives-remaining"
+                  label="Vite rimaste"
+                  onChange={(event) => setCurrentLivesRemainingInput(event.target.value)}
+                  placeholder={String(currentLivesRemaining)}
+                  value={currentLivesRemainingInput}
+                />
+                <button
+                  className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-5 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
+                  onClick={handleApplyCurrentValues}
+                  type="button"
+                >
+                  Applica
+                </button>
               </div>
             </div>
 
-            {isDevToolsEnabled ? (
-              <div className="mt-4 rounded-[1.25rem] border border-cyan-300/15 bg-cyan-400/5 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200/75 mb-3">
-                  Imposta valori
-                </p>
-                <div className="flex flex-wrap items-end gap-3">
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-cyan-100/70">Crediti</span>
-                    <input
-                      className="w-24 rounded-full border border-cyan-300/30 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-cyan-50 outline-none focus:border-cyan-300/60"
-                      inputMode="numeric"
-                      min={0}
-                      onChange={(e) => setAdminCredits(e.target.value)}
-                      placeholder={String(playerState.credits)}
-                      type="number"
-                      value={adminCredits}
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-amber-100/70">Tentativi usati</span>
-                    <input
-                      className="w-24 rounded-full border border-amber-300/30 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-amber-50 outline-none focus:border-amber-300/60"
-                      inputMode="numeric"
-                      min={0}
-                      onChange={(e) => setAdminAttempts(e.target.value)}
-                      placeholder={String(playerState.stats.quizzesAttempted)}
-                      type="number"
-                      value={adminAttempts}
-                    />
-                  </label>
-                  <label className="flex flex-col gap-1.5">
-                    <span className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-rose-100/70">Errori oggi</span>
-                    <input
-                      className="w-24 rounded-full border border-rose-300/30 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-rose-50 outline-none focus:border-rose-300/60"
-                      inputMode="numeric"
-                      min={0}
-                      onChange={(e) => setAdminErrors(e.target.value)}
-                      placeholder={String(playerState.stats.wrongAnswersToday)}
-                      type="number"
-                      value={adminErrors}
-                    />
-                  </label>
-                  <button
-                    className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-5 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18"
-                    onClick={() => {
-                      setAdminStats({
-                        credits: adminCredits !== '' ? Number(adminCredits) : undefined,
-                        quizzesAttempted: adminAttempts !== '' ? Number(adminAttempts) : undefined,
-                        wrongAnswersToday: adminErrors !== '' ? Number(adminErrors) : undefined,
-                      })
-                      setAdminCredits('')
-                      setAdminAttempts('')
-                      setAdminErrors('')
-                      setResetMessage('Valori aggiornati.')
-                    }}
-                    type="button"
-                  >
-                    Applica
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            {resetMessage ? (
-              <p className="mt-4 text-sm font-medium text-emerald-300">{resetMessage}</p>
+            {currentMessage ? (
+              <p className="mt-4 text-sm font-medium text-emerald-300">{currentMessage}</p>
             ) : null}
             {syncError ? (
               <p className="mt-2 text-sm font-medium text-rose-300">{syncError}</p>
             ) : null}
           </div>
 
-          {role === 'admin' ? (
-            <div className="mt-5 rounded-[1.5rem] border border-violet-300/15 bg-violet-400/8 p-5">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-200/80">
-                    Admin tools
-                  </p>
-                  <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
-                    Inserisci il codice del player target per azzerare i contatori del giorno o resettare completamente il profilo. Il reset posizione fine-grained e disponibile solo per il profilo attualmente autenticato.
-                  </p>
-                  <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-500">
-                    Codice admin attivo: {accessCode || 'non disponibile'}
-                  </p>
-                </div>
+          <div className="mt-5 rounded-[1.5rem] border border-violet-300/15 bg-violet-400/8 p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-200/80">
+                  Admin tools
+                </p>
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
+                  Carica un player tramite codice e poi controlla tutto il suo stato: reset giornaliero, reset completo, reset intro musica, reset posizione corrente e valori custom di crediti, tentativi rimasti e vite rimaste.
+                </p>
+                <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                  Codice admin attivo: {accessCode || 'non disponibile'}
+                </p>
+              </div>
 
-                <label className="block min-w-[16rem]" htmlFor="admin-target-code">
+              <div className="flex flex-col gap-3 sm:min-w-[20rem] sm:flex-row sm:items-end">
+                <label className="block sm:flex-1" htmlFor="admin-target-code">
                   <span className="text-[0.72rem] font-semibold uppercase tracking-[0.35em] text-violet-100/80">
                     Codice player target
                   </span>
@@ -346,33 +560,131 @@ function DevPage() {
                     id="admin-target-code"
                     inputMode="numeric"
                     maxLength={6}
-                    onChange={(event) => setTargetCode(event.target.value)}
+                    onChange={(event) => setTargetCodeInput(event.target.value)}
                     placeholder="310119"
-                    value={targetCode}
+                    value={targetCodeInput}
                   />
                 </label>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-3">
                 <button
-                  className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18 disabled:cursor-wait disabled:opacity-70"
-                  disabled={isAdminActionRunning}
-                  onClick={() => void handleAdminDailyReset()}
+                  className="inline-flex items-center justify-center rounded-full border border-violet-200/40 bg-violet-300/12 px-5 py-3 text-sm font-semibold text-violet-50 transition hover:border-violet-100/70 hover:bg-violet-300/18 disabled:cursor-wait disabled:opacity-70"
+                  disabled={isTargetLoading}
+                  onClick={() => void handleLoadTargetPlayer()}
                   type="button"
                 >
-                  {isAdminActionRunning ? 'Operazione in corso...' : 'Reset daily target'}
-                </button>
-                <button
-                  className="inline-flex items-center justify-center rounded-full border border-rose-300/35 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:border-rose-200/60 hover:bg-rose-400/18 disabled:cursor-wait disabled:opacity-70"
-                  disabled={isAdminActionRunning}
-                  onClick={() => void handleAdminFullReset()}
-                  type="button"
-                >
-                  {isAdminActionRunning ? 'Operazione in corso...' : 'Reset totale target'}
+                  {isTargetLoading ? 'Caricamento...' : 'Carica player'}
                 </button>
               </div>
             </div>
-          ) : null}
+
+            {targetPlayerState ? (
+              <>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <StatCard
+                    accentClassName="rounded-2xl border border-cyan-400/20 bg-cyan-400/8 px-4 py-3 text-cyan-100"
+                    label="Crediti target"
+                    value={targetPlayerState.credits}
+                  />
+                  <StatCard
+                    accentClassName="rounded-2xl border border-amber-300/15 bg-amber-300/8 px-4 py-3 text-amber-50"
+                    detail={`usati ${targetPlayerState.stats.quizzesAttempted}`}
+                    label="Tentativi rimasti"
+                    value={targetAttemptsRemaining}
+                  />
+                  <StatCard
+                    accentClassName="rounded-2xl border border-rose-300/15 bg-rose-300/8 px-4 py-3 text-rose-50"
+                    detail={`consumate ${targetPlayerState.stats.wrongAnswersToday}`}
+                    label="Vite rimaste"
+                    value={targetLivesRemaining}
+                  />
+                  <StatCard
+                    accentClassName="rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-white"
+                    detail={targetRole ? `ruolo ${targetRole}` : undefined}
+                    label="Sale sbloccate"
+                    value={targetUnlockedRooms}
+                  />
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-400/18 disabled:cursor-wait disabled:opacity-70"
+                    disabled={targetControlsDisabled}
+                    onClick={() => void handleAdminDailyReset()}
+                    type="button"
+                  >
+                    Reset giornaliero target
+                  </button>
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-violet-300/35 bg-violet-400/10 px-4 py-2 text-sm font-semibold text-violet-100 transition hover:border-violet-200/60 hover:bg-violet-400/18 disabled:cursor-wait disabled:opacity-70"
+                    disabled={targetControlsDisabled}
+                    onClick={() => void handleTargetResetCurrentPosition()}
+                    type="button"
+                  >
+                    Reset posizione target
+                  </button>
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-amber-300/35 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-200/60 hover:bg-amber-300/18 disabled:cursor-wait disabled:opacity-70"
+                    disabled={targetControlsDisabled}
+                    onClick={() => void handleTargetResetMusicIntro()}
+                    type="button"
+                  >
+                    Reset intro musica target
+                  </button>
+                  <button
+                    className="inline-flex items-center justify-center rounded-full border border-rose-300/35 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:border-rose-200/60 hover:bg-rose-400/18 disabled:cursor-wait disabled:opacity-70"
+                    disabled={targetControlsDisabled}
+                    onClick={() => void handleAdminFullReset()}
+                    type="button"
+                  >
+                    Reset totale target
+                  </button>
+                </div>
+
+                <div className="mt-4 rounded-[1.25rem] border border-violet-300/15 bg-violet-300/6 p-4">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-violet-100/80">
+                    Imposta valori target
+                  </p>
+                  <div className="flex flex-wrap items-end gap-3">
+                    <NumericField
+                      accentClassName="text-cyan-100/70"
+                      id="target-credits"
+                      label="Crediti"
+                      onChange={(event) => setTargetCreditsInput(event.target.value)}
+                      placeholder={String(targetPlayerState.credits)}
+                      value={targetCreditsInput}
+                    />
+                    <NumericField
+                      accentClassName="text-amber-100/70"
+                      id="target-attempts-remaining"
+                      label="Tentativi rimasti"
+                      onChange={(event) => setTargetAttemptsRemainingInput(event.target.value)}
+                      placeholder={String(targetAttemptsRemaining)}
+                      value={targetAttemptsRemainingInput}
+                    />
+                    <NumericField
+                      accentClassName="text-rose-100/70"
+                      id="target-lives-remaining"
+                      label="Vite rimaste"
+                      onChange={(event) => setTargetLivesRemainingInput(event.target.value)}
+                      placeholder={String(targetLivesRemaining)}
+                      value={targetLivesRemainingInput}
+                    />
+                    <button
+                      className="inline-flex items-center justify-center rounded-full border border-violet-200/40 bg-violet-300/12 px-5 py-2 text-sm font-semibold text-violet-50 transition hover:border-violet-100/70 hover:bg-violet-300/18 disabled:cursor-wait disabled:opacity-70"
+                      disabled={targetControlsDisabled}
+                      onClick={() => void handleApplyTargetValues()}
+                      type="button"
+                    >
+                      Applica valori target
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : null}
+
+            {targetMessage ? (
+              <p className="mt-4 text-sm font-medium text-emerald-300">{targetMessage}</p>
+            ) : null}
+          </div>
 
           <div className="mt-5 grid gap-3 lg:grid-cols-3">
             {templateOrder.map((type) => (

@@ -1,8 +1,4 @@
-const speakerLabels = {
-  curator: 'Il Curatore',
-  critic: 'Il Critico',
-  neutral: 'La Sala',
-}
+import { getRoomSpeakerLabel } from '../../lib/roomSpeakers'
 
 function ResultModal({ isOpen, feedback, awardedCredits, creditReward, onContinue, disabled, characterComment }) {
   if (!isOpen || !feedback) {
@@ -57,7 +53,7 @@ function ResultModal({ isOpen, feedback, awardedCredits, creditReward, onContinu
         ) : null}
 
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-100/75">
-          {speakerLabels[feedback.speaker]}
+          {getRoomSpeakerLabel(feedback.speaker)}
         </p>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">{feedback.title}</h2>
         <p className="mt-4 text-sm leading-7 text-slate-100/92">{feedback.message}</p>

@@ -3,10 +3,10 @@ import TypewriterText from './TypewriterText.jsx'
 import './vip-home.css'
 
 const ANDREA_MESSAGE =
-  'Benvenuta alla tua mostra privata. Il Critico ha nascosto alcuni pezzi nella Grotta delle Ombre... ma insieme li troveremo. Sei pronta?'
+  'Benvenuta alla tua mostra privata. Il Critico ha nascosto alcuni pezzi nella Grotta delle Ombre. Queste rappresentano ciò che hai sempre evitato. In ogni sala troverai qualcuno che ti guiderà — ma anche chi vorrà fermarti. Sei pronta?'
 
 const MIRANDA_MESSAGE =
-  'Oh guarda chi si vede. Pensavi di essere l\'unica invitata? Il Curatore ha gusti discutibili. Vediamo se riesci a trovare i pezzi che ho nascosto...'
+  'Oh guarda chi si vede. Pensavi fosse una mostra qualunque? Ogni pezzo che ho nascosto è una tua paura. Nelle mani di chi? Vediamo se hai il coraggio di scoprirlo davvero..."'
 
 function NarrativePortrait({ compact = false, fallbackSrc, name, role, src, tone = 'gold' }) {
   const [portraitSrc, setPortraitSrc] = useState(src)
@@ -64,12 +64,14 @@ function VipNarrative({
   narrativeScene,
   onAndreaTypewriterComplete,
   onDiscoverMap,
-  onEnterMusicRoom,
   onMirandaTypewriterComplete,
 }) {
   const isAndreaBoxVisible = narrativeScene === 'andrea'
-  const isAmandaVisible = narrativeScene === 'andrea-leaving' || narrativeScene === 'miranda' || narrativeScene === 'miranda-complete'
-  const isAmandaBoxVisible = narrativeScene === 'miranda'
+  const isMirandaVisible =
+    narrativeScene === 'andrea-leaving' ||
+    narrativeScene === 'miranda' ||
+    narrativeScene === 'miranda-complete'
+  const isMirandaBoxVisible = narrativeScene === 'miranda' || narrativeScene === 'miranda-complete'
   const areCtasVisible = narrativeScene === 'miranda-complete'
 
   return (
@@ -127,7 +129,8 @@ function VipNarrative({
             <div className="relative h-full min-h-0">
               <div
                 className={[
-                  'absolute left-1/2 top-[-5%] z-10 -translate-x-[92%] scale-[0.92] pointer-events-none',
+                  'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
+                  !isMirandaVisible ? 'opacity-100' : 'opacity-0',
                 ].join(' ')}
               >
                 <NarrativePortrait
@@ -141,15 +144,13 @@ function VipNarrative({
 
               <div
                 className={[
-                  'absolute left-1/2 top-[-5%] z-10 translate-x-[14%] scale-[0.92] pointer-events-none transition-opacity duration-700 ease-out',
-                  isAmandaVisible
-                    ? 'opacity-100'
-                    : 'opacity-0 pointer-events-none',
+                  'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
+                  isMirandaBoxVisible ? 'opacity-100' : 'opacity-0',
                 ].join(' ')}
               >
                 <NarrativePortrait
                   fallbackSrc="/images/amanda-priestly.png"
-                  name="Amanda Priestly"
+                  name="Miranda Priestly"
                   role="Il Critico"
                   src="/images/amanda-priestly.png"
                   tone="silver"
@@ -161,7 +162,7 @@ function VipNarrative({
               <div
                 className={[
                   'w-full max-w-[25rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
-                  isAmandaBoxVisible
+                  isMirandaBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : 'translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
                 ].join(' ')}
@@ -179,7 +180,12 @@ function VipNarrative({
           </div>
 
           <div className="mx-auto flex h-full w-full max-w-2xl flex-col justify-center gap-5 lg:hidden">
-            <div className="mx-auto">
+            <div
+              className={[
+                'mx-auto transition-all duration-700',
+                !isMirandaVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+              ].join(' ')}
+            >
               <NarrativePortrait
                 fallbackSrc="/images/andrea_sachs.png"
                 name="Andrea Sachs"
@@ -205,12 +211,17 @@ function VipNarrative({
               />
             </div>
 
-            {isAmandaVisible ? (
-              <div className="mx-auto">
+            {isMirandaVisible ? (
+              <div
+                className={[
+                  'mx-auto transition-all duration-700',
+                  isMirandaBoxVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                ].join(' ')}
+              >
                 <NarrativePortrait
                   compact
                   fallbackSrc="/images/amanda-priestly.png"
-                  name="Amanda Priestly"
+                  name="Miranda Priestly"
                   role="Il Critico"
                   src="/images/amanda-priestly.png"
                   tone="silver"
@@ -221,7 +232,7 @@ function VipNarrative({
             <div
               className={[
                 'rounded-[2rem] border border-stone-300/16 bg-black/54 p-5 backdrop-blur-xl transition-all duration-700 ease-out',
-                isAmandaBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
+                isMirandaBoxVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
               ].join(' ')}
             >
               <TypewriterText

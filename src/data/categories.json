@@ -4,7 +4,7 @@
     "kind": "room",
     "title": "Sala delle Frequenze",
     "ghost": "Il Silenzio dei film horror",
-    "description": "Una sala di risonanze, archivi sonori e tracce trattenute. Il Curatore custodisce gli indizi; il Critico li piega in echi contraddittori.",
+    "description": "Una sala di risonanze, archivi sonori e tracce trattenute. Il Guardiano custodisce gli indizi; l'Inquisitore li piega in echi contraddittori.",
     "backgroundImage": "/images/rooms/musica-bg.png",
     "mapImage": "/images/rooms/musica-map.png",
     "fear": {
@@ -84,60 +84,60 @@
     "unlockCost": 0,
     "buyAccessCost": 60,
     "characters": {
-      "curator": {
-        "id": "achille-lauro",
+      "guardian": {
+        "id": "achille",
         "name": "Achille Lauro",
-        "role": "Il Curatore",
+        "role": "Il Guardiano",
         "imageSrc": "/images/achille-lauro.png",
         "fallbackImageSrc": "/images/achille-lauro.png",
         "tone": "gold"
       },
-      "critic": {
+      "inquisitor": {
         "id": "sal-da-vinci",
-        "name": "Sal Da Vinci",
-        "role": "Il Critico",
+        "name": "Sal da Vinci",
+        "role": "L'Inquisitore",
         "imageSrc": "/images/sal-da-vinci.png",
         "fallbackImageSrc": "/images/sal-da-vinci.png",
         "tone": "silver"
       }
     },
     "introNarrative": {
-      "curator": {
+      "guardian": {
         "name": "Achille Lauro",
-        "message": "Benvenuto nella Sala delle Frequenze. Ogni nota racconta una storia... se sai ascoltare. Io saro la tua guida tra gli indizi sonori."
+        "message": "Ti aspettavo. Ogni nota qui racconta una storia... se sai ascoltare. Io sono il guardiano di questa ombra. Segui la musica."
       },
-      "critic": {
-        "name": "Sal Da Vinci",
-        "message": "Ah, un altro aspirante intenditore. Qui le canzoni non si regalano, si conquistano. Vediamo se le tue orecchie valgono qualcosa..."
+      "inquisitor": {
+        "name": "Sal da Vinci",
+        "message": "Ah, sei arrivata fin qui. Pensi di conoscere la musica? Le canzoni non si regalano, si conquistano. Vediamo se le tue orecchie valgono davvero qualcosa... o se ti spaventa non capire."
       }
     },
     "characterComments": {
       "onCorrect": [
-        { "speaker": "curator", "text": "Eccellente! Le frequenze ti riconoscono." },
-        { "speaker": "curator", "text": "Il Curatore annuisce: questa nota era perfetta." },
-        { "speaker": "curator", "text": "Bravo! La sala risuona della tua risposta." },
-        { "speaker": "curator", "text": "Hai un orecchio notevole. Prosegui cosi." },
-        { "speaker": "curator", "text": "La melodia ti guida bene. Continua." }
+        { "speaker": "guardian", "text": "Eccellente! Le frequenze ti riconoscono." },
+        { "speaker": "guardian", "text": "Il Guardiano annuisce: questa nota era perfetta." },
+        { "speaker": "guardian", "text": "Bravo! La sala risuona della tua risposta." },
+        { "speaker": "guardian", "text": "Hai un orecchio notevole. Prosegui cosi." },
+        { "speaker": "guardian", "text": "La melodia ti guida bene. Continua." }
       ],
       "onWrong": [
-        { "speaker": "critic", "text": "Stonato. Decisamente stonato." },
-        { "speaker": "critic", "text": "Il Critico scuote la testa: non ci siamo proprio." },
-        { "speaker": "critic", "text": "Forse la musica non fa per te... o forse si, chi lo sa." },
-        { "speaker": "critic", "text": "Questa risposta fa piangere anche il pianoforte." },
-        { "speaker": "critic", "text": "Hmm, no. Prova a usare le orecchie la prossima volta." }
+        { "speaker": "inquisitor", "text": "Stonato. Decisamente stonato." },
+        { "speaker": "inquisitor", "text": "L'Inquisitore scuote la testa: non ci siamo proprio." },
+        { "speaker": "inquisitor", "text": "Forse la musica non fa per te... o forse si, chi lo sa." },
+        { "speaker": "inquisitor", "text": "Questa risposta fa piangere anche il pianoforte." },
+        { "speaker": "inquisitor", "text": "Hmm, no. Prova a usare le orecchie la prossima volta." }
       ],
       "onHintUsed": [
-        { "speaker": "curator", "text": "Un piccolo aiuto dal Curatore. Usalo bene." },
-        { "speaker": "curator", "text": "Ecco un indizio... ma ti costera qualche credito." },
-        { "speaker": "curator", "text": "Il Curatore sussurra un suggerimento. Ascolta attentamente." },
-        { "speaker": "curator", "text": "Un frammento per orientarti. Il resto tocca a te." }
+        { "speaker": "guardian", "text": "Un piccolo aiuto dal Guardiano. Usalo bene." },
+        { "speaker": "guardian", "text": "Ecco un indizio... ma ti costera qualche credito." },
+        { "speaker": "guardian", "text": "Il Guardiano sussurra un suggerimento. Ascolta attentamente." },
+        { "speaker": "guardian", "text": "Un frammento per orientarti. Il resto tocca a te." }
       ],
       "onHesitation": [
-        { "speaker": "critic", "text": "Stai ascoltando o stai dormendo?" },
-        { "speaker": "critic", "text": "Il play non si consuma, ma la mia pazienza si." },
-        { "speaker": "critic", "text": "Quante volte ancora? Anche il giradischi si sta annoiando." },
-        { "speaker": "critic", "text": "Prendi una decisione, il tempo non e tuo amico qui." },
-        { "speaker": "critic", "text": "Il Critico sbadiglia vistosamente." }
+        { "speaker": "inquisitor", "text": "Stai ascoltando o stai dormendo?" },
+        { "speaker": "inquisitor", "text": "Il play non si consuma, ma la mia pazienza si." },
+        { "speaker": "inquisitor", "text": "Quante volte ancora? Anche il giradischi si sta annoiando." },
+        { "speaker": "inquisitor", "text": "Prendi una decisione, il tempo non e tuo amico qui." },
+        { "speaker": "inquisitor", "text": "L'Inquisitore sbadiglia vistosamente." }
       ]
     },
     "challenges": [
@@ -161,7 +161,7 @@
         "authorPlaceholder": "Autore o artista",
         "hint": "Il brano ha un tono indie-pop malinconico. Il titolo parla di un ritorno.",
         "explanation": "'Back to Friends' di Sombr: un pezzo indie-pop uscito come singolo, riconoscibile dal synth sognante e dal ritornello sussurrato.",
-        "speaker": "curator",
+        "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
@@ -190,7 +190,7 @@
         "authorPlaceholder": "Autore o artista",
         "hint": "L'artista e britannico e il brano parla di guardare le stelle. Pensa al cielo notturno.",
         "explanation": "'Stargazing' di Myles Smith: un successo virale del 2024, con chitarra acustica e un ritornello che cita letteralmente le stelle.",
-        "speaker": "curator",
+        "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
@@ -291,7 +291,7 @@
         "placeholder": "Completa qui il verso",
         "hint": "Il verso gioca su un doppio significato della parola 'mancano'. Pensa a qualcuno che sente la mancanza piu di altri.",
         "explanation": "Il verso completo e 'Anche se ti mancano, non ti mancano come ti manco io' — un gioco di parole tra assenza e desiderio.",
-        "speaker": "critic",
+        "speaker": "inquisitor",
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
@@ -316,7 +316,7 @@
         "placeholder": "Completa qui il verso",
         "hint": "E una frase breve, quasi una domanda retorica. Si parla di una mamma e di fare colpo.",
         "explanation": "'Che piacevo a tua mamma?' — un verso ironico e diretto, tipico del rap italiano contemporaneo.",
-        "speaker": "critic",
+        "speaker": "inquisitor",
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
@@ -341,7 +341,7 @@
         "placeholder": "Completa qui il verso",
         "hint": "E una frase di cinque parole in inglese. Qualcuno chiede di non essere dimenticato.",
         "explanation": "'Please, don't forget about me' — un verso che esprime la paura dell'oblio, comune nel pop-rock emotivo.",
-        "speaker": "critic",
+        "speaker": "inquisitor",
         "creditReward": 15,
         "hintCost": 15,
         "scoring": {
@@ -366,7 +366,7 @@
         "placeholder": "Titolo del brano",
         "hint": "Il titolo ha a che fare con creature oscure interiori.",
         "explanation": "'Demons' degli Imagine Dragons (2012): il brano parla dei propri demoni interiori. Riconoscibile anche al contrario per il ritmo della batteria.",
-        "speaker": "curator",
+        "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15
       },
@@ -388,7 +388,7 @@
         "placeholder": "Titolo del brano",
         "hint": "Il titolo e una singola parola inglese. L'artista non e mainstream.",
         "explanation": "'Ordinary' — un brano dal tono rilassato. Invertito, il ritmo della voce resta il miglior indizio per riconoscerlo.",
-        "speaker": "curator",
+        "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15
       },
@@ -435,7 +435,7 @@
         "acceptedAnswers": ["Don't Start Now", "Dont Start Now"],
         "hint": "E un successo disco-pop di Dua Lipa.",
         "explanation": "'Don't Start Now' di Dua Lipa (2019): il bassline funky e inconfondibile gia dal primo strumento isolato.",
-        "speaker": "curator",
+        "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
@@ -487,7 +487,7 @@
         "acceptedAnswers": ["Faro di te un uomo", "Faro di te un Uomo", "Faro di te unUomo", "Farò di te un uomo"],
         "hint": "Luca, Giuseppe e Tiziano.",
         "explanation": "'Faro di te un uomo' — un evergreen italiano sull'educazione e la crescita, spesso associato a momenti solenni.",
-        "speaker": "curator",
+        "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {

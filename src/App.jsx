@@ -1,7 +1,6 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom'
 import { usePlayerState } from './hooks/usePlayerState'
 import DevPage from './pages/DevPage.jsx'
-import { isDevToolsEnabled } from './lib/runtimeFlags.js'
 import HomePage from './pages/HomePage.jsx'
 import PlayPage from './pages/PlayPage.jsx'
 import ShadowHallPage from './pages/ShadowHallPage.jsx'
@@ -11,7 +10,7 @@ function AppShell() {
   const navItems = [
     { to: '/', label: 'Home', end: true },
     ...(isAuthenticated ? [{ to: '/shadows', label: 'Sala Ombre' }] : []),
-    ...(role === 'admin' && isDevToolsEnabled ? [{ to: '/dev', label: 'Dev' }] : []),
+    ...(role === 'admin' ? [{ to: '/dev', label: 'Dev' }] : []),
   ]
 
   return (
@@ -99,15 +98,11 @@ function App() {
           <Route path="/map" element={<Navigate replace to="/shadows" />} />
           <Route
             path="/dev"
-            element={
-              isDevToolsEnabled ? (
-                <ProtectedRoute requireAdmin>
-                  <DevPage />
-                </ProtectedRoute>
-              ) : (
-                <Navigate replace to="/" />
-              )
-            }
+            element={(
+              <ProtectedRoute requireAdmin>
+                <DevPage />
+              </ProtectedRoute>
+            )}
           />
           <Route
             path="/play/:categoryId"

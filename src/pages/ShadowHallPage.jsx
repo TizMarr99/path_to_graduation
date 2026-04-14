@@ -205,6 +205,44 @@ export default function ShadowHallPage() {
         }}
       />
 
+      <div
+        style={{
+          position: 'absolute',
+          left: '24px',
+          bottom: '28px',
+          zIndex: 9,
+          maxWidth: 'min(30rem, calc(100vw - 48px))',
+          padding: '14px 18px',
+          borderRadius: '18px',
+          border: '1px solid rgba(212,175,55,0.28)',
+          background: 'linear-gradient(180deg, rgba(15,23,42,0.78), rgba(2,6,23,0.9))',
+          boxShadow: '0 0 30px rgba(0,0,0,0.28)',
+          backdropFilter: 'blur(8px)',
+        }}
+      >
+        <p
+          style={{
+            fontSize: '0.62rem',
+            letterSpacing: '0.34em',
+            textTransform: 'uppercase',
+            color: 'rgba(253,230,138,0.72)',
+            marginBottom: '8px',
+          }}
+        >
+          Didascalia di Sala
+        </p>
+        <p
+          style={{
+            fontSize: 'clamp(0.9rem, 1.5vw, 1.05rem)',
+            lineHeight: 1.65,
+            color: 'rgba(255,248,220,0.92)',
+            textShadow: '0 0 12px rgba(0,0,0,0.28)',
+          }}
+        >
+          Ogni ombra cela una voce. Avvicinati per sentirla.
+        </p>
+      </div>
+
       {/* Slot container */}
       <div style={{ position: 'absolute', inset: 0 }}>
         {shadowSlots.map((slot) => {
@@ -248,7 +286,7 @@ export default function ShadowHallPage() {
             color: 'rgba(251,191,36,0.8)',
           }}
         >
-          La Sala delle Ombre
+          La Grotta delle Ombre
         </p>
 
         <button

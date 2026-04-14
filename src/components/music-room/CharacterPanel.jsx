@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 /**
  * Full-size character panel for displaying character comments.
@@ -6,52 +6,37 @@ import { useEffect, useRef, useState } from 'react'
  * Props:
  *   character      - { name, role, imageSrc, tone }
  *   message        - string to display
- *   visible        - boolean (controls mount/unmount with fade)
+ *   visible        - boolean (controls whether the panel is rendered)
  *   onDismiss      - callback (called on click or tap)
  *   autoDismissMs  - number, default 3000; pass 0 to disable built-in timer
- *   mirror         - boolean; if true, portrait is on the right (used for Sal / critic)
+ *   mirror         - boolean; if true, portrait is on the right (used for Sal / inquisitor)
  */
 function CharacterPanel({ character, message, visible, onDismiss, autoDismissMs = 3000, mirror = false }) {
-  const [isShown, setIsShown] = useState(false)
-  const [isMounted, setIsMounted] = useState(!!visible)
-  const fadeOutTimerRef = useRef(null)
   const autoDismissTimerRef = useRef(null)
 
   useEffect(() => {
-    if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current)
     if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current)
 
-    if (visible) {
-      setIsMounted(true)
-      const frameId = requestAnimationFrame(() => setIsShown(true))
+    if (!visible || autoDismissMs <= 0) {
+      return undefined
+    }
 
-      if (autoDismissMs > 0) {
-        autoDismissTimerRef.current = setTimeout(() => {
-          onDismiss?.()
-        }, autoDismissMs)
-      }
+    autoDismissTimerRef.current = setTimeout(() => {
+      onDismiss?.()
+    }, autoDismissMs)
 
-      return () => {
-        cancelAnimationFrame(frameId)
-        if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current)
-      }
-    } else {
-      setIsShown(false)
-      fadeOutTimerRef.current = setTimeout(() => setIsMounted(false), 500)
-      return () => {
-        if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current)
-      }
+    return () => {
+      if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current)
     }
   }, [visible, autoDismissMs, onDismiss])
 
   useEffect(() => {
     return () => {
-      if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current)
       if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current)
     }
   }, [])
 
-  if (!isMounted) return null
+  if (!visible) return null
 
   const isSilver = character?.tone === 'silver'
   const accentBorder = isSilver ? 'border-stone-300/30' : 'border-amber-300/30'
@@ -128,7 +113,7 @@ function CharacterPanel({ character, message, visible, onDismiss, autoDismissMs 
         accentBorder,
         accentBg,
         accentGlow,
-        isShown && visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-[0.98]',
+        'opacity-100 translate-y-0 scale-100',
       ].join(' ')}
       onClick={onDismiss}
       onKeyDown={(e) => {

@@ -121,7 +121,7 @@ function resolveFeedbackSpeaker(challenge, isCorrect) {
     return challenge.speaker
   }
 
-  return isCorrect ? 'curator' : 'critic'
+  return isCorrect ? 'guardian' : 'inquisitor'
 }
 
 /**
@@ -134,14 +134,14 @@ function resolveFeedbackMessage(challenge, isCorrect) {
     return (
       challenge.successMessage ||
       challenge.explanation ||
-      'Il Curatore lascia filtrare un bagliore: la prova ha ceduto.'
+      'Il Guardiano lascia filtrare un bagliore: la prova ha ceduto.'
     )
   }
 
   return (
     challenge.failureMessage ||
     challenge.explanation ||
-    'Il Critico confonde le tracce. Serve un nuovo tentativo.'
+    "L'Inquisitore confonde le tracce. Serve un nuovo tentativo."
   )
 }
 
@@ -241,7 +241,7 @@ function resolveSolutionLines(challenge) {
 function buildChallengeFeedback(challenge, isCorrect, category) {
   return {
     isCorrect,
-    title: isCorrect ? 'Il Curatore approva il passaggio' : 'Il Critico devia la rotta',
+    title: isCorrect ? 'Il Guardiano approva il passaggio' : "L'Inquisitore devia la rotta",
     message: resolveFeedbackMessage(challenge, isCorrect),
     attemptedChallengeId: challenge.id,
     categoryTitle: category?.title ?? '',
@@ -341,8 +341,8 @@ export const challengeTypeRegistry = {
         scoreEarned,
         maxScore: challenge.scoring.maxScore,
         title: isCorrect
-          ? 'Il Curatore ricompone gli indizi'
-          : 'Il Critico offusca il quadro finale',
+          ? 'Il Guardiano ricompone gli indizi'
+          : "L'Inquisitore offusca il quadro finale",
       })
     },
   },
@@ -517,11 +517,11 @@ export function evaluateChallenge(args) {
   if (!entry) {
     return {
       isCorrect: false,
-      title: 'Il Critico ha manomesso la prova',
+      title: "L'Inquisitore ha manomesso la prova",
       message: 'Questo tipo di sfida non ha ancora un interprete attivo.',
       attemptedChallengeId: args.challenge.id,
       categoryTitle: args.category?.title ?? '',
-      speaker: 'critic',
+      speaker: 'inquisitor',
       tone: 'failure',
     }
   }

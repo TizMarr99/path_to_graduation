@@ -1,4 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  getRoomCharacterBySpeaker,
+  getRoomSpeakerArchetypeLabel,
+  getRoomSpeakerLabel,
+  getRoomSpeakerTone,
+  normalizeRoomSpeaker,
+} from '../lib/roomSpeakers'
 
 /** Duration of the auto-dismissing panel for hesitation / hint-used events. */
 const PANEL_DURATION_MS = 6000
@@ -14,17 +21,17 @@ function pickRandom(items) {
  * @param {import('../types/challenge').CategoryCharacters | null | undefined} characters
  */
 function buildCommentData(comment, characters) {
-  const speakerKey = comment.speaker === 'critic' ? 'critic' : 'curator'
-  const character = characters?.[speakerKey] ?? null
+  const speakerKey = normalizeRoomSpeaker(comment.speaker)
+  const character = getRoomCharacterBySpeaker(characters, comment.speaker)
   return {
     speaker: comment.speaker,
     speakerKey,
     text: comment.text,
     character,
-    characterName: character?.name ?? (speakerKey === 'critic' ? 'Il Critico' : 'Il Curatore'),
+    characterName: character?.name ?? getRoomSpeakerLabel(speakerKey),
     characterImage: character?.imageSrc ?? '',
-    tone: character?.tone ?? (speakerKey === 'critic' ? 'silver' : 'gold'),
-    archetypeLabel: speakerKey === 'critic' ? 'Voce del Critico' : 'Voce del Curatore',
+    tone: character?.tone ?? getRoomSpeakerTone(speakerKey),
+    archetypeLabel: getRoomSpeakerArchetypeLabel(speakerKey),
   }
 }
 

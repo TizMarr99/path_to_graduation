@@ -121,10 +121,6 @@ function HomePage() {
     navigate('/shadows')
   }
 
-  function handleEnterMusicRoom() {
-    navigate('/play/musica')
-  }
-
   return (
     <div className="min-h-screen bg-black text-amber-50">
       {stage === 'login' ? (
@@ -148,7 +144,6 @@ function HomePage() {
           narrativeScene={narrativeScene}
           onAndreaTypewriterComplete={handleAndreaTypewriterComplete}
           onDiscoverMap={handleGoToMap}
-          onEnterMusicRoom={handleEnterMusicRoom}
           onMirandaTypewriterComplete={handleMirandaTypewriterComplete}
         />
       ) : null}

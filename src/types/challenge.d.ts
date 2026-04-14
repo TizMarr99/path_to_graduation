@@ -12,7 +12,7 @@ export type ChallengeType =
   | 'hitster'
 
 export type ChallengeDifficulty = 'easy' | 'medium' | 'hard'
-export type ChallengeSpeaker = 'curator' | 'critic' | 'neutral'
+export type ChallengeSpeaker = 'guardian' | 'inquisitor' | 'curator' | 'critic' | 'neutral'
 export type CategoryKind = 'room' | 'side_game' | 'final_path'
 export type ChallengeAssetKind = 'image' | 'audio' | 'video'
 export type RewardArtifactType = 'hint' | 'shield' | 'light_key'
@@ -301,6 +301,8 @@ export interface CategoryCharacterInfo {
 }
 
 export interface CategoryCharacters {
+  guardian?: CategoryCharacterInfo
+  inquisitor?: CategoryCharacterInfo
   curator?: CategoryCharacterInfo
   critic?: CategoryCharacterInfo
 }
@@ -311,6 +313,8 @@ export interface CategoryNarrativeMessage {
 }
 
 export interface CategoryIntroNarrative {
+  guardian?: CategoryNarrativeMessage
+  inquisitor?: CategoryNarrativeMessage
   curator?: CategoryNarrativeMessage
   critic?: CategoryNarrativeMessage
 }

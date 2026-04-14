@@ -1,4 +1,5 @@
 import rawCategories from '../data/categories.json'
+import { normalizeRoomSpeaker } from './roomSpeakers'
 
 const STATIC_ASSET_PREFIXES = new Map([
   ['/src/data/musica/', '/musica/'],
@@ -57,11 +58,7 @@ function normalizeAssets(rawAssets = []) {
  * @returns {import('../types/challenge').ChallengeSpeaker}
  */
 function normalizeSpeaker(rawChallenge) {
-  if (rawChallenge.speaker === 'critic' || rawChallenge.speaker === 'neutral') {
-    return rawChallenge.speaker
-  }
-
-  return 'curator'
+  return normalizeRoomSpeaker(rawChallenge.speaker)
 }
 
 function normalizeHintCost(rawHintCost, creditReward) {
