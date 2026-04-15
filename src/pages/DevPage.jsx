@@ -471,13 +471,11 @@ function DevPage() {
               />
               <StatCard
                 accentClassName="rounded-2xl border border-amber-300/15 bg-amber-300/8 px-4 py-3 text-amber-50"
-                detail={`usati ${playerState.stats.quizzesAttempted}`}
                 label="Tentativi rimasti"
                 value={currentAttemptsRemaining}
               />
               <StatCard
                 accentClassName="rounded-2xl border border-rose-300/15 bg-rose-300/8 px-4 py-3 text-rose-50"
-                detail={`consumate ${playerState.stats.wrongAnswersToday}`}
                 label="Vite rimaste"
                 value={currentLivesRemaining}
               />
@@ -586,13 +584,11 @@ function DevPage() {
                   />
                   <StatCard
                     accentClassName="rounded-2xl border border-amber-300/15 bg-amber-300/8 px-4 py-3 text-amber-50"
-                    detail={`usati ${targetPlayerState.stats.quizzesAttempted}`}
                     label="Tentativi rimasti"
                     value={targetAttemptsRemaining}
                   />
                   <StatCard
                     accentClassName="rounded-2xl border border-rose-300/15 bg-rose-300/8 px-4 py-3 text-rose-50"
-                    detail={`consumate ${targetPlayerState.stats.wrongAnswersToday}`}
                     label="Vite rimaste"
                     value={targetLivesRemaining}
                   />

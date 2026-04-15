@@ -10,17 +10,13 @@ function clampNonNegativeInteger(value) {
   return Math.max(0, Math.trunc(value))
 }
 
-function clampRemaining(value, maxValue) {
-  return Math.min(maxValue, clampNonNegativeInteger(value))
-}
-
 export function createDefaultStats() {
   return {
     date: '',
     quizzesStarted: 0,
-    quizzesAttempted: 0,
+    attemptsRemaining: MAX_DAILY_QUIZ_ATTEMPTS,
     wrongAnswers: 0,
-    wrongAnswersToday: 0,
+    livesRemaining: MAX_DAILY_LIVES,
     lastResetAt: Date.now(),
   }
 }
@@ -84,9 +80,9 @@ export function normalizeSnapshot(snapshot) {
       stats: {
         date: dailyLimits?.play_date ?? '',
         quizzesStarted: 0,
-        quizzesAttempted: dailyLimits?.quizzes_attempted ?? 0,
+        attemptsRemaining: clampNonNegativeInteger(dailyLimits?.attempts_remaining ?? MAX_DAILY_QUIZ_ATTEMPTS),
         wrongAnswers: 0,
-        wrongAnswersToday: dailyLimits?.wrong_answers_today ?? 0,
+        livesRemaining: clampNonNegativeInteger(dailyLimits?.lives_remaining ?? MAX_DAILY_LIVES),
         lastResetAt: dailyLimits?.updated_at
           ? Date.parse(dailyLimits.updated_at) || Date.now()
           : Date.now(),
@@ -118,27 +114,19 @@ export function buildProgressPayload(playerState) {
 
 export function buildDailyPayload(playerState) {
   return {
-    quizzes_attempted: playerState.stats.quizzesAttempted,
-    wrong_answers_today: playerState.stats.wrongAnswersToday,
+    attempts_remaining: playerState.stats.attemptsRemaining,
+    lives_remaining: playerState.stats.livesRemaining,
   }
 }
 
 export function getAttemptsRemaining(playerState) {
-  const attemptsUsed = clampNonNegativeInteger(playerState?.stats?.quizzesAttempted ?? 0)
-  return Math.max(0, MAX_DAILY_QUIZ_ATTEMPTS - attemptsUsed)
+  const raw = playerState?.stats?.attemptsRemaining ?? 0
+  return Math.max(0, Number.isFinite(raw) ? Math.trunc(raw) : 0)
 }
 
 export function getLivesRemaining(playerState) {
-  const livesUsed = clampNonNegativeInteger(playerState?.stats?.wrongAnswersToday ?? 0)
-  return Math.max(0, MAX_DAILY_LIVES - livesUsed)
-}
-
-export function remainingAttemptsToUsed(remainingAttempts) {
-  return MAX_DAILY_QUIZ_ATTEMPTS - clampRemaining(remainingAttempts, MAX_DAILY_QUIZ_ATTEMPTS)
-}
-
-export function remainingLivesToUsed(remainingLives) {
-  return MAX_DAILY_LIVES - clampRemaining(remainingLives, MAX_DAILY_LIVES)
+  const raw = playerState?.stats?.livesRemaining ?? 0
+  return Math.max(0, Number.isFinite(raw) ? Math.trunc(raw) : 0)
 }
 
 export function resetMusicRoomIntroInPlayerState(playerState) {
@@ -176,30 +164,26 @@ export function resetCurrentPositionInPlayerState(playerState) {
 
 export function applyAdminStateOverrides(
   playerState,
-  { credits, attemptsRemaining, livesRemaining, quizzesAttempted, wrongAnswersToday },
+  { credits, attemptsRemaining, livesRemaining },
 ) {
   const nextCredits =
     typeof credits === 'number' ? clampNonNegativeInteger(credits) : playerState.credits
-  const nextQuizzesAttempted =
+  const nextAttemptsRemaining =
     typeof attemptsRemaining === 'number'
-      ? remainingAttemptsToUsed(attemptsRemaining)
-      : typeof quizzesAttempted === 'number'
-        ? clampNonNegativeInteger(quizzesAttempted)
-        : playerState.stats.quizzesAttempted
-  const nextWrongAnswersToday =
+      ? clampNonNegativeInteger(attemptsRemaining)
+      : playerState.stats.attemptsRemaining
+  const nextLivesRemaining =
     typeof livesRemaining === 'number'
-      ? remainingLivesToUsed(livesRemaining)
-      : typeof wrongAnswersToday === 'number'
-        ? clampNonNegativeInteger(wrongAnswersToday)
-        : playerState.stats.wrongAnswersToday
+      ? clampNonNegativeInteger(livesRemaining)
+      : playerState.stats.livesRemaining
 
   return {
     ...playerState,
     credits: nextCredits,
     stats: {
       ...playerState.stats,
-      quizzesAttempted: nextQuizzesAttempted,
-      wrongAnswersToday: nextWrongAnswersToday,
+      attemptsRemaining: nextAttemptsRemaining,
+      livesRemaining: nextLivesRemaining,
     },
     lastPlayedAt: new Date().toISOString(),
   }

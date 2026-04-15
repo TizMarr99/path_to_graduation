@@ -463,9 +463,9 @@ export type RawChallenge =
 export interface DailyStats {
   date: string
   quizzesStarted: number
-  quizzesAttempted: number
+  attemptsRemaining: number
   wrongAnswers: number
-  wrongAnswersToday: number
+  livesRemaining: number
   lastResetAt: number
 }
 

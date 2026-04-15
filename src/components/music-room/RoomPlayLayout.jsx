@@ -6,13 +6,13 @@ function FearVisualOverlay({ fearId, isActive }) {
   if (fearId === 'horror-musica') {
     return (
       <>
-        {/* Aggressive red flicker flash — fixed so it covers modals too */}
+        {/* Subtle red flicker flash — fixed so it covers modals too */}
         <div
           className="pointer-events-none fixed inset-0 z-[80] horror-flicker"
-          style={{ background: 'radial-gradient(circle at center, rgba(220,20,20,0.82) 0%, rgba(100,0,0,0.65) 45%, rgba(2,6,23,0.90) 100%)' }}
+          style={{ background: 'radial-gradient(circle at center, rgba(190,10,10,0.42) 0%, rgba(60,0,0,0.28) 45%, rgba(2,6,23,0.70) 100%)' }}
         />
         {/* Scanline texture */}
-        <div className="pointer-events-none fixed inset-0 z-[80] opacity-35 [background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.05)_0_1px,transparent_1px_10px),repeating-linear-gradient(90deg,rgba(239,68,68,0.04)_0_1px,transparent_1px_12px)]" />
+        <div className="pointer-events-none fixed inset-0 z-[80] opacity-15 [background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.05)_0_1px,transparent_1px_10px),repeating-linear-gradient(90deg,rgba(239,68,68,0.04)_0_1px,transparent_1px_12px)]" />
       </>
     )
   }

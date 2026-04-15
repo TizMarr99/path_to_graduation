@@ -402,9 +402,9 @@ export function PlayerStateProvider({ children }) {
         credits: currentState.credits + Math.max(0, awardedCredits),
         stats: {
           ...currentState.stats,
-          wrongAnswersToday: consumeLife
-            ? currentState.stats.wrongAnswersToday + 1
-            : currentState.stats.wrongAnswersToday,
+          livesRemaining: consumeLife
+            ? Math.max(0, currentState.stats.livesRemaining - 1)
+            : currentState.stats.livesRemaining,
         },
         lastPlayedAt: new Date().toISOString(),
       }),
@@ -441,7 +441,7 @@ export function PlayerStateProvider({ children }) {
         ...currentState,
         stats: {
           ...currentState.stats,
-          quizzesAttempted: currentState.stats.quizzesAttempted + 1,
+          attemptsRemaining: Math.max(0, currentState.stats.attemptsRemaining - 1),
         },
         lastPlayedAt: new Date().toISOString(),
       }),
@@ -455,7 +455,7 @@ export function PlayerStateProvider({ children }) {
         ...currentState,
         stats: {
           ...currentState.stats,
-          wrongAnswersToday: currentState.stats.wrongAnswersToday + 1,
+          livesRemaining: Math.max(0, currentState.stats.livesRemaining - 1),
         },
         lastPlayedAt: new Date().toISOString(),
       }),
@@ -468,8 +468,8 @@ export function PlayerStateProvider({ children }) {
       ...currentState,
       stats: {
         ...currentState.stats,
-        quizzesAttempted: 0,
-        wrongAnswersToday: 0,
+        attemptsRemaining: MAX_DAILY_QUIZ_ATTEMPTS,
+        livesRemaining: MAX_DAILY_LIVES,
         lastResetAt: Date.now(),
       },
     }))
@@ -669,14 +669,12 @@ export function PlayerStateProvider({ children }) {
     }
   }
 
-  function setAdminStats({ credits, attemptsRemaining, livesRemaining, quizzesAttempted, wrongAnswersToday }) {
+  function setAdminStats({ credits, attemptsRemaining, livesRemaining }) {
     updatePlayerState(
       (currentState) => applyAdminStateOverrides(currentState, {
         credits,
         attemptsRemaining,
         livesRemaining,
-        quizzesAttempted,
-        wrongAnswersToday,
       }),
       { persist: 'immediate' },
     )
@@ -729,8 +727,8 @@ export function PlayerStateProvider({ children }) {
     },
     canAttemptQuiz() {
       return (
-        playerState.stats.quizzesAttempted < MAX_DAILY_QUIZ_ATTEMPTS &&
-        playerState.stats.wrongAnswersToday < MAX_DAILY_LIVES
+        playerState.stats.attemptsRemaining > 0 &&
+        playerState.stats.livesRemaining > 0
       )
     },
     getResumePath() {

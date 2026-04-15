@@ -14,6 +14,7 @@ import MusicRoomNarrative from '../components/music-room/MusicRoomNarrative.jsx'
 import ResultModal from '../components/music-room/ResultModal.jsx'
 import RoomMapModal from '../components/music-room/RoomMapModal.jsx'
 import RoomPlayLayout from '../components/music-room/RoomPlayLayout.jsx'
+import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { useCharacterComments } from '../hooks/useCharacterComments'
 import { useChallengeSession } from '../hooks/useChallengeSession'
 import { useFearEffects } from '../hooks/useFearEffects'
@@ -83,6 +84,13 @@ function DailyLimitOverlay() {
     </div>
   )
 }
+
+const ERROR_IMAGES = [
+  '/images/rooms/musica-error1.png',
+  '/images/rooms/musica-error2.png',
+  '/images/rooms/musica-error4.png',
+]
+const ERROR_OPACITIES = [0.38, 0.52, 0.66]
 
 function PlayCategorySession({ category, preferredChallengeId }) {
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
@@ -363,6 +371,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     syncActiveSessionSnapshot,
   ])
 
+  const challengeMapLocked = !canAttemptQuiz() && !isComplete
+  const currentChallengeLocked =
+    challengeMapLocked &&
+    !hasFeedback &&
+    !isCurrentChallengeResolved
+
+  const isChallengeIntroVisible =
+    isMusicRoom &&
+    !shownIntroChallengeIds.has(currentChallengeId) &&
+    !isCurrentChallengeResolved &&
+    !challengeMapLocked
+
+  useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, isChallengeIntroVisible)
+
   // Music room intro narrative gate (shown once)
   if (shouldShowMusicIntro) {
     return (
@@ -372,12 +394,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       />
     )
   }
-
-  const challengeMapLocked = !canAttemptQuiz() && !isComplete
-  const currentChallengeLocked =
-    challengeMapLocked &&
-    !hasFeedback &&
-    !isCurrentChallengeResolved
 
   if (isComplete) {
     const passedRoom = sessionCorrectCount >= 8
@@ -473,11 +489,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     setIsRoomMapVisible(false)
   }
 
-  const isChallengeIntroVisible =
-    isMusicRoom &&
-    !shownIntroChallengeIds.has(currentChallengeId) &&
-    !isCurrentChallengeResolved &&
-    !challengeMapLocked
   const shouldShowDefaultFloatingPanel =
     activePanel?.eventType === 'onHesitation' || activePanel?.eventType === 'onHintUsed'
 
@@ -592,6 +603,16 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             awardedCredits={awardedCredits}
             characterComment={resultComment}
             creditReward={feedbackChallenge.creditReward}
+            errorImageSrc={
+              isMusicRoom && hasFeedback && !feedback.isCorrect
+                ? (ERROR_IMAGES[Math.min(sessionWrongCount - 1, 2)] ?? null)
+                : null
+            }
+            errorOpacity={
+              isMusicRoom && hasFeedback && !feedback.isCorrect
+                ? (ERROR_OPACITIES[Math.min(sessionWrongCount - 1, 2)] ?? 0.38)
+                : 0
+            }
             feedback={hasFeedback ? feedback : null}
             isOpen={hasFeedback}
             onContinue={() => {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import VipIntroVideo from '../components/home/VipIntroVideo.jsx'
 import VipLoginScreen from '../components/home/VipLoginScreen.jsx'
 import VipNarrative from '../components/home/VipNarrative.jsx'
+import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { usePlayerState } from '../hooks/usePlayerState'
 
 const LOGIN_FADE_DURATION_MS = 700
@@ -29,6 +30,8 @@ function HomePage() {
   const [personalCode, setPersonalCode] = useState('')
   const [isLoginLeaving, setIsLoginLeaving] = useState(false)
   const [isVideoLeaving, setIsVideoLeaving] = useState(false)
+
+  useBackgroundAudio({ src: '/audio/bg_intro.mp3', volume: 0.15 }, stage === 'narrative')
 
   function scheduleTimeout(callback, delay) {
     const timeoutId = window.setTimeout(() => {

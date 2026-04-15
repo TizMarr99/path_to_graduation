@@ -19,15 +19,26 @@
 
 @keyframes horrorShake {
   0%,100% { transform: translate(0, 0) rotate(0deg); }
-  10%     { transform: translate(-4px, -2px) rotate(-0.5deg); }
-  20%     { transform: translate(5px, 3px) rotate(0.4deg); }
-  30%     { transform: translate(-3px, 4px) rotate(-0.3deg); }
-  40%     { transform: translate(4px, -3px) rotate(0.5deg); }
-  50%     { transform: translate(-2px, 2px) rotate(-0.2deg); }
-  60%     { transform: translate(3px, -4px) rotate(0.3deg); }
-  70%     { transform: translate(-4px, 3px) rotate(-0.4deg); }
-  80%     { transform: translate(2px, -2px) rotate(0.2deg); }
-  90%     { transform: translate(-1px, 1px) rotate(-0.1deg); }
+  10%     { transform: translate(-2px, -1px) rotate(-0.25deg); }
+  20%     { transform: translate(3px, 2px) rotate(0.20deg); }
+  30%     { transform: translate(-2px, 2px) rotate(-0.15deg); }
+  40%     { transform: translate(2px, -2px) rotate(0.25deg); }
+  50%     { transform: translate(-1px, 1px) rotate(-0.10deg); }
+  60%     { transform: translate(2px, -2px) rotate(0.15deg); }
+  70%     { transform: translate(-2px, 2px) rotate(-0.20deg); }
+  80%     { transform: translate(1px, -1px) rotate(0.10deg); }
+  90%     { transform: translate(-1px, 1px) rotate(-0.08deg); }
+}
+
+@keyframes errorImageReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.80);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .horror-flicker {
@@ -36,4 +47,8 @@
 
 .horror-shake {
   animation: horrorShake 0.55s ease-in-out;
+}
+
+.error-image-reveal {
+  animation: errorImageReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

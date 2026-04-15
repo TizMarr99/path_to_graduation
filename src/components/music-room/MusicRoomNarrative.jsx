@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import TypewriterText from '../home/TypewriterText.jsx'
 import '../../components/home/vip-home.css'
+import { useBackgroundAudio } from '../../hooks/useBackgroundAudio'
 import { getRoomCharacterBySpeaker, getRoomNarrativeBySpeaker } from '../../lib/roomSpeakers'
 
 const HOLD_AFTER_TYPEWRITER_MS = 2200
@@ -53,6 +54,8 @@ function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role,
 function MusicRoomNarrative({ category, onComplete }) {
   const timeoutIdsRef = useRef([])
   const [scene, setScene] = useState('guardian')
+
+  useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, true)
 
   const guardian = getRoomCharacterBySpeaker(category.characters, 'guardian')
   const inquisitor = getRoomCharacterBySpeaker(category.characters, 'inquisitor')
