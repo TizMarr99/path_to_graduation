@@ -146,6 +146,7 @@ export interface ChallengeBase<T extends ChallengeType> {
   type: T
   title?: string
   prompt: string
+  infoText?: string
   assets: ChallengeAsset[]
   hint: string
   explanation: string
@@ -341,6 +342,7 @@ export interface RawChallengeBase {
   mode?: 'multiple_choice' | 'free_text'
   title?: string
   prompt: string
+  infoText?: string
   assets?: Array<string | ChallengeAsset>
   hint?: string
   explanation?: string

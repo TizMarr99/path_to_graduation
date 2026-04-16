@@ -64,13 +64,12 @@ function normalizeSpeaker(rawChallenge) {
 function normalizeHintCost(rawHintCost, creditReward) {
   const safeReward = Math.max(1, creditReward)
   const fallbackHintCost = Math.max(1, Math.floor(safeReward * 0.5))
-  const maxHintCost = Math.max(1, Math.min(safeReward - 1, Math.floor(safeReward * 0.6)))
 
   if (typeof rawHintCost !== 'number' || Number.isNaN(rawHintCost)) {
     return fallbackHintCost
   }
 
-  return Math.max(1, Math.min(rawHintCost, maxHintCost))
+  return Math.max(1, Math.floor(rawHintCost))
 }
 
 /**
@@ -87,6 +86,7 @@ function createChallengeBase(rawChallenge) {
     type: resolveChallengeType(rawChallenge),
     title: rawChallenge.title ?? '',
     prompt: rawChallenge.prompt,
+    infoText: rawChallenge.infoText ?? rawChallenge.prompt,
     assets: normalizeAssets(rawChallenge.assets),
     hint: rawChallenge.hint ?? '',
     explanation: rawChallenge.explanation ?? '',

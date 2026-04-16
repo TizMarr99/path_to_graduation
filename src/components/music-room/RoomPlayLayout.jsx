@@ -28,8 +28,11 @@ function RoomPlayLayout({
   livesRemaining,
   banner,
   isFearActive,
+  onInfoClick,
   onHintClick,
   onMapClick,
+  infoDisabled,
+  infoDisabledReason,
   hintDisabled,
   hintDisabledReason,
   mapDisabled,
@@ -94,13 +97,25 @@ function RoomPlayLayout({
         {/* Bottom bar: hint circle + progress */}
         <div className="flex items-center gap-3 border-t border-white/10 bg-slate-950/55 px-5 py-3 backdrop-blur-xl sm:px-7">
           <button
+            aria-label="Apri informazioni sulla prova"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-400/10 text-sm font-bold text-cyan-100 transition hover:border-cyan-200/55 hover:bg-cyan-400/18 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={infoDisabled}
+            onClick={onInfoClick}
+            title={infoDisabledReason || 'Apri informazioni sulla prova'}
+            type="button"
+          >
+            i
+          </button>
+
+          <button
+            aria-label="Apri indizio"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/30 bg-amber-400/10 text-base font-bold text-amber-50 transition hover:border-amber-200/55 hover:bg-amber-400/18 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={hintDisabled}
             onClick={onHintClick}
             title={hintDisabledReason || 'Usa un indizio'}
             type="button"
           >
-            ?
+            💡
           </button>
           <span className="text-sm text-slate-300">{progressLabel}</span>
         </div>

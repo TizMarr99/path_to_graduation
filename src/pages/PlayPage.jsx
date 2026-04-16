@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import ChallengeCompleted from '../components/challenges/ChallengeCompleted.jsx'
 import ChallengeFeedback from '../components/challenges/ChallengeFeedback.jsx'
 import ChallengeHintPanel from '../components/challenges/ChallengeHintPanel.jsx'
+import ChallengeInfoModal from '../components/challenges/ChallengeInfoModal.jsx'
 import ChallengeLayout from '../components/challenges/ChallengeLayout.jsx'
 import ChallengeProgress from '../components/challenges/ChallengeProgress.jsx'
 import ChallengeRenderer from '../components/challenges/ChallengeRenderer.jsx'
@@ -148,6 +149,7 @@ function ZoneChallengeNavigator({
 }
 
 function PlayCategorySession({ category, preferredChallengeId }) {
+  const [infoModalChallengeId, setInfoModalChallengeId] = useState('')
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
   const [hintModalChallengeId, setHintModalChallengeId] = useState('')
   const audioPlayCountRef = useRef(0)
@@ -373,10 +375,23 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   function handleHintReveal() {
     const cost = currentChallenge?.hintCost ?? 15
-    if (!spendCredits(cost)) return
+    if (!isHintVisible && !spendCredits(cost)) return
+
     revealHint()
-    showComment('onHintUsed')
+
+    if (!isHintVisible) {
+      showComment('onHintUsed')
+    }
+  }
+
+  function openHintModal() {
+    setInfoModalChallengeId('')
+    setHintModalChallengeId(currentChallengeId)
+  }
+
+  function openInfoModal() {
     setHintModalChallengeId('')
+    setInfoModalChallengeId(currentChallengeId)
   }
 
   function handleRestart() {
@@ -528,23 +543,36 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     ? (sessionWrongCount - 1) % ERROR_IMAGES.length
     : 0
   const roomInteractionsDisabled = isSubmitting || hasFeedback || challengeMapLocked
+  const hasInfo = Boolean(currentChallenge.infoText || currentChallenge.prompt)
+  const infoDisabled = roomInteractionsDisabled || !hasInfo
+  const infoDisabledReason = !hasInfo
+    ? 'Nessuna informazione disponibile per questa prova.'
+    : challengeMapLocked
+      ? 'Hai finito i tentativi per oggi.'
+      : ''
+  const hasHint = Boolean(currentChallenge.hint)
+  const canAffordHint = credits >= (currentChallenge.hintCost ?? 0)
   const hintDisabled =
     roomInteractionsDisabled ||
-    isHintVisible ||
-    !currentChallenge.hint ||
-    credits < (currentChallenge.hintCost ?? 0)
-  const hintDisabledReason = !currentChallenge.hint
+    !hasHint ||
+    (!isHintVisible && !canAffordHint)
+  const hintDisabledReason = !hasHint
     ? 'Nessun indizio disponibile per questa prova.'
     : challengeMapLocked
       ? 'Hai finito i tentativi per oggi.'
-      : isHintVisible
-        ? 'Hai gia usato l\'indizio per questa prova.'
-        : credits < (currentChallenge.hintCost ?? 0)
+      : !isHintVisible && !canAffordHint
           ? 'Crediti insufficienti per usare l\'indizio.'
           : ''
   const mapDisabled = roomInteractionsDisabled
   const mapDisabledReason = challengeMapLocked ? 'Hai finito i tentativi per oggi.' : ''
+  const challengeInfoText = currentChallenge.infoText || currentChallenge.prompt || ''
+  const canPurchaseHint =
+    !roomInteractionsDisabled &&
+    hasHint &&
+    !isHintVisible &&
+    canAffordHint
   const isHintModalOpen = hintModalChallengeId === currentChallengeId && !hasFeedback
+  const isInfoModalOpen = infoModalChallengeId === currentChallengeId && !hasFeedback
   const isRoomMapOpen = isRoomMapVisible && !hasFeedback
   const limitBanner = challengeMapLocked ? (
     <div className="rounded-[1.4rem] border border-amber-300/25 bg-amber-300/10 px-4 py-4">
@@ -570,6 +598,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
     clearResultComment()
     dismissFeedback()
+    setInfoModalChallengeId('')
+    setHintModalChallengeId('')
     setPendingIntroZoneId(zoneId)
     selectChallenge(nextChallengeId, { openResolvedFeedback: false })
     setIsRoomMapVisible(false)
@@ -584,6 +614,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       currentChallengeId={currentChallengeId}
       onSelect={(challengeId) => {
         setHintModalChallengeId('')
+        setInfoModalChallengeId('')
         clearResultComment()
         dismissFeedback()
         selectChallenge(challengeId)
@@ -602,13 +633,16 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             banner={limitBanner}
             category={category}
             credits={credits}
+            infoDisabled={infoDisabled}
+            infoDisabledReason={infoDisabledReason}
             hintDisabled={hintDisabled}
             hintDisabledReason={hintDisabledReason}
             isFearActive={isFearActive}
             livesRemaining={livesRemaining}
             mapDisabled={mapDisabled}
             mapDisabledReason={mapDisabledReason}
-            onHintClick={() => setHintModalChallengeId(currentChallengeId)}
+            onHintClick={openHintModal}
+            onInfoClick={openInfoModal}
             onMapClick={() => setIsRoomMapVisible(true)}
             progressLabel={progressLabel}
           >
@@ -712,17 +746,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             )}
           </RoomPlayLayout>
 
-          <HintModal
-            canUseHint={!hintDisabled}
-            credits={credits}
-            disabledReason={hintDisabledReason}
-            hint={currentChallenge.hint}
-            hintCost={currentChallenge.hintCost}
-            isOpen={isHintModalOpen}
-            onClose={() => setHintModalChallengeId('')}
-            onReveal={handleHintReveal}
-          />
-
           <RoomMapModal
             activeZoneIds={activeZoneIds}
             category={category}
@@ -756,6 +779,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               stopWrongAnswerEffect()
               setIsRoomMapVisible(false)
               setHintModalChallengeId('')
+              setInfoModalChallengeId('')
               clearResultComment()
               dismissFeedback()
             }}
@@ -763,6 +787,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               stopWrongAnswerEffect()
               setIsRoomMapVisible(false)
               setHintModalChallengeId('')
+              setInfoModalChallengeId('')
               clearResultComment()
               const nextChallenge = goToNextChallenge()
 
@@ -825,12 +850,15 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               />
 
               <ChallengeHintPanel
-                credits={credits}
-                disabled={controlsDisabled}
                 hint={currentChallenge.hint}
+                hintDisabled={hintDisabled}
+                hintDisabledReason={hintDisabledReason}
                 hintCost={currentChallenge.hintCost}
+                infoDisabled={infoDisabled}
+                infoDisabledReason={infoDisabledReason}
                 isVisible={isHintVisible}
-                onReveal={handleHintReveal}
+                onHintClick={openHintModal}
+                onInfoClick={openInfoModal}
               />
 
               {hasFeedback ? (
@@ -856,6 +884,25 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           </div>
         </ChallengeLayout>
       )}
+
+      <ChallengeInfoModal
+        description={challengeInfoText}
+        isOpen={isInfoModalOpen}
+        onClose={() => setInfoModalChallengeId('')}
+        title={currentChallenge.title || 'Dettagli prova'}
+      />
+
+      <HintModal
+        canPurchaseHint={canPurchaseHint}
+        credits={credits}
+        disabledReason={hintDisabledReason}
+        hint={currentChallenge.hint}
+        hintCost={currentChallenge.hintCost}
+        isHintVisible={isHintVisible}
+        isOpen={isHintModalOpen}
+        onClose={() => setHintModalChallengeId('')}
+        onReveal={handleHintReveal}
+      />
 
 
     </>

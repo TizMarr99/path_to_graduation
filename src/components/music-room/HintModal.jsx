@@ -1,9 +1,20 @@
-function HintModal({ isOpen, hint, hintCost, credits, canUseHint, disabledReason, onClose, onReveal }) {
+function HintModal({
+  isOpen,
+  hint,
+  hintCost,
+  credits,
+  isHintVisible,
+  canPurchaseHint,
+  disabledReason,
+  onClose,
+  onReveal,
+}) {
   if (!isOpen) {
     return null
   }
 
   const showCost = typeof hintCost === 'number'
+  const isHintAvailable = Boolean(hint)
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/90 px-4 py-6" role="dialog" aria-modal="true">
@@ -14,7 +25,7 @@ function HintModal({ isOpen, hint, hintCost, credits, canUseHint, disabledReason
               Indizio
             </p>
             <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-              Il Guardiano puo concederti un varco.
+              {isHintVisible ? 'Indizio sbloccato' : 'Vuoi comprare un indizio?'}
             </h2>
           </div>
 
@@ -29,28 +40,48 @@ function HintModal({ isOpen, hint, hintCost, credits, canUseHint, disabledReason
 
         <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/5 px-5 py-5">
           <p className="text-sm leading-7 text-slate-100/92">
-            {hint || 'Nessun indizio disponibile per questa prova.'}
+            {isHintVisible
+              ? (hint || 'Nessun indizio disponibile per questa prova.')
+              : isHintAvailable
+                ? 'Confermando l\'acquisto spenderai i crediti indicati e sbloccherai subito l\'indizio per questa prova.'
+                : 'Nessun indizio disponibile per questa prova.'}
           </p>
         </div>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm leading-6 text-slate-300">
-            {showCost ? `Costo: ${hintCost} crediti` : 'Indizio gratuito'}
+            {isHintVisible
+              ? 'Indizio gia sbloccato'
+              : showCost
+                ? `Costo: ${hintCost} crediti`
+                : 'Indizio gratuito'}
             {typeof credits === 'number' ? ` · Crediti disponibili: ${credits}` : ''}
           </div>
 
-          <button
-            className="inline-flex items-center justify-center rounded-full border border-amber-300/35 bg-amber-400/12 px-5 py-3 text-sm font-semibold text-amber-50 transition hover:border-amber-200/60 hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={!canUseHint}
-            onClick={onReveal}
-            title={disabledReason || undefined}
-            type="button"
-          >
-            Usa indizio
-          </button>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row">
+            {!isHintVisible ? (
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-950/85 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-cyan-300/45 hover:text-cyan-100"
+                onClick={onClose}
+                type="button"
+              >
+                Chiudi
+              </button>
+            ) : null}
+
+            <button
+              className="inline-flex items-center justify-center rounded-full border border-amber-300/35 bg-amber-400/12 px-5 py-3 text-sm font-semibold text-amber-50 transition hover:border-amber-200/60 hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={!isHintVisible && !canPurchaseHint}
+              onClick={isHintVisible ? onClose : onReveal}
+              title={!isHintVisible ? (disabledReason || undefined) : undefined}
+              type="button"
+            >
+              {isHintVisible ? 'Chiudi' : 'Compra indizio'}
+            </button>
+          </div>
         </div>
 
-        {disabledReason ? (
+        {!isHintVisible && disabledReason ? (
           <p className="mt-3 text-sm leading-6 text-rose-200/85">{disabledReason}</p>
         ) : null}
       </div>
