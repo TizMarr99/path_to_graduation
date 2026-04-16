@@ -4,7 +4,7 @@ import { usePlayerState } from '../hooks/usePlayerState'
 
 const shadowSlots = [
   { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',  y: '25%', w: '14%', h: '55%' },
-  { id: 'film-serie',          categoryId: 'film-serie',            label: 'Sala Film / Serie TV', x: '24%', y: '18%', w: '14%', h: '60%' },
+  { id: 'serie-film',          categoryId: 'serie-film',            label: 'Sala delle Serie e dei Film', x: '24%', y: '18%', w: '14%', h: '60%' },
   { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '43%', y: '15%', w: '14%', h: '62%' },
   { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Arte / Mito / Lett.',  x: '62%', y: '18%', w: '14%', h: '60%' },
   { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%', y: '25%', w: '14%', h: '55%' },

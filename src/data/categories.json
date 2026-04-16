@@ -611,6 +611,144 @@
     ]
   },
   {
+    "id": "serie-film",
+    "kind": "room",
+    "title": "Sala delle Serie e dei Film",
+    "ghost": "Il Clown del Corridoio",
+    "description": "Una sala di schermi spenti e poltrone vuote, dove le immagini di clown inquietanti e bambole assassine si confondono con i ricordi di jump scare inaspettati. Il Guardiano illumina le scene; l'Inquisitore le distorce in incubi vividi.",
+    "backgroundImage": "/images/rooms/serie-film-bg.png",
+    "mapImage": "/images/rooms/serie-film-map.png",
+    "fear": {
+      "id": "horror-serie-film",
+      "name": "La Bambola senza Occhi",
+      "icon": "🎈",
+      "description": "Risate distorte di clown, bambole che si muovono da sole, schermi che si accendono nel buio.",
+      "sfxSrc": "/audio/horror-clown-laugh.mp3"
+    },
+    "rewardArtifact": {
+      "type": "hint",
+      "label": "Fotogramma maledetto",
+      "description": "Ti concede un indizio extra basato sulle immagini che hai visto."
+    },
+    "mapHotspots": [
+      {
+        "id": "guess-scene",
+        "label": "Riconosci la scena",
+        "description": "Gli schermi a sinistra mostrano scene iconiche da identificare.",
+        "introPrompt": "Osserva attentamente i fotogrammi e riconosci la serie TV o il film da cui provengono.",
+        "icon": "📺",
+        "x": 10,
+        "y": 22,
+        "width": 15,
+        "height": 40
+      },
+      {
+        "id": "quote-match",
+        "label": "Citazione famosa",
+        "description": "Il pannello centrale custodisce le battute più iconiche.",
+        "introPrompt": "Leggi la citazione e identifica da quale serie TV o film proviene.",
+        "icon": "💬",
+        "x": 30,
+        "y": 18,
+        "width": 20,
+        "height": 30
+      },
+      {
+        "id": "character-recognition",
+        "label": "Riconosci il personaggio",
+        "description": "Le immagini appese mostrano volti e personaggi da ricordare.",
+        "introPrompt": "Guarda l'immagine e identifica il personaggio e la sua opera di provenienza.",
+        "icon": "🎭",
+        "x": 55,
+        "y": 15,
+        "width": 18,
+        "height": 35
+      },
+      {
+        "id": "soundtrack-quiz",
+        "label": "Colonna sonora",
+        "description": "Le casse audio nella zona bassa diffondono temi musicali.",
+        "introPrompt": "Ascolta il tema musicale e riconosci serie TV o film a cui appartiene.",
+        "icon": "🎵",
+        "x": 20,
+        "y": 65,
+        "width": 25,
+        "height": 20
+      },
+      {
+        "id": "timeline-order",
+        "label": "Ordine cronologico",
+        "description": "Il muro destro mostra opere da riordinare nel tempo.",
+        "introPrompt": "Metti in ordine cronologico le uscite di queste serie TV o film.",
+        "icon": "📅",
+        "x": 78,
+        "y": 20,
+        "width": 12,
+        "height": 50
+      }
+    ],
+    "unlockCost": 0,
+    "buyAccessCost": 60,
+    "characters": {
+      "guardian": {
+        "id": "tim-burton",
+        "name": "Tim Burton",
+        "role": "Il Guardiano",
+        "imageSrc": "/images/tim-burton.png",
+        "fallbackImageSrc": "/images/tim-burton.png",
+        "tone": "purple"
+      },
+      "inquisitor": {
+        "id": "stephen-king",
+        "name": "Stephen King",
+        "role": "L'Inquisitore",
+        "imageSrc": "/images/stephen-king.png",
+        "fallbackImageSrc": "/images/stephen-king.png",
+        "tone": "red"
+      }
+    },
+    "introNarrative": {
+      "guardian": {
+        "name": "Tim Burton",
+        "message": "Benvenuto nella sala degli schermi. Qui ogni immagine racconta una storia... se hai il coraggio di guardarla. Io sono il guardiano di questa ombra. Segui le scene."
+      },
+      "inquisitor": {
+        "name": "Stephen King",
+        "message": "Ah, pensi di conoscere il cinema e le serie? Le storie non si limitano a essere viste, devono essere vissute. Vediamo se ricordi davvero... o se la paura ti ha fatto dimenticare tutto."
+      }
+    },
+    "characterComments": {
+      "onCorrect": [
+        { "speaker": "guardian", "text": "Eccellente! Hai un occhio per i dettagli." },
+        { "speaker": "guardian", "text": "Il Guardiano annuisce: questa scena l'hai riconosciuta perfettamente." },
+        { "speaker": "guardian", "text": "Bravo! La sala proietta il tuo successo." },
+        { "speaker": "guardian", "text": "Hai una memoria visiva notevole. Continua così." },
+        { "speaker": "guardian", "text": "Le immagini ti guidano bene. Prosegui." }
+      ],
+      "onWrong": [
+        { "speaker": "inquisitor", "text": "Sbagliato. Completamente sbagliato." },
+        { "speaker": "inquisitor", "text": "L'Inquisitore scuote la testa: non hai capito nulla." },
+        { "speaker": "inquisitor", "text": "Forse guardare film non basta... bisogna ricordarli." },
+        { "speaker": "inquisitor", "text": "Questa risposta è peggio di un film di serie Z." },
+        { "speaker": "inquisitor", "text": "Hmm, no. Prova a usare gli occhi la prossima volta." }
+      ],
+      "onHintUsed": [
+        { "speaker": "guardian", "text": "Un piccolo aiuto dal Guardiano. Usalo saggiamente." },
+        { "speaker": "guardian", "text": "Ecco un indizio... ma ti costerà qualche credito." },
+        { "speaker": "guardian", "text": "Il Guardiano sussurra un suggerimento. Guarda con più attenzione." },
+        { "speaker": "guardian", "text": "Un frammento per orientarti. Il resto tocca a te." }
+      ],
+      "onHesitation": [
+        { "speaker": "inquisitor", "text": "Stai guardando o stai sognando a occhi aperti?" },
+        { "speaker": "inquisitor", "text": "Il film non si pausa da solo, ma la mia pazienza sì." },
+        { "speaker": "inquisitor", "text": "Quante volte ancora? Anche lo schermo si sta annoiando." },
+        { "speaker": "inquisitor", "text": "Prendi una decisione, il tempo scorre come i credits di un film." },
+        { "speaker": "inquisitor", "text": "L'Inquisitore sbadiglia rumorosamente." }
+      ]
+    },
+    "challenges": []
+  },
+  {
     "id": "ritratto-spezzato",
     "kind": "side_game",
     "title": "Ritratto Spezzato",
