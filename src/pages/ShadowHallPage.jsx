@@ -53,14 +53,18 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
       }}
       className="group"
     >
-      {/* Pulsing golden border */}
+      {/* Enhanced border for completed rooms */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           borderRadius: '6px',
-          border: '1px solid rgba(212,175,55,0.55)',
-          animation: 'shadowGlowPulse 2.8s ease-in-out infinite',
+          border: prizeWon
+            ? '2px solid rgba(212,175,55,0.75)'
+            : '1px solid rgba(212,175,55,0.55)',
+          animation: prizeWon
+            ? 'shadowGlowPulseCompleted 2.8s ease-in-out infinite'
+            : 'shadowGlowPulse 2.8s ease-in-out infinite',
           pointerEvents: 'none',
         }}
       />
@@ -80,6 +84,34 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
         />
       )}
 
+      {/* Artifact icon for music room */}
+      {prizeWon && slot.categoryId === 'musica' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '8%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          <img
+            src="/images/music-artifact-no-bg.png"
+            alt="Accordatore di Ombre"
+            style={{
+              width: 'clamp(32px, 5vw, 48px)',
+              height: 'clamp(32px, 5vw, 48px)',
+              filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.9))',
+              animation: 'artifactFloat 3s ease-in-out infinite',
+            }}
+            onError={(e) => {
+              e.target.style.display = 'none'
+            }}
+          />
+        </div>
+      )}
+
       {/* Label badge at bottom */}
       <div
         style={{
@@ -96,10 +128,13 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
           style={{
             fontFamily: 'Georgia, "Times New Roman", serif',
             fontSize: 'clamp(0.6rem, 1vw, 0.75rem)',
-            color: '#fde68a',
-            textShadow: '0 0 10px rgba(212,175,55,0.9)',
+            color: prizeWon ? '#fde68a' : '#fde68a',
+            textShadow: prizeWon
+              ? '0 0 14px rgba(212,175,55,1)'
+              : '0 0 10px rgba(212,175,55,0.9)',
             lineHeight: 1.3,
             marginBottom: '4px',
+            fontWeight: prizeWon ? '600' : '400',
           }}
         >
           {slot.label}
@@ -127,7 +162,7 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
         )}
       </div>
 
-      {/* Prize won badge */}
+      {/* Prize won badge (sparkle) */}
       {prizeWon && (
         <div
           style={{
@@ -160,6 +195,12 @@ export default function ShadowHallPage() {
   const navigate = useNavigate()
   const dailyBlocked = !canAttemptQuiz()
   const bgAudioRef = useRef(null)
+
+  // Check if music room has all 12 challenges completed
+  const musicProgress = roomProgress['musica']
+  const hasCompletedAllMusicChallenges = musicProgress?.sessions?.some(
+    (session) => (session.correctCount || 0) + (session.wrongCount || 0) >= 12
+  ) || false
 
   useEffect(() => {
     const audio = new Audio('/audio/shadow-hall-ambient.mp3')
@@ -253,6 +294,105 @@ export default function ShadowHallPage() {
             />
           )
         })}
+
+        {/* New locked door for TV/Film room */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '8%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'clamp(240px, 30vw, 360px)',
+            padding: '20px',
+            background: 'linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.85))',
+            border: hasCompletedAllMusicChallenges
+              ? '2px solid rgba(103, 232, 249, 0.5)'
+              : '2px solid rgba(100, 116, 139, 0.4)',
+            borderRadius: '16px',
+            boxShadow: hasCompletedAllMusicChallenges
+              ? '0 0 30px rgba(103, 232, 249, 0.2)'
+              : '0 0 20px rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(10px)',
+            opacity: hasCompletedAllMusicChallenges ? 0.95 : 0.75,
+            transition: 'all 0.3s ease',
+            cursor: hasCompletedAllMusicChallenges ? 'default' : 'not-allowed',
+            zIndex: 12,
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                marginBottom: '12px',
+                filter: hasCompletedAllMusicChallenges
+                  ? 'grayscale(0%)'
+                  : 'grayscale(70%) opacity(0.6)',
+              }}
+            >
+              {hasCompletedAllMusicChallenges ? '🎭' : '🔒'}
+            </div>
+            <h3
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 'clamp(0.9rem, 1.4vw, 1.1rem)',
+                color: hasCompletedAllMusicChallenges ? '#67e8f9' : 'rgba(203, 213, 225, 0.6)',
+                marginBottom: '8px',
+                fontWeight: '600',
+                textShadow: hasCompletedAllMusicChallenges
+                  ? '0 0 12px rgba(103, 232, 249, 0.4)'
+                  : 'none',
+              }}
+            >
+              Sala delle Serie TV & Film
+            </h3>
+            <p
+              style={{
+                fontSize: 'clamp(0.7rem, 1vw, 0.8rem)',
+                color: hasCompletedAllMusicChallenges
+                  ? 'rgba(224, 242, 254, 0.8)'
+                  : 'rgba(148, 163, 184, 0.6)',
+                marginBottom: '12px',
+                lineHeight: '1.5',
+              }}
+            >
+              {hasCompletedAllMusicChallenges
+                ? 'Prossima sala principale'
+                : 'Completa tutte le 12 prove della Sala Musica'}
+            </p>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '6px 16px',
+                background: hasCompletedAllMusicChallenges
+                  ? 'rgba(103, 232, 249, 0.15)'
+                  : 'rgba(100, 116, 139, 0.2)',
+                border: `1px solid ${
+                  hasCompletedAllMusicChallenges
+                    ? 'rgba(103, 232, 249, 0.4)'
+                    : 'rgba(100, 116, 139, 0.3)'
+                }`,
+                borderRadius: '999px',
+                fontSize: 'clamp(0.7rem, 1vw, 0.8rem)',
+                color: hasCompletedAllMusicChallenges ? '#67e8f9' : 'rgba(148, 163, 184, 0.7)',
+                fontWeight: '600',
+              }}
+            >
+              Costo: 60 🪙
+            </div>
+            {!hasCompletedAllMusicChallenges && (
+              <p
+                style={{
+                  marginTop: '12px',
+                  fontSize: 'clamp(0.65rem, 0.9vw, 0.75rem)',
+                  color: 'rgba(148, 163, 184, 0.5)',
+                  fontStyle: 'italic',
+                }}
+              >
+                Completamento necessario per sbloccare
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Top navigation bar */}
@@ -305,6 +445,14 @@ export default function ShadowHallPage() {
         @keyframes shadowGlowPulse {
           0%, 100% { box-shadow: 0 0 8px 2px rgba(212,175,55,0.25); border-color: rgba(212,175,55,0.45); }
           50%      { box-shadow: 0 0 22px 6px rgba(212,175,55,0.55); border-color: rgba(212,175,55,0.85); }
+        }
+        @keyframes shadowGlowPulseCompleted {
+          0%, 100% { box-shadow: 0 0 16px 4px rgba(212,175,55,0.45); border-color: rgba(212,175,55,0.65); }
+          50%      { box-shadow: 0 0 32px 8px rgba(212,175,55,0.75); border-color: rgba(212,175,55,0.95); }
+        }
+        @keyframes artifactFloat {
+          0%, 100% { transform: translateX(-50%) translateY(0px); }
+          50%      { transform: translateX(-50%) translateY(-8px); }
         }
       `}</style>
     </div>
