@@ -12,6 +12,7 @@ import CharacterPanel from '../components/music-room/CharacterPanel.jsx'
 import HintModal from '../components/music-room/HintModal.jsx'
 import MusicChallengeIntro from '../components/music-room/MusicChallengeIntro.jsx'
 import MusicRoomNarrative from '../components/music-room/MusicRoomNarrative.jsx'
+import MusicRoomVictoryModal from '../components/music-room/MusicRoomVictoryModal.jsx'
 import ResultModal from '../components/music-room/ResultModal.jsx'
 import RoomMapModal from '../components/music-room/RoomMapModal.jsx'
 import RoomPlayLayout from '../components/music-room/RoomPlayLayout.jsx'
@@ -497,6 +498,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   if (isComplete) {
     const passedRoom = sessionCorrectCount >= 8
+
+    // Show special victory modal for music room when prize is won
+    if (category.id === 'musica' && passedRoom) {
+      return <MusicRoomVictoryModal category={category} />
+    }
 
     return (
       <ChallengeCompleted
