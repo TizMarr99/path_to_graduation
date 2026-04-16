@@ -23,7 +23,10 @@ import { getCategoryById } from '../lib/challengeData'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
 import { getAttemptsRemaining, getLivesRemaining } from '../lib/playerStateSnapshot'
 import { getRoomCharacterBySpeaker } from '../lib/roomSpeakers'
-import { resolveChallengeCreditReward } from '../lib/challengeRewards'
+import {
+  resolveChallengeCreditBaseReward,
+  resolveChallengeCreditReward,
+} from '../lib/challengeRewards'
 
 const roomUnlockTargets = {
   musica: ['ritratto-spezzato', 'archivio-vivente'],
@@ -147,7 +150,6 @@ function ZoneChallengeNavigator({
 function PlayCategorySession({ category, preferredChallengeId }) {
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
   const [hintModalChallengeId, setHintModalChallengeId] = useState('')
-  const [shownIntroChallengeIds, setShownIntroChallengeIds] = useState(() => new Set())
   const audioPlayCountRef = useRef(0)
   const challengeMediaRef = useRef(null)
   const hesitationFiredRef = useRef(false)
@@ -239,6 +241,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       .map((challengeId) => category.challenges.find((challenge) => challenge.id === challengeId) ?? null)
       .filter(Boolean),
     [category.challenges, currentZoneId, zoneChallengeMap],
+  )
+  const currentZoneHotspot = useMemo(
+    () => category.mapHotspots?.find((hotspot) => hotspot.id === currentZoneId) ?? null,
+    [category.mapHotspots, currentZoneId],
+  )
+  const [pendingIntroZoneId, setPendingIntroZoneId] = useState(
+    () => (persistedSession ? '' : currentChallenge?.zoneId ?? ''),
   )
 
   useEffect(() => {
@@ -348,12 +357,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       showComment('onHesitation')
     }
   }, [showComment])
-  const shouldPauseHesitationTimer =
-    category.id === 'musica' &&
-    !shownIntroChallengeIds.has(currentChallengeId) &&
-    !isCurrentChallengeResolved &&
-    canAttemptQuiz() &&
-    !isComplete
 
   // Trigger hesitation when user blanks the answer field HESITATION_CLEAR_THRESHOLD times.
   useEffect(() => {
@@ -367,23 +370,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     }
     prevTextAnswerRef.current = currentText
   }, [draftAnswer?.textAnswer, showComment])
-
-  // Trigger hesitation after a time threshold if the user hasn't answered yet.
-  useEffect(() => {
-    if (!currentChallenge || hasFeedback || isComplete || shouldPauseHesitationTimer) {
-      if (hesitationTimerRef.current) clearTimeout(hesitationTimerRef.current)
-      return
-    }
-    const delay = HESITATION_TIME_THRESHOLDS_MS[currentChallenge.type] ?? HESITATION_TIME_THRESHOLDS_MS.default
-    const id = setTimeout(() => {
-      if (!hesitationFiredRef.current) {
-        hesitationFiredRef.current = true
-        showComment('onHesitation')
-      }
-    }, delay)
-    hesitationTimerRef.current = id
-    return () => clearTimeout(id)
-  }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, shouldPauseHesitationTimer, showComment])
 
   function handleHintReveal() {
     const cost = currentChallenge?.hintCost ?? 15
@@ -449,9 +435,38 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   const isChallengeIntroVisible =
     isMusicRoom &&
-    !shownIntroChallengeIds.has(currentChallengeId) &&
-    !isCurrentChallengeResolved &&
+    pendingIntroZoneId === currentZoneId &&
+    Boolean(currentZoneId) &&
     !challengeMapLocked
+  const shouldPauseHesitationTimer =
+    category.id === 'musica' &&
+    isChallengeIntroVisible &&
+    !isCurrentChallengeResolved &&
+    canAttemptQuiz() &&
+    !isComplete
+  const currentZoneIntroText =
+    currentZoneHotspot?.introPrompt ||
+    currentZoneHotspot?.description ||
+    currentZoneChallenges[0]?.prompt ||
+    currentChallenge?.prompt ||
+    'La prova ti aspetta.'
+
+  // Trigger hesitation after a time threshold if the user hasn't answered yet.
+  useEffect(() => {
+    if (!currentChallenge || hasFeedback || isComplete || shouldPauseHesitationTimer) {
+      if (hesitationTimerRef.current) clearTimeout(hesitationTimerRef.current)
+      return
+    }
+    const delay = HESITATION_TIME_THRESHOLDS_MS[currentChallenge.type] ?? HESITATION_TIME_THRESHOLDS_MS.default
+    const id = setTimeout(() => {
+      if (!hesitationFiredRef.current) {
+        hesitationFiredRef.current = true
+        showComment('onHesitation')
+      }
+    }, delay)
+    hesitationTimerRef.current = id
+    return () => clearTimeout(id)
+  }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, shouldPauseHesitationTimer, showComment])
 
   useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, isChallengeIntroVisible)
 
@@ -505,8 +520,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const activeZoneIds = Object.keys(zoneChallengeMap)
   const feedbackChallenge =
     category.challenges.find((challenge) => challenge.id === feedback.attemptedChallengeId) ?? currentChallenge
+  const feedbackCreditReward = resolveChallengeCreditBaseReward(feedbackChallenge)
   const awardedCredits = hasFeedback
     ? resolveChallengeCreditReward(feedbackChallenge, feedback)
+    : 0
+  const errorVisualIndex = sessionWrongCount > 0
+    ? (sessionWrongCount - 1) % ERROR_IMAGES.length
     : 0
   const roomInteractionsDisabled = isSubmitting || hasFeedback || challengeMapLocked
   const hintDisabled =
@@ -545,33 +564,19 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       return
     }
 
-    if (currentZoneId === zoneId) {
-      setIsRoomMapVisible(false)
-      return
-    }
-
     const nextChallengeId =
       zoneChallengeIds.find((challengeId) => !resolvedChallengeIds.includes(challengeId)) ??
       zoneChallengeIds[0]
 
-    selectChallenge(nextChallengeId)
+    clearResultComment()
+    dismissFeedback()
+    setPendingIntroZoneId(zoneId)
+    selectChallenge(nextChallengeId, { openResolvedFeedback: false })
     setIsRoomMapVisible(false)
   }
 
   const shouldShowDefaultFloatingPanel =
     activePanel?.eventType === 'onHesitation' || activePanel?.eventType === 'onHintUsed'
-  const zoneNavigator = (
-    <ZoneChallengeNavigator
-      challenges={currentZoneChallenges}
-      currentChallengeId={currentChallengeId}
-      onSelect={(challengeId) => {
-        setHintModalChallengeId('')
-        clearResultComment()
-        selectChallenge(challengeId)
-      }}
-      resolvedChallengeIds={resolvedChallengeIds}
-    />
-  )
   const zoneNavigatorSide = (
     <ZoneChallengeNavigator
       challenges={currentZoneChallenges}
@@ -579,6 +584,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       onSelect={(challengeId) => {
         setHintModalChallengeId('')
         clearResultComment()
+        dismissFeedback()
         selectChallenge(challengeId)
       }}
       resolvedChallengeIds={resolvedChallengeIds}
@@ -607,12 +613,17 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           >
             {isChallengeIntroVisible ? (
               <div className="space-y-4">
-                {zoneNavigator}
                 <MusicChallengeIntro
-                  key={currentChallengeId}
-                  challenge={currentChallenge}
+                  key={currentZoneId}
                   character={getRoomCharacterBySpeaker(category.characters, 'guardian')}
-                  onComplete={() => setShownIntroChallengeIds((prev) => new Set([...prev, currentChallengeId]))}
+                  introText={currentZoneIntroText}
+                  onComplete={() => {
+                    setPendingIntroZoneId('')
+
+                    if (isCurrentChallengeResolved) {
+                      selectChallenge(currentChallengeId)
+                    }
+                  }}
                 />
               </div>
             ) : (
@@ -706,17 +717,17 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           />
 
           <ResultModal
-            awardedCredits={feedbackMode === 'fresh' ? awardedCredits : 0}
+            awardedCredits={awardedCredits}
             characterComment={feedbackMode === 'fresh' ? resultComment : null}
-            creditReward={feedbackMode === 'fresh' ? feedbackChallenge.creditReward : undefined}
+            creditReward={feedbackCreditReward}
             errorImageSrc={
               isMusicRoom && hasFeedback && !feedback.isCorrect
-                ? (ERROR_IMAGES[Math.min(sessionWrongCount - 1, 2)] ?? null)
+                ? (ERROR_IMAGES[errorVisualIndex] ?? null)
                 : null
             }
             errorOpacity={
               isMusicRoom && hasFeedback && !feedback.isCorrect
-                ? (ERROR_OPACITIES[Math.min(sessionWrongCount - 1, 2)] ?? 0.38)
+                ? (ERROR_OPACITIES[errorVisualIndex % ERROR_OPACITIES.length] ?? 0.38)
                 : 0
             }
             feedback={hasFeedback ? feedback : null}
@@ -734,7 +745,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               setIsRoomMapVisible(false)
               setHintModalChallengeId('')
               clearResultComment()
-              goToNextChallenge()
+              const nextChallenge = goToNextChallenge()
+
+              if (nextChallenge?.zoneId && nextChallenge.zoneId !== currentZoneId) {
+                setPendingIntroZoneId(nextChallenge.zoneId)
+              }
             }}
           />
         </>
@@ -802,7 +817,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               {hasFeedback ? (
                 <ChallengeFeedback
                   awardedCredits={awardedCredits}
-                  creditReward={currentChallenge.creditReward}
+                  creditReward={resolveChallengeCreditBaseReward(currentChallenge)}
                   feedback={feedback}
                   onContinue={goToNextChallenge}
                 />

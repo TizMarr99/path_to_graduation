@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import TypewriterText from '../home/TypewriterText.jsx'
 
-function MusicChallengeIntro({ challenge, character, onComplete }) {
+function MusicChallengeIntro({ character, introText, onComplete }) {
   const [isDone, setIsDone] = useState(false)
 
-  if (!challenge || !character) {
+  if (!character) {
     onComplete?.()
     return null
   }
 
-  const introText = challenge.prompt || challenge.title || 'La prova ti aspetta.'
+  const resolvedIntroText = introText || 'La prova ti aspetta.'
   const isSilver = character.tone === 'silver'
   const accentBorder = isSilver ? 'border-stone-300/30' : 'border-amber-300/30'
   const accentBg = isSilver ? 'bg-stone-900/95' : 'bg-amber-950/95'
@@ -63,7 +63,7 @@ function MusicChallengeIntro({ challenge, character, onComplete }) {
           isActive={true}
           isComplete={isDone}
           onComplete={() => setIsDone(true)}
-          text={introText}
+          text={resolvedIntroText}
         />
 
         <div

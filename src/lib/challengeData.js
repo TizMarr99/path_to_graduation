@@ -150,6 +150,7 @@ function normalizeMapHotspots(rawMapHotspots = []) {
     id: hotspot.id,
     label: hotspot.label ?? '',
     description: hotspot.description ?? '',
+    introPrompt: hotspot.introPrompt ?? '',
     icon: hotspot.icon ?? '',
     x: hotspot.x ?? 0,
     y: hotspot.y ?? 0,
@@ -201,6 +202,7 @@ function normalizeChallenge(rawChallenge) {
       placeholder: rawChallenge.placeholder ?? '',
       scoring: {
         minimumWordMatchRatio: rawChallenge.scoring?.minimumWordMatchRatio ?? 0.7,
+        maxScore: rawChallenge.scoring?.maxScore,
       },
     }
   }

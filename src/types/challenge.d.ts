@@ -43,6 +43,7 @@ export interface CategoryMapHotspot {
   id: string
   label: string
   description?: string
+  introPrompt?: string
   icon?: string
   x: number
   y: number
@@ -109,6 +110,7 @@ export interface GuessTitleAuthorScoring {
 
 export interface FillLyricsScoring {
   minimumWordMatchRatio: number
+  maxScore?: number
 }
 
 export interface MusicalChainScoring {

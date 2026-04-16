@@ -1,3 +1,11 @@
+const metricFormatter = new Intl.NumberFormat('it-IT', {
+  maximumFractionDigits: 2,
+})
+
+function formatMetricValue(value) {
+  return metricFormatter.format(typeof value === 'number' ? value : 0)
+}
+
 function ResultModal({
   isOpen,
   feedback,
@@ -15,11 +23,13 @@ function ResultModal({
     return null
   }
 
-  const hasAwardedCredits = typeof awardedCredits === 'number' && awardedCredits > 0
-  const hasScore = typeof feedback.maxScore === 'number'
   const hasSolutionContent = Boolean(feedback.message) || Boolean(feedback.solutionLines?.length)
   const isHistoryMode = mode === 'history'
   const character = characterComment?.character
+  const scoreEarned = typeof feedback.scoreEarned === 'number' ? feedback.scoreEarned : 0
+  const maxScore = typeof feedback.maxScore === 'number' ? feedback.maxScore : 0
+  const resolvedAwardedCredits = typeof awardedCredits === 'number' ? awardedCredits : 0
+  const resolvedCreditReward = typeof creditReward === 'number' ? creditReward : resolvedAwardedCredits
   const isSilver = character?.tone === 'silver'
   const accentName = isSilver ? 'text-stone-300' : 'text-amber-300'
   const accentLine = isSilver ? 'bg-stone-400/40' : 'bg-amber-300/40'
@@ -28,11 +38,9 @@ function ResultModal({
     : 'border-white/10 bg-slate-950/40'
 
   const footerParts = [
-    hasScore ? `Punteggio: ${feedback.scoreEarned ?? 0}/${feedback.maxScore}` : null,
-    hasAwardedCredits
-      ? `+${awardedCredits} ${typeof creditReward === 'number' && awardedCredits < creditReward ? 'crediti parziali' : 'crediti'}`
-      : null,
-  ].filter(Boolean)
+    `Punteggio: ${formatMetricValue(scoreEarned)}/${formatMetricValue(maxScore)}`,
+    `Crediti: ${formatMetricValue(resolvedAwardedCredits)}/${formatMetricValue(resolvedCreditReward)} 🪙`,
+  ]
 
   return (
     <div
@@ -124,7 +132,7 @@ function ResultModal({
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-200/75">
-            {footerParts.length ? footerParts.join(' | ') : 'Esito registrato'}
+            {footerParts.join(' | ')}
           </p>
 
           <button

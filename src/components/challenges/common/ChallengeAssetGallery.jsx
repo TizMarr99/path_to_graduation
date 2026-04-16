@@ -8,6 +8,7 @@ const assetLabels = {
 
 function ChallengeAssetGallery({ assets = [], onAudioPlay }) {
   const [expandedAsset, setExpandedAsset] = useState(null)
+  const isSingleAsset = assets.length === 1
 
   if (!assets.length) {
     return null
@@ -15,14 +16,20 @@ function ChallengeAssetGallery({ assets = [], onAudioPlay }) {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={[
+        'grid gap-4',
+        isSingleAsset ? 'grid-cols-1' : 'md:grid-cols-2',
+      ].join(' ')}>
         {assets.map((asset, index) => {
           const assetId = asset.id ?? `${asset.kind}-${index}`
 
           return (
             <figure
               key={assetId}
-              className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70"
+              className={[
+                'w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70',
+                isSingleAsset ? 'mx-auto' : '',
+              ].join(' ')}
             >
               <figcaption className="border-b border-slate-800 px-4 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-slate-400">
                 {assetLabels[asset.kind] ?? 'Asset'}

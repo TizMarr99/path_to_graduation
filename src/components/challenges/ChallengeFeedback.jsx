@@ -1,7 +1,17 @@
 import { getRoomSpeakerLabel } from '../../lib/roomSpeakers'
 
+const metricFormatter = new Intl.NumberFormat('it-IT', {
+  maximumFractionDigits: 2,
+})
+
+function formatMetricValue(value) {
+  return metricFormatter.format(typeof value === 'number' ? value : 0)
+}
+
 function ChallengeFeedback({ feedback, onContinue, creditReward, awardedCredits }) {
   const hasAwardedCredits = typeof awardedCredits === 'number'
+  const resolvedAwardedCredits = hasAwardedCredits ? awardedCredits : 0
+  const resolvedCreditReward = typeof creditReward === 'number' ? creditReward : resolvedAwardedCredits
 
   return (
     <section
@@ -18,9 +28,9 @@ function ChallengeFeedback({ feedback, onContinue, creditReward, awardedCredits 
       </p>
       <h3 className="mt-2 text-xl font-semibold text-white">{feedback.title}</h3>
       <p className="mt-3 text-sm leading-7 text-slate-100/90">{feedback.message}</p>
-      {hasAwardedCredits && awardedCredits > 0 ? (
+      {hasAwardedCredits ? (
         <p className="mt-2 text-sm font-semibold text-amber-300">
-          +{awardedCredits} {typeof creditReward === 'number' && awardedCredits < creditReward ? 'crediti parziali' : 'crediti'} 🪙
+          Crediti: {formatMetricValue(resolvedAwardedCredits)}/{formatMetricValue(resolvedCreditReward)} 🪙
         </p>
       ) : null}
       {feedback.solutionLines?.length ? (
@@ -37,7 +47,7 @@ function ChallengeFeedback({ feedback, onContinue, creditReward, awardedCredits 
       ) : null}
       {typeof feedback.maxScore === 'number' ? (
         <p className="mt-3 text-xs uppercase tracking-[0.24em] text-slate-200/75">
-          Punteggio: {feedback.scoreEarned ?? 0}/{feedback.maxScore}
+          Punteggio: {formatMetricValue(feedback.scoreEarned)}/{formatMetricValue(feedback.maxScore)}
         </p>
       ) : null}
 

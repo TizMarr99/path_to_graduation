@@ -24,6 +24,7 @@
         "id": "guess-title-author",
         "label": "Titolo e autore",
         "description": "I vinili sul lato sinistro nascondono i frammenti da riconoscere.",
+        "introPrompt": "Ascolta i frammenti custoditi nei vinili e riconosci insieme titolo e autore. Qui non basta intuire: servono entrambe le risposte.",
         "icon": "🎙️",
         "x": 9,
         "y": 20,
@@ -34,6 +35,7 @@
         "id": "face-morph",
         "label": "Face morph",
         "description": "Il banco centrale mescola volti e identita da ricomporre.",
+        "introPrompt": "I volti si piegano l'uno sull'altro. Guarda bene il morph e separa gli artisti nascosti dentro la stessa immagine.",
         "icon": "🖼️",
         "x": 18,
         "y": 20,
@@ -44,6 +46,7 @@
         "id": "fill-lyrics",
         "label": "Completa il testo",
         "description": "Le frequenze sospese in alto custodiscono i versi spezzati.",
+        "introPrompt": "Le frequenze trattengono solo metà della frase. Ascolta il verso e ricomponilo nel modo più fedele possibile.",
         "icon": "🎼",
         "x": 47,
         "y": 11,
@@ -54,6 +57,7 @@
         "id": "reverse-song",
         "label": "Canzone al contrario",
         "description": "I dischi sul pavimento riportano i brani invertiti.",
+        "introPrompt": "Qui la musica scorre al contrario. Devi riconoscere il titolo anche quando il brano prova a nascondersi dentro il proprio eco invertito.",
         "icon": "⏪",
         "x": 33,
         "y": 53,
@@ -64,6 +68,7 @@
         "id": "musical-chain",
         "label": "Catena musicale",
         "description": "La zona in basso a destra aggiunge strumenti a ogni errore.",
+        "introPrompt": "La catena musicale si arricchisce a ogni tentativo. Indovina il brano prima che l'ultima rivelazione lo renda troppo evidente.",
         "icon": "🔗",
         "x": 63,
         "y": 64,
@@ -74,6 +79,7 @@
         "id": "hitster",
         "label": "Hitster",
         "description": "La parete destra ospita l'archivio cronologico finale.",
+        "introPrompt": "Ascolta le carte una alla volta e poi rimetti tutto in ordine: qui conta il tempo, non solo il titolo del brano.",
         "icon": "🗓️",
         "x": 77,
         "y": 20,
@@ -268,7 +274,7 @@
         "minimumCorrectGroups": 2,
         "placeholder": "Inserisci un cantante",
         "hint": "Uno dei tre e scozzese ed e noto per brani strappalacrime. Un altro e un rapper italiano. Il terzo e un cantautore dai capelli rossi.",
-        "explanation1": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
+        "explanation": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
         "speaker": "neutral",
         "creditReward": 10,
         "hintCost": 15
@@ -295,7 +301,8 @@
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
-          "minimumWordMatchRatio": 0.7
+          "minimumWordMatchRatio": 0.7,
+          "maxScore": 11
         }
       },
       {
@@ -320,7 +327,8 @@
         "creditReward": 10,
         "hintCost": 15,
         "scoring": {
-          "minimumWordMatchRatio": 0.7
+          "minimumWordMatchRatio": 0.7,
+          "maxScore": 5
         }
       },
       {
@@ -345,7 +353,8 @@
         "creditReward": 15,
         "hintCost": 15,
         "scoring": {
-          "minimumWordMatchRatio": 0.7
+          "minimumWordMatchRatio": 0.7,
+          "maxScore": 5
         }
       },
       {

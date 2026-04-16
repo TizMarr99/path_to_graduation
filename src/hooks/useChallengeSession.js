@@ -140,7 +140,8 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     }))
   }
 
-  function selectChallenge(challengeId) {
+  function selectChallenge(challengeId, options = {}) {
+    const { openResolvedFeedback = true } = options
     const nextChallenge = findChallengeById(challenges, challengeId)
     const nextFeedback = challengeResults[challengeId] ?? null
 
@@ -152,8 +153,8 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     setDraftAnswer(createInitialDraftAnswerForChallenge(nextChallenge))
     setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
     setIsHintVisible(false)
-    setFeedback(nextFeedback ?? createFeedback(category))
-    setFeedbackMode(nextFeedback ? 'history' : 'closed')
+    setFeedback(openResolvedFeedback && nextFeedback ? nextFeedback : createFeedback(category))
+    setFeedbackMode(openResolvedFeedback && nextFeedback ? 'history' : 'closed')
     setIsSubmitting(false)
   }
 
@@ -198,14 +199,14 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
   function goToNextChallenge() {
     if (!currentChallenge || !hasFeedback) {
-      return
+      return null
     }
 
     if (resolvedChallengeCount >= totalChallenges) {
       setFeedback(createFeedback(category))
       setFeedbackMode('closed')
       setIsSubmitting(false)
-      return
+      return null
     }
 
     const nextChallengeId = findNextUnresolvedChallengeId(
@@ -219,7 +220,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
       setFeedback(createFeedback(category))
       setFeedbackMode('closed')
       setIsSubmitting(false)
-      return
+      return null
     }
 
     setCurrentChallengeId(nextChallenge.id)
@@ -229,6 +230,8 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     setFeedback(createFeedback(category))
     setFeedbackMode('closed')
     setIsSubmitting(false)
+
+    return nextChallenge
   }
 
   function restartSession() {

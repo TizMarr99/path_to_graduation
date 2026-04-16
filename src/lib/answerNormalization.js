@@ -52,6 +52,18 @@ export function matchesAcceptedAnswerLoose(inputValue, acceptedAnswers = []) {
 }
 
 /**
+ * Keeps contractions intact so lyrics like "don't" count as a single word.
+ * @param {string} value
+ * @returns {string[]}
+ */
+export function tokenizeLyricsWords(value) {
+  return normalizeAnswer(value)
+    .split(/[^a-z0-9']+/)
+    .map((word) => word.replace(/^'+|'+$/g, '').trim())
+    .filter(Boolean)
+}
+
+/**
  * @param {string} inputValue
  * @param {string} solutionText
  * @param {number} minimumWordMatchRatio
@@ -62,16 +74,8 @@ export function evaluateLyricsWordMatch(
   solutionText,
   minimumWordMatchRatio = 0.7,
 ) {
-  const normalizedInput = normalizeAnswer(inputValue)
-  const normalizedSolution = normalizeAnswer(solutionText)
-  const inputWords = normalizedInput
-    .split(/[^a-z0-9]+/)
-    .map((word) => word.trim())
-    .filter(Boolean)
-  const solutionWords = normalizedSolution
-    .split(/[^a-z0-9]+/)
-    .map((word) => word.trim())
-    .filter(Boolean)
+  const inputWords = tokenizeLyricsWords(inputValue)
+  const solutionWords = tokenizeLyricsWords(solutionText)
   const requiredWordCount = Math.floor(solutionWords.length * minimumWordMatchRatio)
   let matchedWordCount = 0
 

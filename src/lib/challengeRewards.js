@@ -1,5 +1,9 @@
+export function resolveChallengeCreditBaseReward(challenge) {
+  return Math.max(0, challenge?.creditReward ?? 10)
+}
+
 export function resolveChallengeCreditReward(challenge, feedback) {
-  const baseReward = challenge?.creditReward ?? 10
+  const baseReward = resolveChallengeCreditBaseReward(challenge)
 
   if (baseReward <= 0) {
     return 0

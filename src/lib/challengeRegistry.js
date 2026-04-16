@@ -17,6 +17,7 @@ import {
   evaluateLyricsWordMatch,
   evaluateTitleAuthorMatch,
   matchesAcceptedAnswer,
+  tokenizeLyricsWords,
 } from './answerNormalization'
 
 export const challengeTypeLabels = {
@@ -271,6 +272,33 @@ function buildFeedback(challenge, isCorrect, category, overrides = {}) {
 }
 
 /**
+ * @param {import('../types/challenge').Challenge} challenge
+ * @param {boolean} isCorrect
+ * @param {import('../types/challenge').Category | null} category
+ * @param {Record<string, unknown>} [overrides]
+ * @returns {import('../types/challenge').ChallengeFeedback}
+ */
+function buildBinaryScoreFeedback(challenge, isCorrect, category, overrides = {}) {
+  return buildFeedback(challenge, isCorrect, category, {
+    scoreEarned: isCorrect ? 1 : 0,
+    maxScore: 1,
+    ...overrides,
+  })
+}
+
+/**
+ * @param {import('../types/challenge').FillLyricsChallenge} challenge
+ * @returns {number}
+ */
+function resolveFillLyricsMaxScore(challenge) {
+  if (typeof challenge.scoring?.maxScore === 'number' && challenge.scoring.maxScore > 0) {
+    return challenge.scoring.maxScore
+  }
+
+  return tokenizeLyricsWords(challenge.solutionText).length
+}
+
+/**
  * @type {Record<import('../types/challenge').Challenge['type'], {
  *   render: (props: any) => React.ReactElement,
  *   evaluate: (args: {
@@ -290,7 +318,7 @@ export const challengeTypeRegistry = {
         challenge.correctChoiceId,
       )
 
-      return buildFeedback(challenge, isCorrect, category)
+      return buildBinaryScoreFeedback(challenge, isCorrect, category)
     },
   },
   free_text: {
@@ -301,7 +329,7 @@ export const challengeTypeRegistry = {
         challenge.acceptedAnswers,
       )
 
-      return buildFeedback(challenge, isCorrect, category)
+      return buildBinaryScoreFeedback(challenge, isCorrect, category)
     },
   },
   ordering: {
@@ -312,7 +340,7 @@ export const challengeTypeRegistry = {
         challenge.correctOrder,
       )
 
-      return buildFeedback(challenge, isCorrect, category)
+      return buildBinaryScoreFeedback(challenge, isCorrect, category)
     },
   },
   multi_stage_progressive_reveal: {
@@ -354,7 +382,7 @@ export const challengeTypeRegistry = {
         challenge.intruderId,
       )
 
-      return buildFeedback(challenge, isCorrect, category)
+      return buildBinaryScoreFeedback(challenge, isCorrect, category)
     },
   },
   sequence_reconstruction: {
@@ -365,7 +393,7 @@ export const challengeTypeRegistry = {
         challenge.correctOrder,
       )
 
-      return buildFeedback(challenge, isCorrect, category)
+      return buildBinaryScoreFeedback(challenge, isCorrect, category)
     },
   },
   guess_title_author: {
@@ -418,10 +446,7 @@ export const challengeTypeRegistry = {
 
       return buildFeedback(challenge, result.isMatch, category, {
         scoreEarned: result.matchedWordCount,
-        maxScore: challenge.solutionText
-          .split(/[^A-Za-z0-9]+/)
-          .map((word) => word.trim())
-          .filter(Boolean).length,
+        maxScore: resolveFillLyricsMaxScore(challenge),
         metadata: result,
       })
     },
@@ -439,9 +464,7 @@ export const challengeTypeRegistry = {
               challenge.scoring.minScore,
               challenge.scoring.maxScore - revealsUsed * challenge.scoring.revealPenalty,
             )
-          : isFinalStage
-            ? 0
-            : undefined,
+          : 0,
         maxScore: challenge.scoring.maxScore,
         metadata: {
           stageIndex: challengeState.musicalChainStageIndex,
