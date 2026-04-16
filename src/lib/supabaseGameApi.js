@@ -70,3 +70,29 @@ export async function adminResetPlayer(adminCode, targetCode) {
     'Impossibile resettare il profilo.',
   )
 }
+
+export async function appDeletePlayerState(accessCodeId) {
+  if (!isSupabaseConfigured || !supabase) {
+    throw createConfigurationError()
+  }
+
+  const [progressResult, dailyLimitsResult] = await Promise.all([
+    supabase
+      .from('player_progress')
+      .delete()
+      .eq('access_code_id', accessCodeId),
+    supabase
+      .from('player_daily_limits')
+      .delete()
+      .eq('access_code_id', accessCodeId),
+  ])
+
+  const deleteError = progressResult.error ?? dailyLimitsResult.error
+
+  if (deleteError) {
+    deleteError.userMessage = 'Impossibile eliminare il profilo dal database.'
+    throw deleteError
+  }
+
+  return { ok: true }
+}

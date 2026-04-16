@@ -230,9 +230,15 @@ function DevPage() {
     setCurrentMessage('Contatori giornalieri del tuo profilo azzerati.')
   }
 
-  function handleResetAll() {
-    resetPlayerState()
-    setCurrentMessage('Profilo corrente azzerato completamente.')
+  async function handleResetAll() {
+    const result = await resetPlayerState()
+
+    if (!result?.ok) {
+      setCurrentMessage('Reset completo non riuscito. Il profilo non e stato azzerato.')
+      return
+    }
+
+    setCurrentMessage('Profilo corrente azzerato completamente. Reinserisci il codice di accesso.')
   }
 
   function handleResetCurrentPosition() {

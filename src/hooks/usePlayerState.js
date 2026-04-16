@@ -21,6 +21,7 @@ import {
 
 const PlayerStateContext = createContext(null)
 const ACCESS_CODE_STORAGE_KEY = 'path-to-graduation:access-code'
+const VIP_ACCESS_STORAGE_KEY = 'path-to-graduation:vip-access'
 const SAVE_DEBOUNCE_MS = 900
 
 function loadStoredAccessCode() {
@@ -49,6 +50,19 @@ function clearStoredAccessCode() {
   }
 
   window.localStorage.removeItem(ACCESS_CODE_STORAGE_KEY)
+}
+
+function clearStoredVipAccess() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.localStorage.removeItem(VIP_ACCESS_STORAGE_KEY)
+}
+
+function clearPersistedAccessArtifacts() {
+  clearStoredAccessCode()
+  clearStoredVipAccess()
 }
 
 function areSerializableSnapshotsEqual(leftValue, rightValue) {
@@ -143,7 +157,6 @@ export function PlayerStateProvider({ children }) {
           return
         }
 
-        clearStoredAccessCode()
         resetLocalSession()
       } finally {
         if (isMounted) {
@@ -174,6 +187,9 @@ export function PlayerStateProvider({ children }) {
   }
 
   function resetLocalSession() {
+    clearPersistedAccessArtifacts()
+    clearScheduledSave()
+
     const defaultPlayerState = createDefaultPlayerState()
 
     playerStateRef.current = defaultPlayerState
@@ -285,7 +301,6 @@ export function PlayerStateProvider({ children }) {
     } catch (error) {
       const message = getFallbackErrorMessage(error, 'Accesso non riuscito.')
 
-      clearStoredAccessCode()
       resetLocalSession()
       setAuthError(message)
 
@@ -297,8 +312,6 @@ export function PlayerStateProvider({ children }) {
   }
 
   function logout() {
-    clearStoredAccessCode()
-    clearScheduledSave()
     resetLocalSession()
   }
 
@@ -475,11 +488,22 @@ export function PlayerStateProvider({ children }) {
     }))
   }
 
-  function resetPlayerState() {
-    updatePlayerState({
+  async function resetPlayerState() {
+    const nextPlayerState = {
       ...createDefaultPlayerState(),
       createdAt: playerStateRef.current.createdAt,
-    })
+    }
+
+    clearScheduledSave()
+
+    const result = await persistPlayerState(nextPlayerState)
+
+    if (!result.ok) {
+      return result
+    }
+
+    resetLocalSession()
+    return { ok: true }
   }
 
   function resetMusicRoomIntro() {
@@ -656,8 +680,7 @@ export function PlayerStateProvider({ children }) {
     }
 
     if (targetCode === accessCodeRef.current || role !== 'admin') {
-      resetPlayerState()
-      return { ok: true }
+      return resetPlayerState()
     }
 
     try {

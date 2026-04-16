@@ -577,6 +577,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   const shouldShowDefaultFloatingPanel =
     activePanel?.eventType === 'onHesitation' || activePanel?.eventType === 'onHintUsed'
+  const isHesitationPanelVisible = activePanel?.eventType === 'onHesitation'
   const zoneNavigatorSide = (
     <ZoneChallengeNavigator
       challenges={currentZoneChallenges}
@@ -643,50 +644,68 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                 ) : null}
 
                 {/* Quiz card + optional Sal hesitation side panel */}
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-                  {currentZoneChallenges.length > 1 ? (
-                    <div className="w-full lg:w-24 lg:shrink-0">
-                      {zoneNavigatorSide}
+                <div className={[
+                  'relative',
+                  isHesitationPanelVisible ? 'lg:pb-36' : '',
+                ].join(' ')}>
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+                    <div
+                      className="w-full lg:min-w-0 lg:flex-1"
+                      ref={challengeMediaRef}
+                    >
+                      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 px-4 py-5 shadow-[0_0_60px_rgba(15,23,42,0.2)] backdrop-blur-xl sm:px-5 sm:py-6">
+                        <div className="mb-4">
+                          <span className="inline-flex items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-100">
+                            {challengeTypeLabels[currentChallenge.type] ?? currentChallenge.type}
+                          </span>
+                        </div>
+                        <ChallengeRenderer
+                          challenge={currentChallenge}
+                          challengeState={challengeState}
+                          disabled={controlsDisabled}
+                          draftAnswer={draftAnswer}
+                          onAudioPlay={handleAudioPlay}
+                          onChallengeStateChange={updateChallengeState}
+                          onDraftAnswerChange={updateDraftAnswer}
+                          onSubmit={handleSubmit}
+                          showHeader={false}
+                        />
+                      </div>
                     </div>
-                  ) : null}
 
-                  <div
-                    className={[
-                    'overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 px-5 py-5 shadow-[0_0_60px_rgba(15,23,42,0.2)] backdrop-blur-xl sm:px-6 sm:py-6',
-                    'w-full lg:flex-1 lg:min-w-0',
-                  ].join(' ')}
-                    ref={challengeMediaRef}
-                  >
-                    <div className="mb-4">
-                      <span className="inline-flex items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-100">
-                        {challengeTypeLabels[currentChallenge.type] ?? currentChallenge.type}
-                      </span>
-                    </div>
-                    <ChallengeRenderer
-                      challenge={currentChallenge}
-                      challengeState={challengeState}
-                      disabled={controlsDisabled}
-                      draftAnswer={draftAnswer}
-                      onAudioPlay={handleAudioPlay}
-                      onChallengeStateChange={updateChallengeState}
-                      onDraftAnswerChange={updateDraftAnswer}
-                      onSubmit={handleSubmit}
-                      showHeader={false}
-                    />
+                    {currentZoneChallenges.length > 1 ? (
+                      <div className="w-full lg:w-24 lg:shrink-0">
+                        {zoneNavigatorSide}
+                      </div>
+                    ) : null}
                   </div>
 
-                  {/* Sal side panel for hesitation (portrait on right / mirrored) */}
-                  {activePanel?.eventType === 'onHesitation' ? (
-                    <div className="w-full lg:w-64 lg:shrink-0">
-                      <CharacterPanel
-                        autoDismissMs={0}
-                        character={activePanel.character}
-                        message={activePanel.text}
-                        mirror
-                        onDismiss={dismissPanel}
-                        visible={!!activePanel}
-                      />
-                    </div>
+                  {isHesitationPanelVisible ? (
+                    <>
+                      <div className="mt-4 lg:hidden">
+                        <CharacterPanel
+                          autoDismissMs={0}
+                          character={activePanel.character}
+                          message={activePanel.text}
+                          mirror
+                          onDismiss={dismissPanel}
+                          visible={!!activePanel}
+                        />
+                      </div>
+
+                      <div className="pointer-events-none absolute bottom-0 left-0 hidden w-72 lg:block">
+                        <div className="pointer-events-auto">
+                          <CharacterPanel
+                            autoDismissMs={0}
+                            character={activePanel.character}
+                            message={activePanel.text}
+                            mirror
+                            onDismiss={dismissPanel}
+                            visible={!!activePanel}
+                          />
+                        </div>
+                      </div>
+                    </>
                   ) : null}
                 </div>
               </div>
