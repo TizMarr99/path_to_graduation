@@ -198,13 +198,9 @@ export default function ShadowHallPage() {
 
   // Check if music room has all 12 challenges completed
   const musicProgress = roomProgress['musica']
-  const musicSessionsCompleted = musicProgress?.sessions?.length || 0
-  const musicChallengesCompleted =
-    musicProgress?.sessions?.reduce(
-      (total, session) => total + (session.correctCount || 0) + (session.wrongCount || 0),
-      0
-    ) || 0
-  const isMusicRoomFullyCompleted = musicChallengesCompleted >= 12
+  const hasCompletedAllMusicChallenges = musicProgress?.sessions?.some(
+    (session) => (session.correctCount || 0) + (session.wrongCount || 0) >= 12
+  ) || false
 
   useEffect(() => {
     const audio = new Audio('/audio/shadow-hall-ambient.mp3')
@@ -309,17 +305,17 @@ export default function ShadowHallPage() {
             width: 'clamp(240px, 30vw, 360px)',
             padding: '20px',
             background: 'linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.85))',
-            border: isMusicRoomFullyCompleted
+            border: hasCompletedAllMusicChallenges
               ? '2px solid rgba(103, 232, 249, 0.5)'
               : '2px solid rgba(100, 116, 139, 0.4)',
             borderRadius: '16px',
-            boxShadow: isMusicRoomFullyCompleted
+            boxShadow: hasCompletedAllMusicChallenges
               ? '0 0 30px rgba(103, 232, 249, 0.2)'
               : '0 0 20px rgba(0, 0, 0, 0.4)',
             backdropFilter: 'blur(10px)',
-            opacity: isMusicRoomFullyCompleted ? 0.95 : 0.75,
+            opacity: hasCompletedAllMusicChallenges ? 0.95 : 0.75,
             transition: 'all 0.3s ease',
-            cursor: isMusicRoomFullyCompleted ? 'default' : 'not-allowed',
+            cursor: hasCompletedAllMusicChallenges ? 'default' : 'not-allowed',
             zIndex: 12,
           }}
         >
@@ -328,21 +324,21 @@ export default function ShadowHallPage() {
               style={{
                 fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
                 marginBottom: '12px',
-                filter: isMusicRoomFullyCompleted
+                filter: hasCompletedAllMusicChallenges
                   ? 'grayscale(0%)'
                   : 'grayscale(70%) opacity(0.6)',
               }}
             >
-              {isMusicRoomFullyCompleted ? '🎭' : '🔒'}
+              {hasCompletedAllMusicChallenges ? '🎭' : '🔒'}
             </div>
             <h3
               style={{
                 fontFamily: 'Georgia, serif',
                 fontSize: 'clamp(0.9rem, 1.4vw, 1.1rem)',
-                color: isMusicRoomFullyCompleted ? '#67e8f9' : 'rgba(203, 213, 225, 0.6)',
+                color: hasCompletedAllMusicChallenges ? '#67e8f9' : 'rgba(203, 213, 225, 0.6)',
                 marginBottom: '8px',
                 fontWeight: '600',
-                textShadow: isMusicRoomFullyCompleted
+                textShadow: hasCompletedAllMusicChallenges
                   ? '0 0 12px rgba(103, 232, 249, 0.4)'
                   : 'none',
               }}
@@ -352,14 +348,14 @@ export default function ShadowHallPage() {
             <p
               style={{
                 fontSize: 'clamp(0.7rem, 1vw, 0.8rem)',
-                color: isMusicRoomFullyCompleted
+                color: hasCompletedAllMusicChallenges
                   ? 'rgba(224, 242, 254, 0.8)'
                   : 'rgba(148, 163, 184, 0.6)',
                 marginBottom: '12px',
                 lineHeight: '1.5',
               }}
             >
-              {isMusicRoomFullyCompleted
+              {hasCompletedAllMusicChallenges
                 ? 'Prossima sala principale'
                 : 'Completa tutte le 12 prove della Sala Musica'}
             </p>
@@ -367,23 +363,23 @@ export default function ShadowHallPage() {
               style={{
                 display: 'inline-block',
                 padding: '6px 16px',
-                background: isMusicRoomFullyCompleted
+                background: hasCompletedAllMusicChallenges
                   ? 'rgba(103, 232, 249, 0.15)'
                   : 'rgba(100, 116, 139, 0.2)',
                 border: `1px solid ${
-                  isMusicRoomFullyCompleted
+                  hasCompletedAllMusicChallenges
                     ? 'rgba(103, 232, 249, 0.4)'
                     : 'rgba(100, 116, 139, 0.3)'
                 }`,
                 borderRadius: '999px',
                 fontSize: 'clamp(0.7rem, 1vw, 0.8rem)',
-                color: isMusicRoomFullyCompleted ? '#67e8f9' : 'rgba(148, 163, 184, 0.7)',
+                color: hasCompletedAllMusicChallenges ? '#67e8f9' : 'rgba(148, 163, 184, 0.7)',
                 fontWeight: '600',
               }}
             >
               Costo: 60 🪙
             </div>
-            {!isMusicRoomFullyCompleted && (
+            {!hasCompletedAllMusicChallenges && (
               <p
                 style={{
                   marginTop: '12px',
@@ -392,7 +388,7 @@ export default function ShadowHallPage() {
                   fontStyle: 'italic',
                 }}
               >
-                Progresso: {musicChallengesCompleted}/12
+                Completamento necessario per sbloccare
               </p>
             )}
           </div>
