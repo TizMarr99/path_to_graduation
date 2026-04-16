@@ -504,6 +504,8 @@ export interface PlayerState {
   currentChallengeId: string
   activeSession: Record<string, unknown> | null
   lastPlayedAt: string | null
+  music_mail1_sent_at?: string | null
+  music_mail2_sent_at?: string | null
 }
 
 export interface RawCategory {
