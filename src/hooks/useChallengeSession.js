@@ -83,6 +83,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   )
   const [isHintVisible, setIsHintVisible] = useState(persistedSession?.isHintVisible ?? false)
   const [feedback, setFeedback] = useState(() => createFeedback(category))
+  const [feedbackMode, setFeedbackMode] = useState('closed')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [sessionCorrectCount, setSessionCorrectCount] = useState(
     persistedSession?.sessionCorrectCount ?? 0,
@@ -98,7 +99,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   const resolvedChallengeIds = Object.keys(challengeResults)
   const resolvedChallengeCount = resolvedChallengeIds.length
   const allChallengesResolved = totalChallenges > 0 && resolvedChallengeCount >= totalChallenges
-  const hasFeedback = Boolean(feedback.attemptedChallengeId)
+  const hasFeedback = feedbackMode !== 'closed' && Boolean(feedback.attemptedChallengeId)
   const isCurrentChallengeResolved = Boolean(currentChallenge && challengeResults[currentChallenge.id])
   const isComplete = allChallengesResolved && !hasFeedback
 
@@ -119,6 +120,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     setChallengeState(createInitialRuntimeStateForChallenge(nextInitialChallenge))
     setIsHintVisible(false)
     setFeedback(createFeedback(category))
+    setFeedbackMode('closed')
     setIsSubmitting(false)
     setSessionCorrectCount(0)
     setSessionWrongCount(0)
@@ -140,6 +142,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
   function selectChallenge(challengeId) {
     const nextChallenge = findChallengeById(challenges, challengeId)
+    const nextFeedback = challengeResults[challengeId] ?? null
 
     if (!nextChallenge) {
       return
@@ -149,7 +152,14 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     setDraftAnswer(createInitialDraftAnswerForChallenge(nextChallenge))
     setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
     setIsHintVisible(false)
-    setFeedback(challengeResults[nextChallenge.id] ?? createFeedback(category))
+    setFeedback(nextFeedback ?? createFeedback(category))
+    setFeedbackMode(nextFeedback ? 'history' : 'closed')
+    setIsSubmitting(false)
+  }
+
+  function dismissFeedback() {
+    setFeedback(createFeedback(category))
+    setFeedbackMode('closed')
     setIsSubmitting(false)
   }
 
@@ -175,6 +185,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
       [currentChallenge.id]: nextFeedback,
     }))
     setFeedback(nextFeedback)
+    setFeedbackMode('fresh')
     if (nextFeedback.isCorrect) {
       setSessionCorrectCount((count) => count + 1)
     } else {
@@ -192,6 +203,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
     if (resolvedChallengeCount >= totalChallenges) {
       setFeedback(createFeedback(category))
+      setFeedbackMode('closed')
       setIsSubmitting(false)
       return
     }
@@ -205,6 +217,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
     if (!nextChallenge) {
       setFeedback(createFeedback(category))
+      setFeedbackMode('closed')
       setIsSubmitting(false)
       return
     }
@@ -214,6 +227,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
     setIsHintVisible(false)
     setFeedback(createFeedback(category))
+    setFeedbackMode('closed')
     setIsSubmitting(false)
   }
 
@@ -229,8 +243,10 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     currentIndex,
     currentChallengeId,
     challengeState,
+    dismissFeedback,
     draftAnswer,
     feedback,
+    feedbackMode,
     hasFeedback,
     isComplete,
     isCurrentChallengeResolved,

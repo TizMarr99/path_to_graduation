@@ -32,7 +32,7 @@ function FaceMorphChallenge({
               disabled={disabled}
               id={`${challenge.id}-slot-${index}`}
               onChange={(event) => handleAnswerChange(index, event.target.value)}
-              placeholder={`${challenge.placeholder || 'Inserisci un cantante'} ${index + 1}`}
+              placeholder={`${challenge.placeholder || 'Inserisci un cantante'}`}
               type="text"
               value={answer}
             />

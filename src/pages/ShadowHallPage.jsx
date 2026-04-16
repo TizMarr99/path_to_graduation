@@ -208,35 +208,28 @@ export default function ShadowHallPage() {
       <div
         style={{
           position: 'absolute',
-          left: '24px',
-          bottom: '28px',
-          zIndex: 9,
-          maxWidth: 'min(30rem, calc(100vw - 48px))',
-          padding: '14px 18px',
-          borderRadius: '18px',
-          border: '1px solid rgba(212,175,55,0.28)',
-          background: 'linear-gradient(180deg, rgba(15,23,42,0.78), rgba(2,6,23,0.9))',
-          boxShadow: '0 0 30px rgba(0,0,0,0.28)',
-          backdropFilter: 'blur(8px)',
+          top: '22px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 11,
+          maxWidth: 'min(40rem, calc(100vw - 112px))',
+          padding: '10px 22px',
+          borderRadius: '999px',
+          border: '1px solid rgba(252,211,77,0.66)',
+          background: 'rgba(2,6,23,0.34)',
+          boxShadow: '0 0 24px rgba(212,175,55,0.18)',
+          backdropFilter: 'blur(10px)',
+          textAlign: 'center',
         }}
       >
         <p
           style={{
-            fontSize: '0.62rem',
-            letterSpacing: '0.34em',
+            fontSize: 'clamp(0.72rem, 1.1vw, 0.82rem)',
+            letterSpacing: '0.28em',
             textTransform: 'uppercase',
-            color: 'rgba(253,230,138,0.72)',
-            marginBottom: '8px',
-          }}
-        >
-          Didascalia di Sala
-        </p>
-        <p
-          style={{
-            fontSize: 'clamp(0.9rem, 1.5vw, 1.05rem)',
-            lineHeight: 1.65,
             color: 'rgba(255,248,220,0.92)',
-            textShadow: '0 0 12px rgba(0,0,0,0.28)',
+            textShadow: '0 0 12px rgba(0,0,0,0.32)',
+            lineHeight: 1.45,
           }}
         >
           Ogni ombra cela una voce. Avvicinati per sentirla.
@@ -272,23 +265,11 @@ export default function ShadowHallPage() {
           padding: '12px 24px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           background: 'linear-gradient(to bottom, rgba(0,0,0,0.55), transparent)',
           zIndex: 10,
         }}
       >
-        <p
-          style={{
-            fontSize: 'clamp(0.65rem, 1.1vw, 0.8rem)',
-            fontWeight: 600,
-            letterSpacing: '0.35em',
-            textTransform: 'uppercase',
-            color: 'rgba(251,191,36,0.8)',
-          }}
-        >
-          La Grotta delle Ombre
-        </p>
-
         <button
           onClick={() => navigate(-1)}
           style={{

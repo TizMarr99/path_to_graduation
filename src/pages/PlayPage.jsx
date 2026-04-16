@@ -92,11 +92,64 @@ const ERROR_IMAGES = [
 ]
 const ERROR_OPACITIES = [0.38, 0.52, 0.66]
 
+function ZoneChallengeNavigator({
+  currentChallengeId,
+  challenges,
+  onSelect,
+  resolvedChallengeIds,
+  vertical = false,
+}) {
+  if (challenges.length <= 1) {
+    return null
+  }
+
+  return (
+    <div className={[
+      vertical
+        ? 'flex flex-col items-stretch gap-2'
+        : 'mb-4 flex flex-wrap items-center gap-2',
+    ].join(' ')}>
+      <span className={[
+        'text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-slate-300/75',
+        vertical ? 'mb-1 text-center' : 'mr-2',
+      ].join(' ')}>
+        Prove della zona
+      </span>
+      {challenges.map((challenge, index) => {
+        const isActive = challenge.id === currentChallengeId
+        const isResolved = resolvedChallengeIds.includes(challenge.id)
+
+        return (
+          <button
+            key={challenge.id}
+            aria-pressed={isActive}
+            className={[
+              'inline-flex min-w-10 items-center justify-center rounded-full border px-3 py-1.5 text-xs font-semibold transition',
+              vertical ? 'w-full min-h-10 px-0' : '',
+              isActive
+                ? 'border-amber-200/70 bg-amber-300/18 text-amber-50'
+                : isResolved
+                  ? 'border-emerald-300/35 bg-emerald-400/10 text-emerald-100 hover:border-emerald-200/55'
+                  : 'border-white/12 bg-white/5 text-slate-100 hover:border-cyan-300/45 hover:text-cyan-100',
+            ].join(' ')}
+            onClick={() => onSelect(challenge.id)}
+            title={challenge.title}
+            type="button"
+          >
+            {index + 1}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 function PlayCategorySession({ category, preferredChallengeId }) {
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
   const [hintModalChallengeId, setHintModalChallengeId] = useState('')
   const [shownIntroChallengeIds, setShownIntroChallengeIds] = useState(() => new Set())
   const audioPlayCountRef = useRef(0)
+  const challengeMediaRef = useRef(null)
   const hesitationFiredRef = useRef(false)
   const clearCountRef = useRef(0)
   const prevTextAnswerRef = useRef('')
@@ -120,7 +173,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     category.characterComments,
     category.characters,
   )
-  const { isFearActive, triggerWrongAnswerEffect } = useFearEffects(category)
+  const { isFearActive, stopWrongAnswerEffect, triggerWrongAnswerEffect } = useFearEffects(category)
   const persistedSession = playerState.activeSession?.categoryId === category.id
     ? playerState.activeSession
     : null
@@ -130,8 +183,10 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     currentChallengeId,
     challengeState,
     currentChallenge,
+    dismissFeedback,
     draftAnswer,
     feedback,
+    feedbackMode,
     goToNextChallenge,
     hasFeedback,
     isComplete,
@@ -162,6 +217,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     playerState.unlockedCategoryIds.includes(categoryId),
   )
   const isMusicRoom = category.id === 'musica'
+  const currentZoneId = currentChallenge?.zoneId ?? ''
   const zoneChallengeMap = useMemo(
     () =>
       category.challenges.reduce((accumulator, challenge) => {
@@ -177,6 +233,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         return accumulator
       }, {}),
     [category.challenges],
+  )
+  const currentZoneChallenges = useMemo(
+    () => (zoneChallengeMap[currentZoneId] ?? [])
+      .map((challengeId) => category.challenges.find((challenge) => challenge.id === challengeId) ?? null)
+      .filter(Boolean),
+    [category.challenges, currentZoneId, zoneChallengeMap],
   )
 
   useEffect(() => {
@@ -222,6 +284,14 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   function handleSubmit(event) {
     event.preventDefault()
+    if (challengeMediaRef.current) {
+      const mediaElements = challengeMediaRef.current.querySelectorAll('audio, video')
+      mediaElements.forEach((mediaElement) => {
+        mediaElement.pause()
+        mediaElement.currentTime = 0
+      })
+    }
+
     const nextFeedback = submitChallenge()
 
     if (!nextFeedback) {
@@ -432,7 +502,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const credits = getCredits()
   const attemptsRemaining = getAttemptsRemaining(playerState)
   const livesRemaining = getLivesRemaining(playerState)
-  const currentZoneId = currentChallenge.zoneId ?? ''
   const activeZoneIds = Object.keys(zoneChallengeMap)
   const feedbackChallenge =
     category.challenges.find((challenge) => challenge.id === feedback.attemptedChallengeId) ?? currentChallenge
@@ -491,6 +560,31 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   const shouldShowDefaultFloatingPanel =
     activePanel?.eventType === 'onHesitation' || activePanel?.eventType === 'onHintUsed'
+  const zoneNavigator = (
+    <ZoneChallengeNavigator
+      challenges={currentZoneChallenges}
+      currentChallengeId={currentChallengeId}
+      onSelect={(challengeId) => {
+        setHintModalChallengeId('')
+        clearResultComment()
+        selectChallenge(challengeId)
+      }}
+      resolvedChallengeIds={resolvedChallengeIds}
+    />
+  )
+  const zoneNavigatorSide = (
+    <ZoneChallengeNavigator
+      challenges={currentZoneChallenges}
+      currentChallengeId={currentChallengeId}
+      onSelect={(challengeId) => {
+        setHintModalChallengeId('')
+        clearResultComment()
+        selectChallenge(challengeId)
+      }}
+      resolvedChallengeIds={resolvedChallengeIds}
+      vertical
+    />
+  )
 
   return (
     <>
@@ -512,12 +606,15 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             progressLabel={progressLabel}
           >
             {isChallengeIntroVisible ? (
-              <MusicChallengeIntro
-                key={currentChallengeId}
-                challenge={currentChallenge}
-                character={getRoomCharacterBySpeaker(category.characters, 'guardian')}
-                onComplete={() => setShownIntroChallengeIds((prev) => new Set([...prev, currentChallengeId]))}
-              />
+              <div className="space-y-4">
+                {zoneNavigator}
+                <MusicChallengeIntro
+                  key={currentChallengeId}
+                  challenge={currentChallenge}
+                  character={getRoomCharacterBySpeaker(category.characters, 'guardian')}
+                  onComplete={() => setShownIntroChallengeIds((prev) => new Set([...prev, currentChallengeId]))}
+                />
+              </div>
             ) : (
               <div className="space-y-4">
                 {currentChallengeLocked ? <DailyLimitOverlay /> : null}
@@ -535,11 +632,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                 ) : null}
 
                 {/* Quiz card + optional Sal hesitation side panel */}
-                <div className={activePanel?.eventType === 'onHesitation' ? 'flex flex-col sm:flex-row items-start gap-4' : ''}>
-                  <div className={[
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+                  {currentZoneChallenges.length > 1 ? (
+                    <div className="w-full lg:w-24 lg:shrink-0">
+                      {zoneNavigatorSide}
+                    </div>
+                  ) : null}
+
+                  <div
+                    className={[
                     'overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 px-5 py-5 shadow-[0_0_60px_rgba(15,23,42,0.2)] backdrop-blur-xl sm:px-6 sm:py-6',
-                    activePanel?.eventType === 'onHesitation' ? 'w-full sm:flex-1 sm:min-w-0' : '',
-                  ].join(' ')}>
+                    'w-full lg:flex-1 lg:min-w-0',
+                  ].join(' ')}
+                    ref={challengeMediaRef}
+                  >
                     <div className="mb-4">
                       <span className="inline-flex items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-100">
                         {challengeTypeLabels[currentChallenge.type] ?? currentChallenge.type}
@@ -560,7 +666,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
                   {/* Sal side panel for hesitation (portrait on right / mirrored) */}
                   {activePanel?.eventType === 'onHesitation' ? (
-                    <div className="w-full sm:w-64 sm:shrink-0">
+                    <div className="w-full lg:w-64 lg:shrink-0">
                       <CharacterPanel
                         autoDismissMs={0}
                         character={activePanel.character}
@@ -600,9 +706,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           />
 
           <ResultModal
-            awardedCredits={awardedCredits}
-            characterComment={resultComment}
-            creditReward={feedbackChallenge.creditReward}
+            awardedCredits={feedbackMode === 'fresh' ? awardedCredits : 0}
+            characterComment={feedbackMode === 'fresh' ? resultComment : null}
+            creditReward={feedbackMode === 'fresh' ? feedbackChallenge.creditReward : undefined}
             errorImageSrc={
               isMusicRoom && hasFeedback && !feedback.isCorrect
                 ? (ERROR_IMAGES[Math.min(sessionWrongCount - 1, 2)] ?? null)
@@ -615,7 +721,16 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             }
             feedback={hasFeedback ? feedback : null}
             isOpen={hasFeedback}
+            mode={feedbackMode}
+            onClose={() => {
+              stopWrongAnswerEffect()
+              setIsRoomMapVisible(false)
+              setHintModalChallengeId('')
+              clearResultComment()
+              dismissFeedback()
+            }}
             onContinue={() => {
+              stopWrongAnswerEffect()
               setIsRoomMapVisible(false)
               setHintModalChallengeId('')
               clearResultComment()
@@ -662,7 +777,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               type={currentChallenge.type}
             />
 
-            <div className="relative space-y-4 rounded-[1.75rem] border border-slate-800 bg-slate-950/55 p-5 sm:p-6">
+            <div className="relative space-y-4 rounded-[1.75rem] border border-slate-800 bg-slate-950/55 p-5 sm:p-6" ref={challengeMediaRef}>
               {currentChallengeLocked ? <DailyLimitOverlay /> : null}
               <ChallengeRenderer
                 challenge={currentChallenge}

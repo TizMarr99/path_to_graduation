@@ -116,19 +116,19 @@
         { "speaker": "guardian", "text": "Eccellente! Le frequenze ti riconoscono." },
         { "speaker": "guardian", "text": "Il Guardiano annuisce: questa nota era perfetta." },
         { "speaker": "guardian", "text": "Bravo! La sala risuona della tua risposta." },
-        { "speaker": "guardian", "text": "Hai un orecchio notevole. Prosegui cosi." },
+        { "speaker": "guardian", "text": "Hai un orecchio notevole. Prosegui così." },
         { "speaker": "guardian", "text": "La melodia ti guida bene. Continua." }
       ],
       "onWrong": [
         { "speaker": "inquisitor", "text": "Stonato. Decisamente stonato." },
         { "speaker": "inquisitor", "text": "L'Inquisitore scuote la testa: non ci siamo proprio." },
-        { "speaker": "inquisitor", "text": "Forse la musica non fa per te... o forse si, chi lo sa." },
+        { "speaker": "inquisitor", "text": "Forse la musica non fa per te... o forse sì, chi lo sa." },
         { "speaker": "inquisitor", "text": "Questa risposta fa piangere anche il pianoforte." },
         { "speaker": "inquisitor", "text": "Hmm, no. Prova a usare le orecchie la prossima volta." }
       ],
       "onHintUsed": [
         { "speaker": "guardian", "text": "Un piccolo aiuto dal Guardiano. Usalo bene." },
-        { "speaker": "guardian", "text": "Ecco un indizio... ma ti costera qualche credito." },
+        { "speaker": "guardian", "text": "Ecco un indizio... ma ti costerà qualche credito." },
         { "speaker": "guardian", "text": "Il Guardiano sussurra un suggerimento. Ascolta attentamente." },
         { "speaker": "guardian", "text": "Un frammento per orientarti. Il resto tocca a te." }
       ],
@@ -136,7 +136,7 @@
         { "speaker": "inquisitor", "text": "Stai ascoltando o stai dormendo?" },
         { "speaker": "inquisitor", "text": "Il play non si consuma, ma la mia pazienza si." },
         { "speaker": "inquisitor", "text": "Quante volte ancora? Anche il giradischi si sta annoiando." },
-        { "speaker": "inquisitor", "text": "Prendi una decisione, il tempo non e tuo amico qui." },
+        { "speaker": "inquisitor", "text": "Prendi una decisione, il tempo non è tuo amico qui." },
         { "speaker": "inquisitor", "text": "L'Inquisitore sbadiglia vistosamente." }
       ]
     },
@@ -268,7 +268,7 @@
         "minimumCorrectGroups": 2,
         "placeholder": "Inserisci un cantante",
         "hint": "Uno dei tre e scozzese ed e noto per brani strappalacrime. Un altro e un rapper italiano. Il terzo e un cantautore dai capelli rossi.",
-        "explanation": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
+        "explanation1": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
         "speaker": "neutral",
         "creditReward": 10,
         "hintCost": 15
@@ -304,7 +304,7 @@
         "difficulty": "medium",
         "type": "fill_lyrics",
         "title": "Completa il testo",
-        "prompt": "Ricostruisci il verso cantato: basta arrivare alla soglia minima di parole corrette.",
+        "prompt": "Ascolta il frammento e completa il verso nel modo piu fedele possibile.",
         "assets": [
           {
             "kind": "audio",
@@ -329,7 +329,7 @@
         "difficulty": "hard",
         "type": "fill_lyrics",
         "title": "Completa il testo",
-        "prompt": "Trascrivi il verso in inglese mantenendo almeno il 70% delle parole corrette.",
+        "prompt": "Ascolta il frammento e completa il verso nel modo piu fedele possibile.",
         "assets": [
           {
             "kind": "audio",
@@ -433,8 +433,8 @@
           }
         ],
         "acceptedAnswers": ["Don't Start Now", "Dont Start Now"],
-        "hint": "E un successo disco-pop di Dua Lipa.",
-        "explanation": "'Don't Start Now' di Dua Lipa (2019): il bassline funky e inconfondibile gia dal primo strumento isolato.",
+        "hint": "È un successo disco-pop di Dua Lipa.",
+        "explanation": "'Don't Start Now' di Dua Lipa (2019): il bassline funky è inconfondibile già dal primo strumento isolato.",
         "speaker": "guardian",
         "creditReward": 10,
         "hintCost": 15,

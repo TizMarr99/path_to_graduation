@@ -122,12 +122,12 @@ function MusicRoomNarrative({ category, onComplete }) {
         </div>
 
         {/* Desktop layout */}
-        <div className="relative mt-2 flex flex-1 items-start overflow-hidden pb-24 pt-4 sm:mt-3 sm:pb-28 sm:pt-6">
-          <div className="mx-auto hidden h-full w-full max-w-7xl lg:grid lg:grid-cols-[minmax(17rem,1fr)_minmax(20rem,27rem)_minmax(17rem,1fr)] lg:gap-8">
-            <div className="flex h-full items-start pt-[24%] xl:pt-[22%]">
+        <div className="relative mt-2 flex flex-1 items-start overflow-hidden pb-24 pt-4 sm:mt-3 sm:pb-28 sm:pt-6 lg:pt-2">
+          <div className="mx-auto hidden h-full w-full max-w-[88rem] lg:grid lg:grid-cols-[minmax(20rem,1fr)_minmax(18rem,22rem)_minmax(20rem,1fr)] lg:items-start lg:gap-4 xl:gap-6">
+            <div className="flex h-full items-start justify-end lg:pt-10 xl:pt-12">
               <div
                 className={[
-                  'w-full max-w-[25rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
+                  'w-full max-w-[30rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out lg:mr-[-0.5rem] xl:mr-[-1rem]',
                   isGuardianBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : '-translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
@@ -144,11 +144,11 @@ function MusicRoomNarrative({ category, onComplete }) {
               </div>
             </div>
 
-            <div className="relative h-full min-h-0">
+            <div className="relative flex h-full min-h-[30rem] items-start justify-center xl:min-h-[32rem]">
               {guardian ? (
                 <div
                   className={[
-                    'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
+                    'absolute left-1/2 top-0 z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
                     !isInquisitorVisible ? 'opacity-100' : 'opacity-0',
                   ].join(' ')}
                 >
@@ -164,7 +164,7 @@ function MusicRoomNarrative({ category, onComplete }) {
               {inquisitor ? (
                 <div
                   className={[
-                    'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
+                    'absolute left-1/2 top-0 z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
                     isInquisitorBoxVisible ? 'opacity-100' : 'opacity-0',
                   ].join(' ')}
                 >
@@ -179,10 +179,10 @@ function MusicRoomNarrative({ category, onComplete }) {
               ) : null}
             </div>
 
-            <div className="flex h-full items-start justify-end pt-[24%] xl:pt-[22%]">
+            <div className="flex h-full items-start justify-start lg:pt-10 xl:pt-12">
               <div
                 className={[
-                  'w-full max-w-[25rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
+                  'w-full max-w-[30rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out lg:ml-[-0.5rem] xl:ml-[-1rem]',
                   isInquisitorBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : 'translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
@@ -269,7 +269,7 @@ function MusicRoomNarrative({ category, onComplete }) {
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-5 z-10 mx-auto flex w-full max-w-3xl items-center justify-center gap-4 px-5 sm:bottom-6 sm:px-0">
+        <div className="absolute right-5 top-5 z-10 flex flex-col items-end gap-3 sm:right-6 sm:top-6 lg:right-7 lg:top-7">
           {!isCtaVisible ? (
             <button
               className="inline-flex items-center justify-center rounded-full border border-slate-500/40 bg-slate-900/60 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-300 backdrop-blur-sm transition hover:border-slate-400/60 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-400/25"
@@ -283,7 +283,7 @@ function MusicRoomNarrative({ category, onComplete }) {
           <div
             className={[
               'transition duration-700 ease-out',
-              isCtaVisible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-5 opacity-0',
+              isCtaVisible ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0',
             ].join(' ')}
           >
             <button

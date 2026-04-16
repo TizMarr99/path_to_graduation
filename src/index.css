@@ -33,11 +33,13 @@
 @keyframes errorImageReveal {
   from {
     opacity: 0;
-    transform: scale(0.80);
+    transform: scale(1.14);
+    filter: blur(10px);
   }
   to {
     opacity: 1;
     transform: scale(1);
+    filter: blur(0);
   }
 }
 
@@ -50,5 +52,6 @@
 }
 
 .error-image-reveal {
+  transform-origin: bottom right;
   animation: errorImageReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

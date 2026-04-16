@@ -64,15 +64,15 @@ function TypewriterText({
   useEffect(() => {
     clearTimers()
 
-    if (!isActive) {
-      hasCompletedRef.current = false
-      frameIdRef.current = window.requestAnimationFrame(() => setVisibleLength(0))
-      return () => clearTimers()
-    }
-
     if (isComplete) {
       frameIdRef.current = window.requestAnimationFrame(() => setVisibleLength(text.length))
       hasCompletedRef.current = true
+      return () => clearTimers()
+    }
+
+    if (!isActive) {
+      hasCompletedRef.current = false
+      frameIdRef.current = window.requestAnimationFrame(() => setVisibleLength(0))
       return () => clearTimers()
     }
 

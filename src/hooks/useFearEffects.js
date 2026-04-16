@@ -7,18 +7,26 @@ export function useFearEffects(category) {
   const timeoutRef = useRef(null)
   const audioRef = useRef(null)
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current)
-      }
+  const stopWrongAnswerEffect = useCallback(() => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
 
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current = null
-      }
+    setIsFearActive(false)
+
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      audioRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    return () => {
+      stopWrongAnswerEffect()
+    }
+  }, [stopWrongAnswerEffect])
 
   const triggerWrongAnswerEffect = useCallback(() => {
     setIsFearActive(true)
@@ -54,6 +62,7 @@ export function useFearEffects(category) {
 
   return {
     isFearActive,
+    stopWrongAnswerEffect,
     triggerWrongAnswerEffect,
   }
 }

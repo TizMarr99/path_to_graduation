@@ -6,7 +6,7 @@ const ANDREA_MESSAGE =
   'Benvenuta alla tua mostra privata. Il Critico ha nascosto alcuni pezzi nella Grotta delle Ombre. Queste rappresentano ciò che hai sempre evitato. In ogni sala troverai qualcuno che ti guiderà — ma anche chi vorrà fermarti. Sei pronta?'
 
 const MIRANDA_MESSAGE =
-  'Oh guarda chi si vede. Pensavi fosse una mostra qualunque? Ogni pezzo che ho nascosto è una tua paura. Nelle mani di chi? Vediamo se hai il coraggio di scoprirlo davvero..."'
+  'Oh guarda chi si vede. Pensavi fosse una mostra qualunque? Ogni pezzo che ho nascosto è una tua paura. Nelle mani di chi? Vediamo se hai il coraggio di scoprirlo davvero...'
 
 function NarrativePortrait({ compact = false, fallbackSrc, name, role, src, tone = 'gold' }) {
   const [portraitSrc, setPortraitSrc] = useState(src)
@@ -104,12 +104,12 @@ function VipNarrative({
           </div>
         </div>
 
-        <div className="relative mt-2 flex flex-1 items-start overflow-hidden pb-24 pt-4 sm:mt-3 sm:pb-28 sm:pt-6">
-          <div className="mx-auto hidden h-full w-full max-w-7xl lg:grid lg:grid-cols-[minmax(17rem,1fr)_minmax(20rem,27rem)_minmax(17rem,1fr)] lg:gap-8">
-            <div className="flex h-full items-start pt-[24%] xl:pt-[22%]">
+        <div className="relative mt-2 flex flex-1 items-start overflow-hidden pb-24 pt-4 sm:mt-3 sm:pb-28 sm:pt-6 lg:pt-2">
+          <div className="mx-auto hidden h-full w-full max-w-[88rem] lg:grid lg:grid-cols-[minmax(20rem,1fr)_minmax(18rem,22rem)_minmax(20rem,1fr)] lg:items-start lg:gap-4 xl:gap-6">
+            <div className="flex h-full items-start justify-end lg:pt-10 xl:pt-12">
               <div
                 className={[
-                  'w-full max-w-[25rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
+                  'w-full max-w-[30rem] rounded-[2rem] border border-amber-300/18 bg-black/50 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out lg:mr-[-0.5rem] xl:mr-[-1rem]',
                   isAndreaBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : '-translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
@@ -126,10 +126,10 @@ function VipNarrative({
               </div>
             </div>
 
-            <div className="relative h-full min-h-0">
+            <div className="relative flex h-full min-h-[30rem] items-start justify-center xl:min-h-[32rem]">
               <div
                 className={[
-                  'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
+                  'absolute left-1/2 top-0 z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
                   !isMirandaVisible ? 'opacity-100' : 'opacity-0',
                 ].join(' ')}
               >
@@ -144,7 +144,7 @@ function VipNarrative({
 
               <div
                 className={[
-                  'absolute left-1/2 top-[-5%] z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
+                  'absolute left-1/2 top-0 z-10 -translate-x-1/2 scale-[0.92] pointer-events-none transition-all duration-700',
                   isMirandaBoxVisible ? 'opacity-100' : 'opacity-0',
                 ].join(' ')}
               >
@@ -158,10 +158,10 @@ function VipNarrative({
               </div>
             </div>
 
-            <div className="flex h-full items-start justify-end pt-[24%] xl:pt-[22%]">
+            <div className="flex h-full items-start justify-start lg:pt-10 xl:pt-12">
               <div
                 className={[
-                  'w-full max-w-[25rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out',
+                  'w-full max-w-[30rem] rounded-[2rem] border border-stone-300/16 bg-black/54 px-7 py-6 backdrop-blur-xl transition-all duration-700 ease-out lg:ml-[-0.5rem] xl:ml-[-1rem]',
                   isMirandaBoxVisible
                     ? 'translate-x-0 opacity-100 scale-100'
                     : 'translate-x-6 opacity-0 scale-[0.97] pointer-events-none',
