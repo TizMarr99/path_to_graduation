@@ -217,7 +217,7 @@ export function PlayerStateProvider({ children }) {
     totalChallenges,
     unlockedCategoryIds = [],
   }) {
-    const passed = correctCount >= 2
+    const passed = correctCount >= 8
     const previousProgress =
       currentState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
     const startedAt = previousProgress.startedAt ?? Date.now()

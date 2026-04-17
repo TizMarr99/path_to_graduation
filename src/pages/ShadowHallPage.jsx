@@ -313,7 +313,7 @@ export default function ShadowHallPage() {
     ? playerState.activeSession
     : null
   const hasUnlockedMusicByScore =
-    (activeMusicSession?.sessionCorrectCount ?? 0) >= 2 ||
+    (activeMusicSession?.sessionCorrectCount ?? 0) >= 8 ||
     musicProgress?.unlockedByScore === true ||
     musicProgress?.prizeWon === true
 
@@ -465,11 +465,11 @@ export default function ShadowHallPage() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(to bottom, rgba(2, 6, 23, 0.75), rgba(15, 23, 42, 0.75))',
-                border: '2px solid rgba(103, 232, 249, 0.5)',
+                  background: 'linear-gradient(to bottom, rgba(4, 12, 24, 0.48), rgba(11, 28, 45, 0.58))',
+                  border: '2px solid rgba(96, 165, 250, 0.3)',
                 borderRadius: '16px',
-                boxShadow: '0 0 30px rgba(103, 232, 249, 0.2)',
-                backdropFilter: 'blur(6px)',
+                  boxShadow: '0 0 24px rgba(37, 99, 235, 0.12), inset 0 0 18px rgba(2, 6, 23, 0.24)',
+                  backdropFilter: 'blur(3px)',
                 padding: '12px 8px',
                 textAlign: 'center',
               }}
@@ -486,38 +486,39 @@ export default function ShadowHallPage() {
                 style={{
                   fontFamily: 'Georgia, serif',
                   fontSize: 'clamp(0.7rem, 1.2vw, 0.95rem)',
-                  color: '#67e8f9',
+                  color: '#93c5fd',
                   marginBottom: '6px',
                   fontWeight: '600',
-                  textShadow: '0 0 12px rgba(103, 232, 249, 0.4)',
+                  textShadow: '0 0 10px rgba(59, 130, 246, 0.22)',
                 }}
               >
                 Sala delle Serie TV & Film
               </h3>
-              <p
-                style={{
-                  fontSize: 'clamp(0.6rem, 0.9vw, 0.75rem)',
-                  color: 'rgba(224, 242, 254, 0.8)',
-                  marginBottom: '8px',
-                  lineHeight: '1.4',
-                }}
-              >
-                Prossima sala principale
-              </p>
               <div
                 style={{
                   display: 'inline-block',
                   padding: '4px 12px',
-                  background: 'rgba(103, 232, 249, 0.15)',
-                  border: '1px solid rgba(103, 232, 249, 0.4)',
+                  background: 'rgba(96, 165, 250, 0.12)',
+                  border: '1px solid rgba(96, 165, 250, 0.28)',
                   borderRadius: '999px',
                   fontSize: 'clamp(0.6rem, 0.9vw, 0.75rem)',
-                  color: '#67e8f9',
+                  color: '#bfdbfe',
                   fontWeight: '600',
                 }}
               >
                 Costo: 60 🪙
               </div>
+              <p
+                style={{
+                  fontSize: 'clamp(0.58rem, 0.86vw, 0.72rem)',
+                  color: 'rgba(219, 234, 254, 0.76)',
+                  marginTop: '8px',
+                  lineHeight: '1.35',
+                  maxWidth: '14ch',
+                }}
+              >
+                Prima completa i 12 quiz della sala precedente.
+              </p>
             </div>
           </div>
         )}

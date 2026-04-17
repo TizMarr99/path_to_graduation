@@ -1,7 +1,9 @@
 import { isSupabaseConfigured, supabase } from './supabaseClient'
 
 function createConfigurationError() {
-  return new Error('Configura VITE_SUPABASE_URL e la chiave pubblica Supabase nel file .env.local.')
+  return new Error(
+    'Configura VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY (oppure VITE_SUPABASE_ANON_KEY) nelle variabili ambiente del client.',
+  )
 }
 
 function mapRpcError(error, fallbackMessage) {
