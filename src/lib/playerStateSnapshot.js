@@ -29,6 +29,7 @@ export function createDefaultRoomProgress(categoryId) {
     unlockedByScore: false,
     prizeWon: false,
     buyAccessAvailable: false,
+    victoryModalSeen: false,
   }
 }
 

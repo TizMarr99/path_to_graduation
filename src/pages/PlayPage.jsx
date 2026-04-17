@@ -165,6 +165,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     spendCredits,
     registerQuizAttempt,
     markMusicRoomIntroSeen,
+    markVictoryModalSeen,
     canAttemptQuiz,
     getCredits,
     isRoomIntroPending,
@@ -213,7 +214,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     [category.id],
   )
   const isMusicRoom = category.id === 'musica'
-  const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 8 && !isComplete
+  const musicRoomProgress = playerState.roomProgress[category.id]
+  const victoryModalAlreadySeen = musicRoomProgress?.victoryModalSeen ?? false
+  const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 8 && !isComplete && !victoryModalAlreadySeen
   const currentZoneId = currentChallenge?.zoneId ?? ''
   const zoneChallengeMap = useMemo(
     () =>
@@ -473,13 +476,14 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }
 
   // Show special victory modal for music room when 8+ correct (even before all 12 answered)
-  if (earlyMusicVictory || (isComplete && category.id === 'musica' && sessionCorrectCount >= 8)) {
+  if (earlyMusicVictory || (isComplete && category.id === 'musica' && sessionCorrectCount >= 8 && !victoryModalAlreadySeen)) {
     return (
       <MusicRoomVictoryModal
         category={category}
         sessionCorrectCount={sessionCorrectCount}
         sessionWrongCount={sessionWrongCount}
         totalChallenges={totalChallenges}
+        onClose={() => markVictoryModalSeen(category.id)}
       />
     )
   }
