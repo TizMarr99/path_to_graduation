@@ -7,7 +7,8 @@ import { pathToFileURL } from 'url'
 
 // Load ALL env vars (including non-VITE_ ones like RESEND_API_KEY)
 // so serverless handlers can read them via process.env during local dev.
-for (const envFile of ['.env', '.env.local']) {
+// .env.local is loaded first so it takes priority over .env (Vite convention).
+for (const envFile of ['.env.local', '.env']) {
   try {
     const envPath = path.resolve(envFile)
     if (fs.existsSync(envPath)) {

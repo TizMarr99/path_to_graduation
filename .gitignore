@@ -49,5 +49,3 @@ dist-ssr/
 .copilot_history
 .vercel
 .env*.local
-.env.example
-.env.example
