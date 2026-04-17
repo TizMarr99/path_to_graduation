@@ -83,6 +83,20 @@ export default async function handler(req, res) {
       });
     }
 
+      const { data: accessCodeRow, error: accessCodeError } = await supabase
+        .from('access_codes')
+        .select('email')
+        .eq('id', snapshot.access_code_id)
+        .single();
+
+      if (accessCodeError) {
+        return res.status(500).json({
+          error: 'Failed to load recipient email',
+          userMessage: 'Impossibile recuperare l\'email del destinatario.',
+          details: accessCodeError.message
+        });
+      }
+
     // Extract progress data
     const progress = snapshot.progress || {};
     const roomProgress = progress.room_progress || {};
@@ -122,9 +136,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Get player email (placeholder - will need to be implemented properly)
-    // For now, use a test email from environment or return error
-    const playerEmail = process.env.TEST_EMAIL || snapshot.email;
+    const playerEmail = process.env.TEST_EMAIL?.trim() || accessCodeRow?.email?.trim() || '';
 
     if (!playerEmail) {
       return res.status(400).json({
