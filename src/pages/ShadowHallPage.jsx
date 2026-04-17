@@ -313,7 +313,7 @@ export default function ShadowHallPage() {
     ? playerState.activeSession
     : null
   const hasUnlockedMusicByScore =
-    (activeMusicSession?.sessionCorrectCount ?? 0) >= 8 ||
+    (activeMusicSession?.sessionCorrectCount ?? 0) >= 2 ||
     musicProgress?.unlockedByScore === true ||
     musicProgress?.prizeWon === true
 

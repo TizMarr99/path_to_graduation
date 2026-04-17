@@ -1,4 +1,4 @@
-import { createContext, createElement, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, createElement, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   adminResetDailyLimits,
   adminResetPlayer,
@@ -210,6 +210,54 @@ export function PlayerStateProvider({ children }) {
     }
   }
 
+  function buildRoomOutcomePlayerState(currentState, {
+    categoryId,
+    correctCount,
+    wrongCount,
+    totalChallenges,
+    unlockedCategoryIds = [],
+  }) {
+    const passed = correctCount >= 2
+    const previousProgress =
+      currentState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
+    const startedAt = previousProgress.startedAt ?? Date.now()
+
+    return {
+      ...currentState,
+      roomProgress: {
+        ...currentState.roomProgress,
+        [categoryId]: {
+          ...previousProgress,
+          startedAt,
+          sessions: [
+            ...previousProgress.sessions,
+            {
+              categoryId,
+              startedAt,
+              completedAt: Date.now(),
+              correctCount,
+              wrongCount,
+              totalChallenges,
+              passed,
+              unlockedCategoryIds: passed ? unlockedCategoryIds : [],
+              prizeAwarded: passed,
+            },
+          ],
+          unlockedByScore: previousProgress.unlockedByScore || passed,
+          prizeWon: previousProgress.prizeWon || passed,
+          buyAccessAvailable: !passed && correctCount + wrongCount >= totalChallenges,
+        },
+      },
+      unlockedCategoryIds: passed
+        ? Array.from(new Set([...currentState.unlockedCategoryIds, ...unlockedCategoryIds]))
+        : currentState.unlockedCategoryIds,
+      currentRoom: null,
+      currentChallengeId: '',
+      activeSession: null,
+      lastPlayedAt: new Date().toISOString(),
+    }
+  }
+
   async function persistPlayerState(nextPlayerState, { silent = false } = {}) {
     if (!accessCodeRef.current) {
       return { ok: false }
@@ -339,55 +387,18 @@ export function PlayerStateProvider({ children }) {
     )
   }
 
-  function registerRoomOutcome({
-    categoryId,
-    correctCount,
-    wrongCount,
-    totalChallenges,
-    unlockedCategoryIds = [],
-  }) {
-    updatePlayerState((currentState) => {
-      const passed = correctCount >= 8
-      const previousProgress =
-        currentState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
-      const startedAt = previousProgress.startedAt ?? Date.now()
-
-      return {
-        ...currentState,
-        roomProgress: {
-          ...currentState.roomProgress,
-          [categoryId]: {
-            ...previousProgress,
-            startedAt,
-            sessions: [
-              ...previousProgress.sessions,
-              {
-                categoryId,
-                startedAt,
-                completedAt: Date.now(),
-                correctCount,
-                wrongCount,
-                totalChallenges,
-                passed,
-                unlockedCategoryIds: passed ? unlockedCategoryIds : [],
-                prizeAwarded: passed,
-              },
-            ],
-            unlockedByScore: previousProgress.unlockedByScore || passed,
-            prizeWon: previousProgress.prizeWon || passed,
-            buyAccessAvailable: !passed && correctCount + wrongCount >= totalChallenges,
-          },
-        },
-        unlockedCategoryIds: passed
-          ? Array.from(new Set([...currentState.unlockedCategoryIds, ...unlockedCategoryIds]))
-          : currentState.unlockedCategoryIds,
-        currentRoom: null,
-        currentChallengeId: '',
-        activeSession: null,
-        lastPlayedAt: new Date().toISOString(),
-      }
+  const registerRoomOutcome = useCallback(async ({
+    categoryId, correctCount, wrongCount, totalChallenges, unlockedCategoryIds = [],
+  }) => {
+    const nextPlayerState = buildRoomOutcomePlayerState(playerStateRef.current, {
+      categoryId, correctCount, wrongCount, totalChallenges, unlockedCategoryIds,
     })
-  }
+    playerStateRef.current = nextPlayerState
+    setPlayerState(nextPlayerState)
+    if (!accessCodeRef.current) return { ok: true }
+    clearScheduledSave()
+    return persistPlayerState(nextPlayerState)
+  }, [])
 
   function addCredits(amount) {
     if (amount <= 0) {
@@ -578,7 +589,7 @@ export function PlayerStateProvider({ children }) {
     return true
   }
 
-  function syncActiveSessionSnapshot(snapshot, { debounced = true } = {}) {
+  const syncActiveSessionSnapshot = useCallback(function syncActiveSessionSnapshot(snapshot, { debounced = true } = {}) {
     const persistMode = debounced ? 'debounced' : 'immediate'
 
     updatePlayerState(
@@ -634,9 +645,9 @@ export function PlayerStateProvider({ children }) {
       },
       { persist: persistMode },
     )
-  }
+  }, [])
 
-  function clearActiveSession() {
+  const clearActiveSession = useCallback(function clearActiveSession() {
     updatePlayerState((currentState) => {
       if (!currentState.currentRoom && !currentState.currentChallengeId && !currentState.activeSession) {
         return currentState
@@ -649,7 +660,7 @@ export function PlayerStateProvider({ children }) {
         activeSession: null,
       }
     })
-  }
+  }, [])
 
   function resetCurrentPosition() {
     updatePlayerState((currentState) => resetCurrentPositionInPlayerState(currentState))

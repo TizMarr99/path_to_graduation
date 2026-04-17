@@ -4,8 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 function normalizeJsonObject(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return {};
@@ -134,7 +133,7 @@ export default async function handler(req, res) {
     }
 
     // Prepare email content (placeholder)
-    const badgeUrl = `${process.env.VITE_BASE_URL || 'https://path-to-graduation.vercel.app'}/images/rooms/music_artifact.png`;
+    const badgeUrl = `${process.env.VITE_BASE_URL || 'https://path-to-graduation.vercel.app'}/images/rooms/music-artifact.png`;
     const badgeAlt = 'La Frequenza Nascosta - Artefatto della Sala Musica';
 
     const emailHtml = `

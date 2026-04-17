@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { usePlayerState } from '../../hooks/usePlayerState'
-import { sendMusicPrizeMail1, sendMusicPrizeMail2 } from '../../lib/emailApi'
 
 const VICTORY_AUDIO_SRC = '/audio/music-prize-won.mp3'
 const VICTORY_AUDIO_START_TIME = 10
@@ -13,10 +11,8 @@ const VICTORY_AUDIO_FADE_OUT_MS = 900
  * artifact display, and allows user to continue playing after closing.
  */
 export default function MusicRoomVictoryModal({ category, sessionCorrectCount, sessionWrongCount, totalChallenges, onClose }) {
-  const { accessCode } = usePlayerState()
   const audioRef = useRef(null)
   const fadeIntervalRef = useRef(null)
-  const emailSentRef = useRef(false)
   const [isClosing, setIsClosing] = useState(false)
 
   const guardian = category.characters?.guardian
@@ -58,15 +54,6 @@ export default function MusicRoomVictoryModal({ category, sessionCorrectCount, s
       }
     }
   }, [])
-
-  // Send prize emails on mount (fire-and-forget, idempotent on server side)
-  useEffect(() => {
-    if (emailSentRef.current || !accessCode) return
-    emailSentRef.current = true
-
-    void sendMusicPrizeMail1(accessCode).catch(() => {})
-    void sendMusicPrizeMail2(accessCode).catch(() => {})
-  }, [accessCode])
 
   function fadeOutVictoryAudio(onComplete) {
     const audio = audioRef.current
