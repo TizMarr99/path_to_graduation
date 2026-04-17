@@ -266,7 +266,7 @@ export default async function handler(req, res) {
   </html>
     `.trim();
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'andrea.sachs@mostra-ombre.org';
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'andrea@mostra-ombre.org';
     const fromName = process.env.RESEND_FROM_NAME || 'Andrea Sachs';
 
     // Send email via Resend

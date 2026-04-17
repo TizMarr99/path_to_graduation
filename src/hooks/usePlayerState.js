@@ -703,6 +703,27 @@ export function PlayerStateProvider({ children }) {
     )
   }
 
+  function markVictoryModalSeen(categoryId) {
+    updatePlayerState(
+      (currentState) => {
+        const previousProgress =
+          currentState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
+
+        return {
+          ...currentState,
+          roomProgress: {
+            ...currentState.roomProgress,
+            [categoryId]: {
+              ...previousProgress,
+              victoryModalSeen: true,
+            },
+          },
+        }
+      },
+      { persist: 'immediate' },
+    )
+  }
+
   const value = {
     accessCode,
     accessCodeId,
@@ -739,6 +760,7 @@ export function PlayerStateProvider({ children }) {
     buyCategoryBundle,
     syncActiveSessionSnapshot,
     setAdminStats,
+    markVictoryModalSeen,
     isCategoryUnlocked(categoryId) {
       return playerState.unlockedCategoryIds.includes(categoryId)
     },

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { usePlayerState } from '../../hooks/usePlayerState'
 import { sendMusicPrizeMail1, sendMusicPrizeMail2 } from '../../lib/emailApi'
 
@@ -11,10 +10,9 @@ const VICTORY_AUDIO_FADE_OUT_MS = 900
 /**
  * Modal shown when player completes the music room (8/12 threshold).
  * Features character dialogues from Achille Lauro (Guardian) and Sal da Vinci (Inquisitor),
- * artifact display, and navigation back to Shadow Hall.
+ * artifact display, and allows user to continue playing after closing.
  */
-export default function MusicRoomVictoryModal({ category, sessionCorrectCount, sessionWrongCount, totalChallenges }) {
-  const navigate = useNavigate()
+export default function MusicRoomVictoryModal({ category, sessionCorrectCount, sessionWrongCount, totalChallenges, onClose }) {
   const { accessCode } = usePlayerState()
   const audioRef = useRef(null)
   const fadeIntervalRef = useRef(null)
@@ -120,7 +118,7 @@ export default function MusicRoomVictoryModal({ category, sessionCorrectCount, s
 
     setIsClosing(true)
     fadeOutVictoryAudio(() => {
-      navigate('/shadows')
+      onClose()
     })
   }
 
@@ -516,7 +514,7 @@ export default function MusicRoomVictoryModal({ category, sessionCorrectCount, s
             e.currentTarget.style.boxShadow = 'none'
           }}
         >
-          Continua → Sala delle Ombre
+          Continua il Quiz
         </button>
       </div>
     </div>
