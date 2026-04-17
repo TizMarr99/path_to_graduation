@@ -6,6 +6,14 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
+function normalizeJsonObject(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+
+  return value;
+}
+
 /**
  * API endpoint for sending Music Room Prize Mail 2 (concert gift announcement)
  * POST /api/mail/music-prize-2
@@ -68,10 +76,34 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!snapshot.access_code_id) {
+      return res.status(500).json({
+        error: 'Missing access code id',
+        userMessage: 'Impossibile recuperare il profilo del giocatore.'
+      });
+    }
+
     // Extract progress data
     const progress = snapshot.progress || {};
     const roomProgress = progress.room_progress || {};
     const musicRoomProgress = roomProgress.musica;
+
+    const { data: progressRow, error: progressRowError } = await supabase
+      .from('player_progress')
+      .select('email_state')
+      .eq('access_code_id', snapshot.access_code_id)
+      .single();
+
+    if (progressRowError) {
+      return res.status(500).json({
+        error: 'Failed to load player progress',
+        userMessage: 'Impossibile leggere lo stato email del giocatore.',
+        details: progressRowError.message
+      });
+    }
+
+    const emailState = normalizeJsonObject(progressRow?.email_state);
+    const mail2State = normalizeJsonObject(emailState.music_prize_2);
 
     // Check if player has completed the Music Room
     if (!musicRoomProgress || !musicRoomProgress.prizeWon) {
@@ -82,11 +114,11 @@ export default async function handler(req, res) {
     }
 
     // Check if Mail 2 was already sent
-    if (progress.music_mail2_sent_at) {
+    if (mail2State.sent_at) {
       return res.status(409).json({
         error: 'Email already sent',
         userMessage: 'Questa email è già stata inviata.',
-        sentAt: progress.music_mail2_sent_at
+        sentAt: mail2State.sent_at
       });
     }
 
@@ -105,22 +137,112 @@ export default async function handler(req, res) {
     const emailHtml = `
 <!DOCTYPE html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Regalo Concerto - Sala Musica</title>
-</head>
-<body>
-  <!-- TODO: email 2 template -->
-  <h1>Un regalo speciale per te!</h1>
-  <p>Abbiamo una sorpresa per te legata al tuo successo nella Sala Musica!</p>
-  <p>Questo è un template placeholder. Il contenuto definitivo verrà inserito successivamente.</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Concerto per due</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#0b0b10;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#0b0b10;padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background-color:#14141d;border-radius:12px;overflow:hidden;border:1px solid #262637;">
+            <!-- Header -->
+            <tr>
+              <td style="padding:24px 24px 16px 24px;background:linear-gradient(135deg,#191927,#262637);border-bottom:1px solid #262637;">
+                <p style="margin:0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#b3b3ff;">
+                  La Mostra delle Ombre Illuminate
+                </p>
+                <h1 style="margin:8px 0 0 0;font-size:22px;line-height:1.3;color:#ffffff;">
+                  Un biglietto fuori dalla sala
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Saluto -->
+            <tr>
+              <td style="padding:20px 24px 8px 24px;">
+                <p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#e5e5f5;">
+                  Ciao Francesca,
+                </p>
+                <p style="margin:0 0 12px 0;font-size:14px;line-height:1.7;color:#c5c5dd;">
+                  alcune ombre, quando le attraversi, lasciano qualcosa che non può stare
+                  dentro una stanza virtuale. Questa volta è una di quelle.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Blocco regalo -->
+            <tr>
+              <td style="padding:8px 24px 16px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-radius:10px;border:1px solid #2c2c3b;background:radial-gradient(circle at 0% 0%,#25253a,#171720);">
+                  <tr>
+                    <td style="padding:16px 18px 18px 18px;">
+                      <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#ffd59e;">
+                        Regalo reale
+                      </p>
+                      <h2 style="margin:0 0 10px 0;font-size:18px;line-height:1.4;color:#ffffff;">
+                        Concerto dei Pinguini Tattici Nucleari · x2
+                      </h2>
+                      <p style="margin:0 0 10px 0;font-size:13px;line-height:1.8;color:#d0d0ea;">
+                        Per celebrare la Sala delle Frequenze, il regalo è una serata da tenere
+                        fuori dallo schermo: un <strong>concerto dei Pinguini Tattici Nucleari</strong>,
+                        per due persone.
+                      </p>
+                      <p style="margin:0 0 10px 0;font-size:13px;line-height:1.8;color:#c5c5dd;">
+                        Il biglietto è valido per due persone e ti permetterà di vivere un'esperienza musicale unica.
+                      </p>
+                      <p style="margin:0;font-size:12px;line-height:1.8;color:#9f9fb8;">
+                        Consideralo il corrispettivo, nel mondo reale, della Frequenza Nascosta:
+                        un appuntamento che puoi far suonare quando vuoi.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Invito a parlarne -->
+            <tr>
+              <td style="padding:0 24px 20px 24px;">
+                <p style="margin:0 0 10px 0;font-size:13px;line-height:1.7;color:#c5c5dd;">
+                  Non c’è nessuna scadenza nascosta: il biglietto resta qui,
+                  in sospeso, finché non vorrai usarlo.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Firma -->
+            <tr>
+              <td style="padding:0 24px 24px 24px;">
+                <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#c5c5dd;">
+                  Con calma, ma con entusiasmo,
+                </p>
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#e5e5f5;">
+                  <strong>Andrea</strong><br />
+                  Curatrice della Mostra delle Ombre
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding:16px 24px 20px 24px;border-top:1px solid #262637;background-color:#111118;">
+                <p style="margin:0;font-size:11px;line-height:1.6;color:#6e6e86;">
+                  Questa mail è legata al tuo percorso nella
+                  <strong>“Mostra delle Ombre Illuminate”</strong>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
     `.trim();
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'andrea@mostre-ombre.it';
-    const fromName = process.env.RESEND_FROM_NAME || 'Andrea';
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'andrea.sachs@mostra-ombre.org';
+    const fromName = process.env.RESEND_FROM_NAME || 'Andrea Sachs';
 
     // Send email via Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
@@ -138,16 +260,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // Update music_mail2_sent_at in player_progress
+    // Update email_state in player_progress
     const now = new Date().toISOString();
-    progress.music_mail2_sent_at = now;
+    const nextEmailState = {
+      ...emailState,
+      music_prize_2: {
+        ...mail2State,
+        sent_at: now,
+        email_id: emailData?.id ?? null,
+        recipient: playerEmail,
+      },
+    };
 
-    // Save updated progress via RPC
-    const { error: saveError } = await supabase.rpc('app_save_snapshot', {
-      p_code: accessCode,
-      p_progress: progress,
-      p_daily: snapshot.daily || {}
-    });
+    const { error: saveError } = await supabase
+      .from('player_progress')
+      .update({ email_state: nextEmailState })
+      .eq('access_code_id', snapshot.access_code_id);
 
     if (saveError) {
       // Email was sent but tracking update failed - log this

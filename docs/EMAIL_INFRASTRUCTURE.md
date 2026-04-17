@@ -23,9 +23,9 @@ Located in `/api/mail/`:
 Both endpoints:
 1. Validate the player's access code
 2. Check if the Music Room was completed (`prizeWon === true`)
-3. Check if the email was already sent (via `music_mail1_sent_at` / `music_mail2_sent_at`)
+3. Check if the email was already sent (via `player_progress.email_state`)
 4. Send the email via Resend
-5. Update the tracking timestamp in Supabase
+5. Update `player_progress.email_state` in Supabase
 
 ### Client-Side API
 
@@ -40,14 +40,33 @@ Both return promises with success/error handling and user-friendly Italian messa
 Added to `PlayerState` in `/src/types/challenge.d.ts`:
 ```typescript
 {
-  music_mail1_sent_at?: string | null  // ISO timestamp when Mail 1 was sent
-  music_mail2_sent_at?: string | null  // ISO timestamp when Mail 2 was sent
+  rewardState?: Record<string, unknown>
+  emailState?: Record<string, unknown>
 }
 ```
 
 **Note**: Database columns must be added manually to Supabase `player_progress` table:
-- `music_mail1_sent_at` (timestamptz, nullable)
-- `music_mail2_sent_at` (timestamptz, nullable)
+- `reward_state` (`jsonb`, `not null`, default `'{}'::jsonb`)
+- `email_state` (`jsonb`, `not null`, default `'{}'::jsonb`)
+
+Current email tracking shape:
+
+```json
+{
+  "music_prize_1": {
+    "sent_at": "2026-04-17T21:00:00.000Z",
+    "email_id": "re_123",
+    "recipient": "test@example.com"
+  },
+  "music_prize_2": {
+    "sent_at": "2026-04-17T21:05:00.000Z",
+    "email_id": "re_456",
+    "recipient": "test@example.com"
+  }
+}
+```
+
+`reward_state` is available for reward-specific metadata, while the actual Music Room completion gate remains the existing `progress.room_progress.musica.prizeWon` flag.
 
 ## Configuration
 
@@ -63,11 +82,15 @@ RESEND_FROM_NAME=Andrea
 
 # Optional: Test email override (development only)
 TEST_EMAIL=test@example.com
+
+# Optional: absolute base URL for assets referenced inside emails
+VITE_BASE_URL=https://path-to-graduation.vercel.app
 ```
 
 Existing Supabase variables are reused:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_ANON_KEY` (fallback)
 
 ### Resend Setup
 
@@ -139,25 +162,18 @@ function MusicRoomVictoryModal() {
 
 ## Email Templates
 
-### Current State (Placeholder)
+### Current State
 
-Both emails use minimal HTML placeholders:
+Both emails are now real inline HTML templates inside the API endpoints:
 
-```html
-<!-- TODO: email 1 template -->
-<h1>Congratulazioni!</h1>
-<p>Hai completato la Sala Musica e vinto l'artefatto!</p>
-```
+- `/api/mail/music-prize-1.js` - Mail 1, with artifact image and absolute asset URL
+- `/api/mail/music-prize-2.js` - Mail 2, with hardcoded salutation for Francesca
 
-```html
-<!-- TODO: email 2 template -->
-<h1>Un regalo speciale per te!</h1>
-<p>Abbiamo una sorpresa per te legata al tuo successo nella Sala Musica!</p>
-```
+If the copy changes, update the `emailHtml` strings directly in those endpoint files.
 
 ### Future Work
 
-Replace placeholder HTML with final copy and design:
+Refine or extract the inline templates if needed:
 1. Update `emailHtml` in `/api/mail/music-prize-1.js`
 2. Update `emailHtml` in `/api/mail/music-prize-2.js`
 
@@ -170,17 +186,16 @@ Templates should include:
 **IMPORTANT**: The following SQL must be run on Supabase manually:
 
 ```sql
--- Add email tracking columns to player_progress table
 ALTER TABLE public.player_progress
-ADD COLUMN music_mail1_sent_at TIMESTAMPTZ NULL,
-ADD COLUMN music_mail2_sent_at TIMESTAMPTZ NULL;
+  ADD COLUMN reward_state jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN email_state jsonb NOT NULL DEFAULT '{}'::jsonb;
 
--- Add indexes for performance (optional)
-CREATE INDEX idx_player_progress_music_mail1_sent_at
-ON public.player_progress(music_mail1_sent_at);
+-- Optional: GIN indexes if you plan to query these JSON fields directly
+CREATE INDEX idx_player_progress_reward_state_gin
+ON public.player_progress USING gin (reward_state);
 
-CREATE INDEX idx_player_progress_music_mail2_sent_at
-ON public.player_progress(music_mail2_sent_at);
+CREATE INDEX idx_player_progress_email_state_gin
+ON public.player_progress USING gin (email_state);
 ```
 
 ## Testing
@@ -191,14 +206,14 @@ ON public.player_progress(music_mail2_sent_at);
 2. Ensure Music Room is completed (`prizeWon === true`)
 3. Call API endpoints via client functions
 4. Verify email received at test address
-5. Verify timestamp saved in Supabase
+5. Verify `email_state` was updated in `player_progress`
 
 ### Production Checklist
 
 - [ ] Resend domain verified
 - [ ] API key configured in production environment
 - [ ] Database columns created in Supabase
-- [ ] Final email templates replaced
+- [ ] `email_state` updates correctly after each send
 - [ ] Test send to real player
 - [ ] Verify tracking prevents duplicate sends
 
@@ -212,7 +227,7 @@ ON public.player_progress(music_mail2_sent_at);
 ## Limitations & Future Improvements
 
 1. **Email Address Storage**: Currently using placeholder/test email. Need to add email field to player profile.
-2. **Email Templates**: Using basic HTML placeholders. Need final design/copy.
+2. **Email Templates**: Templates are inline in the API endpoints. Extract them only if they become harder to maintain.
 3. **Notification**: No in-app notification when email sent. Consider adding UI feedback.
 4. **Retry Logic**: No automatic retry on failure. Consider adding queue system.
 5. **Analytics**: No tracking of open/click rates. Resend provides webhooks for this.
@@ -222,6 +237,7 @@ ON public.player_progress(music_mail2_sent_at);
 - `/api/mail/music-prize-1.js` - API endpoint for Mail 1
 - `/api/mail/music-prize-2.js` - API endpoint for Mail 2
 - `/src/lib/emailApi.js` - Client-side API helpers
+- `/src/lib/playerStateSnapshot.js` - Snapshot normalization for `reward_state` / `email_state`
 - `/src/types/challenge.d.ts` - TypeScript types
 - `/.env.example` - Environment variables documentation
 - `/package.json` - Resend dependency added

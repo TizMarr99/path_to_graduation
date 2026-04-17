@@ -30,9 +30,7 @@ import {
   resolveChallengeCreditReward,
 } from '../lib/challengeRewards'
 
-const roomUnlockTargets = {
-  musica: ['ritratto-spezzato', 'archivio-vivente'],
-}
+const roomUnlockTargets = {}
 
 function NotFoundState({ categoryId }) {
   return (
@@ -163,9 +161,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     clearActiveSession,
     applyChallengeFeedbackOutcome,
     playerState,
-    getRoomProgress,
     registerRoomOutcome,
-    unlockCategories,
     spendCredits,
     registerQuizAttempt,
     markMusicRoomIntroSeen,
@@ -216,12 +212,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     () => roomUnlockTargets[category.id] ?? [],
     [category.id],
   )
-  const roomProgress = getRoomProgress(category.id)
-  const hasUnlockedByScore = roomProgress?.unlockedByScore ?? false
-  const hasUnlockedTargets = immediateUnlockTargets.every((categoryId) =>
-    playerState.unlockedCategoryIds.includes(categoryId),
-  )
   const isMusicRoom = category.id === 'musica'
+  const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 2 && !isComplete
   const currentZoneId = currentChallenge?.zoneId ?? ''
   const zoneChallengeMap = useMemo(
     () =>
@@ -254,25 +246,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   )
 
   useEffect(() => {
-    if (
-      sessionCorrectCount >= 8 &&
-      immediateUnlockTargets.length &&
-      !hasUnlockedByScore &&
-      !hasUnlockedTargets
-    ) {
-      unlockCategories(immediateUnlockTargets)
-    }
-  }, [
-    hasUnlockedByScore,
-    hasUnlockedTargets,
-    immediateUnlockTargets,
-    playerState.unlockedCategoryIds,
-    sessionCorrectCount,
-    unlockCategories,
-  ])
-
-  useEffect(() => {
-    if (!isComplete || hasPersistedOutcomeRef.current) {
+    const shouldPersist = isComplete || earlyMusicVictory
+    if (!shouldPersist || hasPersistedOutcomeRef.current) {
       return
     }
 
@@ -286,6 +261,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     hasPersistedOutcomeRef.current = true
   }, [
     category.id,
+    earlyMusicVictory,
     immediateUnlockTargets,
     isComplete,
     registerRoomOutcome,
@@ -496,13 +472,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     )
   }
 
-  if (isComplete) {
-    const passedRoom = sessionCorrectCount >= 8
+  // Show special victory modal for music room when 8+ correct (even before all 12 answered)
+  if (earlyMusicVictory || (isComplete && category.id === 'musica' && sessionCorrectCount >= 2)) {
+    return (
+      <MusicRoomVictoryModal
+        category={category}
+        sessionCorrectCount={sessionCorrectCount}
+        sessionWrongCount={sessionWrongCount}
+        totalChallenges={totalChallenges}
+      />
+    )
+  }
 
-    // Show special victory modal for music room when prize is won
-    if (category.id === 'musica' && passedRoom) {
-      return <MusicRoomVictoryModal category={category} />
-    }
+  if (isComplete) {
+    const passedRoom = sessionCorrectCount >= 2
 
     return (
       <ChallengeCompleted

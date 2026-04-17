@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategories } from '../lib/challengeData'
 
-const musicUnlockTargets = ['ritratto-spezzato', 'archivio-vivente']
+const musicUnlockTargets = ['serie-film']
 
 const galleryFrameStyles = {
   unlocked:
@@ -39,7 +39,7 @@ function RoomFrame({ category, isUnlocked, roomProgress }) {
             >
               <div className="relative z-10 text-center">
                 <p className="text-4xl opacity-80 sm:text-5xl">
-                  {category.id === 'musica' ? '🎵' : category.id === 'ritratto-spezzato' ? '🖼️' : '📚'}
+                  {category.id === 'musica' ? '🎵' : category.id === 'serie-film' ? '🎭' : '📚'}
                 </p>
               </div>
             </div>
@@ -197,7 +197,7 @@ function DashboardPage() {
                 Sblocco congiunto disponibile
               </p>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-cyan-50/90">
-                Hai completato tutti e 12 i quiz della sala musica senza raggiungere 8/12. Ora puoi sbloccare insieme le due nuove sale.
+                Hai completato tutti e 12 i quiz della sala musica senza raggiungere 8/12. Ora puoi sbloccare la Sala delle Serie TV e Film usando i crediti.
               </p>
             </div>
 
@@ -207,7 +207,7 @@ function DashboardPage() {
               onClick={handleBundleUnlock}
               type="button"
             >
-              Sblocca entrambe le sale ({bundleCost} 🪙)
+              Sblocca la sala ({bundleCost} 🪙)
             </button>
           </div>
         </div>
@@ -219,7 +219,7 @@ function DashboardPage() {
             Sblocco delle nuove sale
           </p>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
-            Per accedere alle due nuove stanze devi prima completare tutti i 12 quiz della sala musica. L'unico sblocco anticipato resta il risultato di almeno 8/12.
+            La Sala delle Serie TV e Film compare solo dopo avere raggiunto 8/12 nella sala musica oppure dopo aver completato tutte e 12 le prove. Prima di quel momento nella Sala delle Ombre resta visibile solo la prima porta.
           </p>
         </div>
       ) : null}

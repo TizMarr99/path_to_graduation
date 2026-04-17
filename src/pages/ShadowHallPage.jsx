@@ -3,15 +3,51 @@ import { useNavigate } from 'react-router-dom'
 import { usePlayerState } from '../hooks/usePlayerState'
 
 const shadowSlots = [
-  { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',  y: '25%', w: '14%', h: '55%' },
-  { id: 'serie-film',          categoryId: 'serie-film',            label: 'Sala delle Serie e dei Film', x: '24%', y: '18%', w: '14%', h: '60%' },
-  { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '43%', y: '15%', w: '14%', h: '62%' },
-  { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Arte / Mito / Lett.',  x: '62%', y: '18%', w: '14%', h: '60%' },
-  { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%', y: '25%', w: '14%', h: '55%' },
+  { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',    y: '25%', w: '14%', h: '55%', accent: 'amber' },
+  { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '43%',   y: '15%', w: '14%', h: '62%', accent: 'amber' },
+  { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Arte / Mito / Lett.',  x: '62%',   y: '18%', w: '14%', h: '60%', accent: 'amber' },
+  { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%',  y: '25%', w: '14%', h: '55%', accent: 'amber' },
 ]
 
-function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
+const slotThemes = {
+  amber: {
+    border: 'rgba(212,175,55,0.55)',
+    borderStrong: 'rgba(212,175,55,0.75)',
+    glow: 'rgba(212,175,55,0.55)',
+    glowStrong: 'rgba(212,175,55,0.75)',
+    label: '#fde68a',
+    labelSoft: 'rgba(253,230,138,0.85)',
+    muted: 'rgba(253,230,138,0.6)',
+    revealOverlay: 'rgba(255,255,255,0.07)',
+    lockedOverlay: 'rgba(2,6,23,0.26)',
+  },
+  cyan: {
+    border: 'rgba(103,232,249,0.5)',
+    borderStrong: 'rgba(103,232,249,0.7)',
+    glow: 'rgba(103,232,249,0.42)',
+    glowStrong: 'rgba(103,232,249,0.62)',
+    label: '#67e8f9',
+    labelSoft: 'rgba(224,242,254,0.88)',
+    muted: 'rgba(186,230,253,0.7)',
+    revealOverlay: 'rgba(103,232,249,0.12)',
+    lockedOverlay: 'rgba(2,6,23,0.34)',
+  },
+}
+
+function ShadowSlot({
+  slot,
+  visible,
+  unlocked,
+  prizeWon,
+  dailyBlocked,
+  onNavigate,
+  staticBright = false,
+  revealCost = null,
+  scoreLabel = null,
+}) {
   const isClickable = unlocked && !dailyBlocked
+  const isRevealOnly = visible && !unlocked
+  const theme = slotThemes[slot.accent] ?? slotThemes.amber
 
   function handleClick() {
     if (isClickable) {
@@ -19,8 +55,7 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
     }
   }
 
-  // Locked slots: invisible, no interaction
-  if (!unlocked) {
+  if (!visible) {
     return (
       <div
         style={{
@@ -35,6 +70,25 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
       />
     )
   }
+
+  const frameBorder = prizeWon
+    ? `2px solid ${theme.borderStrong}`
+    : `1px solid ${isRevealOnly ? theme.borderStrong : theme.border}`
+  const frameAnimation = staticBright || isRevealOnly
+    ? undefined
+    : prizeWon
+      ? 'shadowGlowPulseCompleted 2.8s ease-in-out infinite'
+      : 'shadowGlowPulse 2.8s ease-in-out infinite'
+  const frameShadow = staticBright
+    ? `0 0 24px 6px ${theme.glow}`
+    : isRevealOnly
+      ? `0 0 28px 6px ${theme.glow}`
+      : undefined
+  const brightOverlayBackground = staticBright
+    ? theme.revealOverlay
+    : isRevealOnly
+      ? theme.lockedOverlay
+      : 'rgba(255,255,255,0)'
 
   return (
     <div
@@ -59,29 +113,64 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
           position: 'absolute',
           inset: 0,
           borderRadius: '6px',
-          border: prizeWon
-            ? '2px solid rgba(212,175,55,0.75)'
-            : '1px solid rgba(212,175,55,0.55)',
-          animation: prizeWon
-            ? 'shadowGlowPulseCompleted 2.8s ease-in-out infinite'
-            : 'shadowGlowPulse 2.8s ease-in-out infinite',
+          border: frameBorder,
+          animation: frameAnimation,
+          boxShadow: frameShadow,
           pointerEvents: 'none',
         }}
       />
 
-      {/* Hover brightness overlay */}
-      {isClickable && (
+      {/* Static/reveal brightness overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '6px',
+          background: brightOverlayBackground,
+          transition: 'background 0.25s ease',
+          pointerEvents: 'none',
+        }}
+        className={!staticBright && isClickable ? 'group-hover:!bg-white/[0.07]' : undefined}
+      />
+
+      {isRevealOnly && (
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            borderRadius: '6px',
-            background: 'rgba(255,255,255,0)',
-            transition: 'background 0.25s ease',
+            top: '14%',
+            left: '50%',
+            transform: 'translateX(-50%)',
             pointerEvents: 'none',
+            zIndex: 2,
+            textAlign: 'center',
           }}
-          className="group-hover:!bg-white/[0.07]"
-        />
+        >
+          <div
+            style={{
+              fontSize: 'clamp(1.05rem, 1.9vw, 1.6rem)',
+              marginBottom: '8px',
+              filter: 'drop-shadow(0 0 10px rgba(103,232,249,0.35))',
+            }}
+          >
+            🔒
+          </div>
+          {typeof revealCost === 'number' ? (
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '4px 10px',
+                borderRadius: '999px',
+                background: 'rgba(103,232,249,0.15)',
+                border: '1px solid rgba(103,232,249,0.35)',
+                color: '#67e8f9',
+                fontSize: 'clamp(0.58rem, 0.82vw, 0.68rem)',
+                fontWeight: '600',
+              }}
+            >
+              {revealCost} 🪙
+            </div>
+          ) : null}
+        </div>
       )}
 
       {/* Artifact icon for music room */}
@@ -97,7 +186,7 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
           }}
         >
           <img
-            src="/images/music-artifact-no-bg.png"
+            src="/images/rooms/music-artifact-no-bg.png"
             alt="Accordatore di Ombre"
             style={{
               width: 'clamp(32px, 5vw, 48px)',
@@ -128,10 +217,10 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
           style={{
             fontFamily: 'Georgia, "Times New Roman", serif',
             fontSize: 'clamp(0.6rem, 1vw, 0.75rem)',
-            color: prizeWon ? '#fde68a' : '#fde68a',
+            color: theme.label,
             textShadow: prizeWon
-              ? '0 0 14px rgba(212,175,55,1)'
-              : '0 0 10px rgba(212,175,55,0.9)',
+              ? `0 0 14px ${theme.glowStrong}`
+              : `0 0 10px ${theme.glow}`,
             lineHeight: 1.3,
             marginBottom: '4px',
             fontWeight: prizeWon ? '600' : '400',
@@ -140,20 +229,43 @@ function ShadowSlot({ slot, unlocked, prizeWon, dailyBlocked, onNavigate }) {
           {slot.label}
         </p>
 
+        {scoreLabel && (
+          <p
+            style={{
+              fontSize: 'clamp(0.5rem, 0.8vw, 0.62rem)',
+              color: theme.labelSoft,
+              marginBottom: '4px',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {scoreLabel}
+          </p>
+        )}
+
         {dailyBlocked ? (
           <p
             style={{
               fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
-              color: 'rgba(253,230,138,0.6)',
+              color: theme.muted,
             }}
           >
             🔒 Hai finito i tentativi per oggi
+          </p>
+        ) : isRevealOnly ? (
+          <p
+            style={{
+              fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
+              color: theme.labelSoft,
+              letterSpacing: '0.05em',
+            }}
+          >
+            Sblocco disponibile
           </p>
         ) : (
           <p
             style={{
               fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
-              color: 'rgba(253,230,138,0.85)',
+              color: theme.labelSoft,
               letterSpacing: '0.05em',
             }}
           >
@@ -196,11 +308,39 @@ export default function ShadowHallPage() {
   const dailyBlocked = !canAttemptQuiz()
   const bgAudioRef = useRef(null)
 
-  // Check if music room has all 12 challenges completed
   const musicProgress = roomProgress['musica']
-  const hasCompletedAllMusicChallenges = musicProgress?.sessions?.some(
-    (session) => (session.correctCount || 0) + (session.wrongCount || 0) >= 12
-  ) || false
+  const activeMusicSession = playerState.activeSession?.categoryId === 'musica'
+    ? playerState.activeSession
+    : null
+  const hasUnlockedMusicByScore =
+    (activeMusicSession?.sessionCorrectCount ?? 0) >= 2 ||
+    musicProgress?.unlockedByScore === true ||
+    musicProgress?.prizeWon === true
+
+  // Count music challenges completed across all sessions
+  const musicChallengesCompleted =
+    musicProgress?.sessions?.reduce(
+      (total, session) => total + (session.correctCount || 0) + (session.wrongCount || 0),
+      0
+    ) || 0
+  const isMusicRoomFullyCompleted = musicChallengesCompleted >= 12
+
+  // Serie-film card appears when music room is passed (8+ correct) or fully completed
+  const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
+
+  // Best session score for music room (for display)
+  const musicBestCorrect = musicProgress?.sessions?.reduce(
+    (best, session) => Math.max(best, session.correctCount || 0), 0
+  ) || 0
+  const musicBestWrong = musicProgress?.sessions?.reduce(
+    (best, session) => {
+      if ((session.correctCount || 0) === musicBestCorrect) return session.wrongCount || 0
+      return best
+    }, 0
+  ) || 0
+  const musicScoreLabel = musicProgress?.sessions?.length
+    ? `✓ ${musicBestCorrect} · ✗ ${musicBestWrong}`
+    : null
 
   useEffect(() => {
     const audio = new Audio('/audio/shadow-hall-ambient.mp3')
@@ -282,117 +422,105 @@ export default function ShadowHallPage() {
         {shadowSlots.map((slot) => {
           const unlocked = unlockedCategoryIds.includes(slot.categoryId)
           const prizeWon = roomProgress[slot.categoryId]?.prizeWon === true
+          const visible = unlocked
+          const staticBright = slot.categoryId === 'musica' && hasUnlockedMusicByScore
+          const scoreLabel = slot.categoryId === 'musica' ? musicScoreLabel : null
 
           return (
             <ShadowSlot
               key={slot.id}
               slot={slot}
+              visible={visible}
               unlocked={unlocked}
               prizeWon={prizeWon}
               dailyBlocked={dailyBlocked}
               onNavigate={navigate}
+              staticBright={staticBright}
+              scoreLabel={scoreLabel}
             />
           )
         })}
 
-        {/* New locked door for TV/Film room */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '8%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'clamp(240px, 30vw, 360px)',
-            padding: '20px',
-            background: 'linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.85))',
-            border: hasCompletedAllMusicChallenges
-              ? '2px solid rgba(103, 232, 249, 0.5)'
-              : '2px solid rgba(100, 116, 139, 0.4)',
-            borderRadius: '16px',
-            boxShadow: hasCompletedAllMusicChallenges
-              ? '0 0 30px rgba(103, 232, 249, 0.2)'
-              : '0 0 20px rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(10px)',
-            opacity: hasCompletedAllMusicChallenges ? 0.95 : 0.75,
-            transition: 'all 0.3s ease',
-            cursor: hasCompletedAllMusicChallenges ? 'default' : 'not-allowed',
-            zIndex: 12,
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
+        {/* Locked door for TV/Film room — appears after music room passed */}
+        {hasSeriesFilmReveal && (
+          <div
+            style={{
+              position: 'absolute',
+              left: '24%',
+              top: '18%',
+              width: '14%',
+              height: '55%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'not-allowed',
+              zIndex: 12,
+            }}
+          >
             <div
               style={{
-                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
-                marginBottom: '12px',
-                filter: hasCompletedAllMusicChallenges
-                  ? 'grayscale(0%)'
-                  : 'grayscale(70%) opacity(0.6)',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(to bottom, rgba(2, 6, 23, 0.75), rgba(15, 23, 42, 0.75))',
+                border: '2px solid rgba(103, 232, 249, 0.5)',
+                borderRadius: '16px',
+                boxShadow: '0 0 30px rgba(103, 232, 249, 0.2)',
+                backdropFilter: 'blur(6px)',
+                padding: '12px 8px',
+                textAlign: 'center',
               }}
             >
-              {hasCompletedAllMusicChallenges ? '🎭' : '🔒'}
-            </div>
-            <h3
-              style={{
-                fontFamily: 'Georgia, serif',
-                fontSize: 'clamp(0.9rem, 1.4vw, 1.1rem)',
-                color: hasCompletedAllMusicChallenges ? '#67e8f9' : 'rgba(203, 213, 225, 0.6)',
-                marginBottom: '8px',
-                fontWeight: '600',
-                textShadow: hasCompletedAllMusicChallenges
-                  ? '0 0 12px rgba(103, 232, 249, 0.4)'
-                  : 'none',
-              }}
-            >
-              Sala delle Serie TV & Film
-            </h3>
-            <p
-              style={{
-                fontSize: 'clamp(0.7rem, 1vw, 0.8rem)',
-                color: hasCompletedAllMusicChallenges
-                  ? 'rgba(224, 242, 254, 0.8)'
-                  : 'rgba(148, 163, 184, 0.6)',
-                marginBottom: '12px',
-                lineHeight: '1.5',
-              }}
-            >
-              {hasCompletedAllMusicChallenges
-                ? 'Prossima sala principale'
-                : 'Completa tutte le 12 prove della Sala Musica'}
-            </p>
-            <div
-              style={{
-                display: 'inline-block',
-                padding: '6px 16px',
-                background: hasCompletedAllMusicChallenges
-                  ? 'rgba(103, 232, 249, 0.15)'
-                  : 'rgba(100, 116, 139, 0.2)',
-                border: `1px solid ${
-                  hasCompletedAllMusicChallenges
-                    ? 'rgba(103, 232, 249, 0.4)'
-                    : 'rgba(100, 116, 139, 0.3)'
-                }`,
-                borderRadius: '999px',
-                fontSize: 'clamp(0.7rem, 1vw, 0.8rem)',
-                color: hasCompletedAllMusicChallenges ? '#67e8f9' : 'rgba(148, 163, 184, 0.7)',
-                fontWeight: '600',
-              }}
-            >
-              Costo: 60 🪙
-            </div>
-            {!hasCompletedAllMusicChallenges && (
-              <p
+              <div
                 style={{
-                  marginTop: '12px',
-                  fontSize: 'clamp(0.65rem, 0.9vw, 0.75rem)',
-                  color: 'rgba(148, 163, 184, 0.5)',
-                  fontStyle: 'italic',
+                  fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                  marginBottom: '8px',
                 }}
               >
-                Completamento necessario per sbloccare
+                🔒
+              </div>
+              <h3
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 'clamp(0.7rem, 1.2vw, 0.95rem)',
+                  color: '#67e8f9',
+                  marginBottom: '6px',
+                  fontWeight: '600',
+                  textShadow: '0 0 12px rgba(103, 232, 249, 0.4)',
+                }}
+              >
+                Sala delle Serie TV & Film
+              </h3>
+              <p
+                style={{
+                  fontSize: 'clamp(0.6rem, 0.9vw, 0.75rem)',
+                  color: 'rgba(224, 242, 254, 0.8)',
+                  marginBottom: '8px',
+                  lineHeight: '1.4',
+                }}
+              >
+                Prossima sala principale
               </p>
-            )}
+              <div
+                style={{
+                  display: 'inline-block',
+                  padding: '4px 12px',
+                  background: 'rgba(103, 232, 249, 0.15)',
+                  border: '1px solid rgba(103, 232, 249, 0.4)',
+                  borderRadius: '999px',
+                  fontSize: 'clamp(0.6rem, 0.9vw, 0.75rem)',
+                  color: '#67e8f9',
+                  fontWeight: '600',
+                }}
+              >
+                Costo: 60 🪙
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Top navigation bar */}

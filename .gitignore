@@ -47,3 +47,6 @@ dist-ssr/
 
 # Copilot / AI temp files
 .copilot_history
+.vercel
+.env*.local
+.env.example

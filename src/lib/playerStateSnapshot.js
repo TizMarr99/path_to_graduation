@@ -44,7 +44,17 @@ export function createDefaultPlayerState() {
     currentChallengeId: '',
     activeSession: null,
     lastPlayedAt: null,
+    rewardState: {},
+    emailState: {},
   }
+}
+
+function normalizeJsonObject(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {}
+  }
+
+  return value
 }
 
 export function normalizeRoomProgress(roomProgress = {}) {
@@ -97,6 +107,8 @@ export function normalizeSnapshot(snapshot) {
         progress?.current_challenge_id ?? progress?.active_session?.currentChallengeId ?? '',
       activeSession: progress?.active_session ?? null,
       lastPlayedAt: progress?.last_played_at ?? null,
+      rewardState: normalizeJsonObject(snapshot?.reward_state),
+      emailState: normalizeJsonObject(snapshot?.email_state),
     },
   }
 }

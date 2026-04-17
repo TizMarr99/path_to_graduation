@@ -23,8 +23,8 @@ await sendMusicPrizeMail2(accessCode)
 
 ### TypeScript Types
 Added to `PlayerState`:
-- `music_mail1_sent_at?: string | null`
-- `music_mail2_sent_at?: string | null`
+- `rewardState?: Record<string, unknown>`
+- `emailState?: Record<string, unknown>`
 
 ## Setup Required
 
@@ -43,8 +43,8 @@ RESEND_FROM_NAME=Andrea
 
 ```sql
 ALTER TABLE public.player_progress
-ADD COLUMN music_mail1_sent_at TIMESTAMPTZ NULL,
-ADD COLUMN music_mail2_sent_at TIMESTAMPTZ NULL;
+  ADD COLUMN reward_state jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN email_state jsonb NOT NULL DEFAULT '{}'::jsonb;
 ```
 
 ### 3. Resend Account Setup
@@ -56,11 +56,13 @@ ADD COLUMN music_mail2_sent_at TIMESTAMPTZ NULL;
 
 ## Email Templates
 
-Both emails use **placeholder HTML** marked with `<!-- TODO: email X template -->`.
+Both emails now use inline HTML templates embedded directly in the API endpoints.
 
-Replace the `emailHtml` content in:
+Update the `emailHtml` content in:
 - `/api/mail/music-prize-1.js` - Mail 1 template
 - `/api/mail/music-prize-2.js` - Mail 2 template
+
+Mail 1 also uses an absolute image URL built from `VITE_BASE_URL` (with a production fallback).
 
 ## Testing
 
@@ -118,6 +120,6 @@ function MusicRoomVictoryModal() {
 1. [ ] Run database migration on Supabase
 2. [ ] Configure Resend account and verify domain
 3. [ ] Add email field to player profile (or use admin-provided list)
-4. [ ] Replace placeholder email templates with final copy
+4. [ ] Review/update inline email templates if the copy changes
 5. [ ] Add UI triggers to send emails (buttons or automatic)
 6. [ ] Test with real email addresses

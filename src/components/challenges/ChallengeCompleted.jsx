@@ -21,15 +21,15 @@ function ChallengeCompleted({
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
           Hai chiuso {totalChallenges} prove: {sessionCorrectCount} corrette e {sessionWrongCount} errate.
           {passedRoom
-            ? ' Hai raggiunto la soglia di 8/12, quindi i due giochi successivi risultano subito sbloccati e il premio resta valido.'
-            : ' Non hai raggiunto la soglia di 8/12. Se hai completato tutte le 12 prove, dalla mappa potrai sbloccare insieme le due sale successive usando i crediti.'}
+            ? ' Hai raggiunto la soglia di 8/12, quindi la Sala delle Serie TV e Film risulta subito sbloccata e il premio resta valido.'
+            : ' Non hai raggiunto la soglia di 8/12. Se hai completato tutte le 12 prove, dalla mappa potrai sbloccare la Sala delle Serie TV e Film usando i crediti.'}
         </p>
       </div>
 
       {unlockedCategoryIds.length ? (
         <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/8 px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
-            Giochi sbloccati
+            Contenuto sbloccato
           </p>
           <p className="mt-2 text-sm leading-7 text-cyan-50">
             {unlockedCategoryIds.join(' · ')}
