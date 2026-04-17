@@ -5,7 +5,31 @@
  * with tracking to prevent duplicate sends.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+function normalizeApiBaseUrl(value) {
+  const normalizedValue = value?.trim() || '';
+
+  if (!normalizedValue) {
+    return '';
+  }
+
+  if (typeof window === 'undefined' || normalizedValue.startsWith('/')) {
+    return normalizedValue.replace(/\/$/, '');
+  }
+
+  try {
+    const normalizedUrl = new URL(normalizedValue);
+
+    if (normalizedUrl.origin === window.location.origin) {
+      return '';
+    }
+
+    return `${normalizedUrl.origin}${normalizedUrl.pathname}`.replace(/\/$/, '');
+  } catch {
+    return normalizedValue.replace(/\/$/, '');
+  }
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 /**
  * Send Music Room Prize Mail 1 (artifact + gettone)

@@ -13,12 +13,26 @@ function normalizeJsonObject(value) {
   return value;
 }
 
+function applyCorsHeaders(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
+  res.setHeader('Vary', 'Origin');
+}
+
 /**
  * API endpoint for sending Music Room Prize Mail 1 (artifact + gettone)
  * POST /api/mail/music-prize-1
  * Body: { accessCode: string }
  */
 export default async function handler(req, res) {
+  applyCorsHeaders(req, res);
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({
