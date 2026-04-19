@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePlayerState } from '../hooks/usePlayerState'
+import { getCategoryById } from '../lib/challengeData'
+import { getRoomTransition } from '../lib/roomTransitions'
 
 const shadowSlots = [
   { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',    y: '25%', w: '14%', h: '55%', accent: 'amber' },
+  { id: 'serie-film',          categoryId: 'serie-film',            label: 'Sala delle Serie TV & Film', x: '24%', y: '18%', w: '14%', h: '55%', accent: 'cyan' },
   { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '43%',   y: '15%', w: '14%', h: '62%', accent: 'amber' },
   { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Arte / Mito / Lett.',  x: '62%',   y: '18%', w: '14%', h: '60%', accent: 'amber' },
   { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%',  y: '25%', w: '14%', h: '55%', accent: 'amber' },
@@ -34,24 +37,95 @@ const slotThemes = {
   },
 }
 
+const defeatedPortalImages = {
+  musica: [
+    '/images/rooms/musica-error1.png',
+    '/images/rooms/musica-error2.png',
+    '/images/rooms/musica-error4.png',
+  ],
+}
+
+function resolvePortalScoreLabel(progress, activeSession = null) {
+  const hasStoredProgress = Boolean(progress?.lastCompletedSession) || (progress?.sessions?.length ?? 0) > 0
+
+  if (!activeSession && !hasStoredProgress) {
+    return null
+  }
+
+  const scoreSource = activeSession
+    ? {
+        correctCount: activeSession.sessionCorrectCount ?? 0,
+        wrongCount: activeSession.sessionWrongCount ?? 0,
+      }
+    : progress?.lastCompletedSession ?? progress?.sessions?.at(-1) ?? null
+
+  if (!scoreSource) {
+    return null
+  }
+
+  const correctCount = scoreSource.correctCount ?? scoreSource.sessionCorrectCount ?? 0
+  const wrongCount = scoreSource.wrongCount ?? scoreSource.sessionWrongCount ?? 0
+
+  return `✓ ${correctCount} · ✗ ${wrongCount}`
+}
+
+function resolvePortalOutcome(progress, activeSession = null) {
+  const scoreSource = activeSession
+    ? {
+        correctCount: activeSession.sessionCorrectCount ?? 0,
+        wrongCount: activeSession.sessionWrongCount ?? 0,
+      }
+    : progress?.lastCompletedSession ?? progress?.sessions?.at(-1) ?? null
+
+  if (!scoreSource) {
+    return null
+  }
+
+  return {
+    correctCount: scoreSource.correctCount ?? scoreSource.sessionCorrectCount ?? 0,
+    wrongCount: scoreSource.wrongCount ?? scoreSource.sessionWrongCount ?? 0,
+  }
+}
+
+function resolveDefeatedPortalImage(categoryId, outcome) {
+  const categoryImages = defeatedPortalImages[categoryId] ?? []
+
+  if (!categoryImages.length || !outcome) {
+    return null
+  }
+
+  const imageIndex = Math.max(0, (outcome.wrongCount ?? 1) - 1) % categoryImages.length
+  return categoryImages[imageIndex]
+}
+
 function ShadowSlot({
   slot,
   visible,
   unlocked,
   prizeWon,
+  defeated,
+  defeatedImageSrc = null,
   dailyBlocked,
   onNavigate,
+  onRevealRequest,
   staticBright = false,
   revealCost = null,
   scoreLabel = null,
 }) {
   const isClickable = unlocked && !dailyBlocked
   const isRevealOnly = visible && !unlocked
+  const canReveal = isRevealOnly && typeof onRevealRequest === 'function'
+  const isInteractive = isClickable || canReveal
   const theme = slotThemes[slot.accent] ?? slotThemes.amber
 
   function handleClick() {
     if (isClickable) {
       onNavigate(`/play/${slot.categoryId}`)
+      return
+    }
+
+    if (canReveal) {
+      onRevealRequest(slot.categoryId)
     }
   }
 
@@ -73,29 +147,35 @@ function ShadowSlot({
 
   const frameBorder = prizeWon
     ? `2px solid ${theme.borderStrong}`
-    : `1px solid ${isRevealOnly ? theme.borderStrong : theme.border}`
-  const frameAnimation = staticBright || isRevealOnly
+    : defeated
+      ? '1px solid rgba(71, 85, 105, 0.78)'
+      : `1px solid ${isRevealOnly ? theme.borderStrong : theme.border}`
+  const frameAnimation = staticBright || isRevealOnly || defeated
     ? undefined
     : prizeWon
       ? 'shadowGlowPulseCompleted 2.8s ease-in-out infinite'
       : 'shadowGlowPulse 2.8s ease-in-out infinite'
   const frameShadow = staticBright
     ? `0 0 24px 6px ${theme.glow}`
+    : defeated
+      ? '0 0 18px rgba(0, 0, 0, 0.62), 0 0 34px rgba(0, 0, 0, 0.42), inset 0 0 26px rgba(0, 0, 0, 0.68)'
     : isRevealOnly
       ? `0 0 28px 6px ${theme.glow}`
       : undefined
   const brightOverlayBackground = staticBright
     ? theme.revealOverlay
+    : defeated
+      ? 'linear-gradient(180deg, rgba(2,6,23,0.28), rgba(2,6,23,0.58))'
     : isRevealOnly
       ? theme.lockedOverlay
       : 'rgba(255,255,255,0)'
 
   return (
     <div
-      role={isClickable ? 'button' : undefined}
-      tabIndex={isClickable ? 0 : undefined}
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
       aria-label={slot.label}
-      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleClick() } : undefined}
+      onKeyDown={isInteractive ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleClick() } : undefined}
       onClick={handleClick}
       style={{
         position: 'absolute',
@@ -103,7 +183,7 @@ function ShadowSlot({
         top: slot.y,
         width: slot.w,
         height: slot.h,
-        cursor: isClickable ? 'pointer' : 'default',
+        cursor: isInteractive ? 'pointer' : 'default',
       }}
       className="group"
     >
@@ -130,8 +210,38 @@ function ShadowSlot({
           transition: 'background 0.25s ease',
           pointerEvents: 'none',
         }}
-        className={!staticBright && isClickable ? 'group-hover:!bg-white/[0.07]' : undefined}
+        className={!staticBright && isInteractive ? 'group-hover:!bg-white/[0.07]' : undefined}
       />
+
+      {defeated && defeatedImageSrc ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: '11%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          <img
+            src={defeatedImageSrc}
+            alt="Eco dell'ombra"
+            style={{
+              width: 'clamp(40px, 6.4vw, 62px)',
+              height: 'clamp(40px, 6.4vw, 62px)',
+              objectFit: 'cover',
+              borderRadius: '10px',
+              border: '1px solid rgba(148, 163, 184, 0.38)',
+              opacity: 0.78,
+              filter: 'grayscale(0.18) brightness(0.7) drop-shadow(0 0 10px rgba(2,6,23,0.7))',
+            }}
+            onError={(e) => {
+              e.target.style.display = 'none'
+            }}
+          />
+        </div>
+      ) : null}
 
       {isRevealOnly && (
         <div
@@ -217,8 +327,10 @@ function ShadowSlot({
           style={{
             fontFamily: 'Georgia, "Times New Roman", serif',
             fontSize: 'clamp(0.6rem, 1vw, 0.75rem)',
-            color: theme.label,
-            textShadow: prizeWon
+            color: defeated ? 'rgba(203, 213, 225, 0.82)' : theme.label,
+            textShadow: defeated
+              ? '0 0 10px rgba(2,6,23,0.75)'
+              : prizeWon
               ? `0 0 14px ${theme.glowStrong}`
               : `0 0 10px ${theme.glow}`,
             lineHeight: 1.3,
@@ -233,7 +345,7 @@ function ShadowSlot({
           <p
             style={{
               fontSize: 'clamp(0.5rem, 0.8vw, 0.62rem)',
-              color: theme.labelSoft,
+              color: defeated ? 'rgba(148, 163, 184, 0.86)' : theme.labelSoft,
               marginBottom: '4px',
               letterSpacing: '0.05em',
             }}
@@ -242,16 +354,7 @@ function ShadowSlot({
           </p>
         )}
 
-        {dailyBlocked ? (
-          <p
-            style={{
-              fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
-              color: theme.muted,
-            }}
-          >
-            🔒 Hai finito i tentativi per oggi
-          </p>
-        ) : isRevealOnly ? (
+        {isRevealOnly ? (
           <p
             style={{
               fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
@@ -259,7 +362,16 @@ function ShadowSlot({
               letterSpacing: '0.05em',
             }}
           >
-            Sblocco disponibile
+            {dailyBlocked ? 'Sblocca oggi · entra domani' : 'Sblocco disponibile'}
+          </p>
+        ) : defeated ? null : dailyBlocked ? (
+          <p
+            style={{
+              fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
+              color: defeated ? 'rgba(148, 163, 184, 0.78)' : theme.muted,
+            }}
+          >
+            🔒 Torna domani
           </p>
         ) : (
           <p
@@ -302,11 +414,24 @@ function ShadowSlot({
 }
 
 export default function ShadowHallPage() {
-  const { playerState, canAttemptQuiz } = usePlayerState()
+  const {
+    buyRoomAccess,
+    canAttemptQuiz,
+    clearPendingBridge,
+    getCredits,
+    playerState,
+  } = usePlayerState()
   const { unlockedCategoryIds, roomProgress } = playerState
   const navigate = useNavigate()
   const dailyBlocked = !canAttemptQuiz()
   const bgAudioRef = useRef(null)
+  const pendingBridge = playerState.transitionState?.pendingBridge ?? null
+  const pendingTargetCategory = pendingBridge ? getCategoryById(pendingBridge.targetCategoryId) : null
+  const pendingSourceTransition = pendingBridge ? getRoomTransition(pendingBridge.sourceCategoryId) : null
+  const credits = getCredits()
+  const pendingRoomCost = pendingTargetCategory?.buyAccessCost ?? 0
+  const hasCreditsForPendingRoom = credits >= pendingRoomCost
+  const [purchaseModalBridgeKey, setPurchaseModalBridgeKey] = useState(null)
 
   const musicProgress = roomProgress['musica']
   const activeMusicSession = playerState.activeSession?.categoryId === 'musica'
@@ -327,20 +452,60 @@ export default function ShadowHallPage() {
 
   // Serie-film card appears when music room is passed (8+ correct) or fully completed
   const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
-
-  // Best session score for music room (for display)
-  const musicBestCorrect = musicProgress?.sessions?.reduce(
-    (best, session) => Math.max(best, session.correctCount || 0), 0
-  ) || 0
-  const musicBestWrong = musicProgress?.sessions?.reduce(
-    (best, session) => {
-      if ((session.correctCount || 0) === musicBestCorrect) return session.wrongCount || 0
-      return best
-    }, 0
-  ) || 0
-  const musicScoreLabel = musicProgress?.sessions?.length
-    ? `✓ ${musicBestCorrect} · ✗ ${musicBestWrong}`
+  const activeBridgeKey = pendingBridge?.bridgeCompletedAt
+    ? `${pendingBridge.sourceCategoryId}:${pendingBridge.targetCategoryId}:${pendingBridge.bridgeCompletedAt}`
     : null
+  const isPurchaseModalOpen =
+    purchaseModalBridgeKey !== null &&
+    purchaseModalBridgeKey === activeBridgeKey &&
+    Boolean(pendingBridge?.bridgeCompletedAt) &&
+    Boolean(pendingTargetCategory) &&
+    !unlockedCategoryIds.includes(pendingTargetCategory?.id)
+
+  useEffect(() => {
+    if (pendingBridge && !pendingBridge.bridgeCompletedAt) {
+      navigate('/bridge', { replace: true })
+    }
+  }, [navigate, pendingBridge])
+
+  useEffect(() => {
+    if (
+      pendingBridge?.targetCategoryId &&
+      unlockedCategoryIds.includes(pendingBridge.targetCategoryId)
+    ) {
+      clearPendingBridge(pendingBridge.targetCategoryId)
+    }
+  }, [clearPendingBridge, pendingBridge, unlockedCategoryIds])
+
+  function handlePendingRoomPurchase() {
+    if (!pendingBridge || !pendingTargetCategory) {
+      return
+    }
+
+    const cost = pendingTargetCategory.buyAccessCost ?? 0
+    const purchaseSucceeded = buyRoomAccess(pendingTargetCategory.id, cost)
+
+    if (!purchaseSucceeded) {
+      return
+    }
+
+    setPurchaseModalBridgeKey(null)
+
+    if (canAttemptQuiz()) {
+      navigate(`/play/${pendingTargetCategory.id}`)
+    }
+  }
+
+  function handleRevealRequest(categoryId) {
+    if (
+      pendingBridge?.bridgeCompletedAt &&
+      pendingTargetCategory?.id === categoryId &&
+      !unlockedCategoryIds.includes(categoryId) &&
+      hasCreditsForPendingRoom
+    ) {
+      setPurchaseModalBridgeKey(activeBridgeKey)
+    }
+  }
 
   useEffect(() => {
     const audio = new Audio('/audio/shadow-hall-ambient.mp3')
@@ -421,10 +586,32 @@ export default function ShadowHallPage() {
       <div style={{ position: 'absolute', inset: 0 }}>
         {shadowSlots.map((slot) => {
           const unlocked = unlockedCategoryIds.includes(slot.categoryId)
-          const prizeWon = roomProgress[slot.categoryId]?.prizeWon === true
-          const visible = unlocked
+          const slotProgress = roomProgress[slot.categoryId] ?? null
+          const prizeWon = slotProgress?.prizeWon === true
+          const activeSessionForSlot = playerState.activeSession?.categoryId === slot.categoryId
+            ? playerState.activeSession
+            : null
+          const slotOutcome = resolvePortalOutcome(slotProgress, activeSessionForSlot)
+          const defeated =
+            unlocked &&
+            !prizeWon &&
+            !activeSessionForSlot &&
+            Boolean(slotProgress?.buyAccessAvailable || slotProgress?.lastCompletedSession)
+          const visible = slot.categoryId === 'serie-film'
+            ? unlocked || hasSeriesFilmReveal
+            : unlocked
           const staticBright = slot.categoryId === 'musica' && hasUnlockedMusicByScore
-          const scoreLabel = slot.categoryId === 'musica' ? musicScoreLabel : null
+          const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot)
+          const defeatedImageSrc = defeated
+            ? resolveDefeatedPortalImage(slot.categoryId, slotOutcome)
+            : null
+          const slotCategory = getCategoryById(slot.categoryId)
+          const revealCost = !unlocked ? slotCategory?.buyAccessCost ?? null : null
+          const canOpenRevealModal =
+            pendingBridge?.bridgeCompletedAt &&
+            pendingTargetCategory?.id === slot.categoryId &&
+            !unlocked &&
+            hasCreditsForPendingRoom
 
           return (
             <ShadowSlot
@@ -433,96 +620,157 @@ export default function ShadowHallPage() {
               visible={visible}
               unlocked={unlocked}
               prizeWon={prizeWon}
+              defeated={defeated}
+              defeatedImageSrc={defeatedImageSrc}
               dailyBlocked={dailyBlocked}
               onNavigate={navigate}
+              onRevealRequest={canOpenRevealModal ? handleRevealRequest : undefined}
               staticBright={staticBright}
+              revealCost={revealCost}
               scoreLabel={scoreLabel}
             />
           )
         })}
+      </div>
 
-        {/* Locked door for TV/Film room — appears after music room passed */}
-        {hasSeriesFilmReveal && (
+      {pendingBridge?.bridgeCompletedAt && pendingTargetCategory && !unlockedCategoryIds.includes(pendingTargetCategory.id) && hasCreditsForPendingRoom && isPurchaseModalOpen ? (
+        <div
+          onClick={() => setPurchaseModalBridgeKey(null)}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 14,
+            background: 'rgba(2, 6, 23, 0.58)',
+            backdropFilter: 'blur(6px)',
+          }}
+        />
+      ) : null}
+
+      {pendingBridge?.bridgeCompletedAt && pendingTargetCategory && !unlockedCategoryIds.includes(pendingTargetCategory.id) && hasCreditsForPendingRoom && isPurchaseModalOpen ? (
+        <div
+          onClick={(event) => event.stopPropagation()}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 'min(720px, calc(100vw - 40px))',
+            zIndex: 15,
+            borderRadius: '24px',
+            border: '1px solid rgba(96, 165, 250, 0.28)',
+            background: 'linear-gradient(180deg, rgba(3, 7, 18, 0.86), rgba(15, 23, 42, 0.9))',
+            boxShadow: '0 0 32px rgba(37, 99, 235, 0.16)',
+            backdropFilter: 'blur(14px)',
+            padding: '20px 22px',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '0.72rem',
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color: 'rgba(191, 219, 254, 0.82)',
+            }}
+          >
+            {pendingSourceTransition?.bridgeNarrative?.eyebrow ?? 'Passaggio aperto'}
+          </p>
+          <h2
+            style={{
+              marginTop: '10px',
+              fontSize: 'clamp(1.2rem, 2.4vw, 1.7rem)',
+              color: '#eff6ff',
+              fontWeight: '600',
+            }}
+          >
+            {pendingSourceTransition?.purchasePrompt?.title ?? 'La Soglia di Mezzo e pronta.'}
+          </h2>
+          <p
+            style={{
+              marginTop: '12px',
+              color: 'rgba(219, 234, 254, 0.82)',
+              lineHeight: 1.65,
+              fontSize: '0.95rem',
+            }}
+          >
+            {dailyBlocked
+              ? pendingSourceTransition?.purchasePrompt?.blockedDescription
+              : pendingSourceTransition?.purchasePrompt?.description}
+          </p>
           <div
             style={{
-              position: 'absolute',
-              left: '24%',
-              top: '18%',
-              width: '14%',
-              height: '55%',
+              marginTop: '16px',
               display: 'flex',
+              flexWrap: 'wrap',
+              gap: '12px',
               alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'not-allowed',
-              zIndex: 12,
+              justifyContent: 'space-between',
             }}
           >
             <div
               style={{
-                width: '100%',
-                height: '100%',
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                  background: 'linear-gradient(to bottom, rgba(4, 12, 24, 0.48), rgba(11, 28, 45, 0.58))',
-                  border: '2px solid rgba(96, 165, 250, 0.3)',
-                borderRadius: '16px',
-                  boxShadow: '0 0 24px rgba(37, 99, 235, 0.12), inset 0 0 18px rgba(2, 6, 23, 0.24)',
-                  backdropFilter: 'blur(3px)',
-                padding: '12px 8px',
-                textAlign: 'center',
+                gap: '12px',
+                flexWrap: 'wrap',
+                color: 'rgba(191, 219, 254, 0.92)',
+                fontSize: '0.9rem',
               }}
             >
-              <div
+              <span>{pendingTargetCategory.title}</span>
+              <span>Costo: {pendingTargetCategory.buyAccessCost ?? 0} 🪙</span>
+              <span>Crediti disponibili: {credits} 🪙</span>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setPurchaseModalBridgeKey(null)}
                 style={{
-                  fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
-                  marginBottom: '8px',
-                }}
-              >
-                🔒
-              </div>
-              <h3
-                style={{
-                  fontFamily: 'Georgia, serif',
-                  fontSize: 'clamp(0.7rem, 1.2vw, 0.95rem)',
-                  color: '#93c5fd',
-                  marginBottom: '6px',
-                  fontWeight: '600',
-                  textShadow: '0 0 10px rgba(59, 130, 246, 0.22)',
-                }}
-              >
-                Sala delle Serie TV & Film
-              </h3>
-              <div
-                style={{
-                  display: 'inline-block',
-                  padding: '4px 12px',
-                  background: 'rgba(96, 165, 250, 0.12)',
-                  border: '1px solid rgba(96, 165, 250, 0.28)',
                   borderRadius: '999px',
-                  fontSize: 'clamp(0.6rem, 0.9vw, 0.75rem)',
-                  color: '#bfdbfe',
+                  border: '1px solid rgba(148, 163, 184, 0.32)',
+                  background: 'rgba(15, 23, 42, 0.62)',
+                  color: 'rgba(226, 232, 240, 0.92)',
+                  padding: '10px 18px',
+                  cursor: 'pointer',
                   fontWeight: '600',
                 }}
+                type="button"
               >
-                Costo: 60 🪙
-              </div>
-              <p
+                Annulla
+              </button>
+              <button
+                disabled={!hasCreditsForPendingRoom}
+                onClick={handlePendingRoomPurchase}
                 style={{
-                  fontSize: 'clamp(0.58rem, 0.86vw, 0.72rem)',
-                  color: 'rgba(219, 234, 254, 0.76)',
-                  marginTop: '8px',
-                  lineHeight: '1.35',
-                  maxWidth: '14ch',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(147, 197, 253, 0.42)',
+                  background: !hasCreditsForPendingRoom
+                    ? 'rgba(30, 41, 59, 0.55)'
+                    : 'rgba(96, 165, 250, 0.14)',
+                  color: !hasCreditsForPendingRoom
+                    ? 'rgba(148, 163, 184, 0.85)'
+                    : '#eff6ff',
+                  padding: '10px 18px',
+                  cursor: !hasCreditsForPendingRoom ? 'not-allowed' : 'pointer',
+                  fontWeight: '600',
                 }}
+                type="button"
               >
-                Prima completa i 12 quiz della sala precedente.
-              </p>
+                {pendingSourceTransition?.purchasePrompt?.actionLabel ?? 'Acquista l’accesso'}
+              </button>
             </div>
           </div>
-        )}
-      </div>
+          {dailyBlocked ? (
+            <p
+              style={{
+                marginTop: '12px',
+                color: 'rgba(191, 219, 254, 0.76)',
+                fontSize: '0.86rem',
+                lineHeight: 1.5,
+              }}
+            >
+              Se acquisti adesso, l’ingresso effettivo restera sospeso fino a domani.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {/* Top navigation bar */}
       <div

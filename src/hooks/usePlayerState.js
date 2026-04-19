@@ -83,6 +83,7 @@ function getFallbackErrorMessage(error, fallbackMessage) {
 
 function getResumePathForState(playerState) {
   const activeSession = playerState.activeSession
+  const pendingBridge = playerState.transitionState?.pendingBridge
 
   if (activeSession?.categoryId) {
     const params = new URLSearchParams()
@@ -94,6 +95,10 @@ function getResumePathForState(playerState) {
     const queryString = params.toString()
 
     return `/play/${activeSession.categoryId}${queryString ? `?${queryString}` : ''}`
+  }
+
+  if (pendingBridge && !pendingBridge.bridgeCompletedAt) {
+    return '/bridge'
   }
 
   return '/shadows'
@@ -133,6 +138,44 @@ export function PlayerStateProvider({ children }) {
     }
   }, [])
 
+  function applySnapshot(snapshot, nextCode = accessCodeRef.current) {
+    const normalized = normalizeSnapshot(snapshot)
+
+    playerStateRef.current = normalized.playerState
+    accessCodeRef.current = nextCode
+
+    setPlayerState(normalized.playerState)
+    setRole(normalized.role)
+    setAccessCodeId(normalized.accessCodeId)
+    setAccessCode(nextCode)
+
+    return normalized
+  }
+
+  const clearScheduledSave = useCallback(() => {
+    if (debouncedSaveTimeoutRef.current) {
+      window.clearTimeout(debouncedSaveTimeoutRef.current)
+      debouncedSaveTimeoutRef.current = null
+    }
+  }, [])
+
+  const resetLocalSession = useCallback(() => {
+    clearPersistedAccessArtifacts()
+    clearScheduledSave()
+
+    const defaultPlayerState = createDefaultPlayerState()
+
+    playerStateRef.current = defaultPlayerState
+    accessCodeRef.current = ''
+
+    setPlayerState(defaultPlayerState)
+    setRole('')
+    setAccessCodeId('')
+    setAccessCode('')
+    setAuthError('')
+    setSyncError('')
+  }, [clearScheduledSave])
+
   useEffect(() => {
     let isMounted = true
 
@@ -170,48 +213,11 @@ export function PlayerStateProvider({ children }) {
     return () => {
       isMounted = false
     }
-  }, [])
-
-  function applySnapshot(snapshot, nextCode = accessCodeRef.current) {
-    const normalized = normalizeSnapshot(snapshot)
-
-    playerStateRef.current = normalized.playerState
-    accessCodeRef.current = nextCode
-
-    setPlayerState(normalized.playerState)
-    setRole(normalized.role)
-    setAccessCodeId(normalized.accessCodeId)
-    setAccessCode(nextCode)
-
-    return normalized
-  }
-
-  function resetLocalSession() {
-    clearPersistedAccessArtifacts()
-    clearScheduledSave()
-
-    const defaultPlayerState = createDefaultPlayerState()
-
-    playerStateRef.current = defaultPlayerState
-    accessCodeRef.current = ''
-
-    setPlayerState(defaultPlayerState)
-    setRole('')
-    setAccessCodeId('')
-    setAccessCode('')
-    setAuthError('')
-    setSyncError('')
-  }
-
-  function clearScheduledSave() {
-    if (debouncedSaveTimeoutRef.current) {
-      window.clearTimeout(debouncedSaveTimeoutRef.current)
-      debouncedSaveTimeoutRef.current = null
-    }
-  }
+  }, [resetLocalSession])
 
   function buildRoomOutcomePlayerState(currentState, {
     categoryId,
+    challengeResults = {},
     correctCount,
     wrongCount,
     totalChallenges,
@@ -243,6 +249,17 @@ export function PlayerStateProvider({ children }) {
               prizeAwarded: passed,
             },
           ],
+          lastCompletedSession:
+            correctCount + wrongCount >= totalChallenges
+              ? {
+                  challengeResults,
+                  completedAt: Date.now(),
+                  currentChallengeId: Object.keys(challengeResults)[0] ?? '',
+                  correctCount,
+                  totalChallenges,
+                  wrongCount,
+                }
+              : previousProgress.lastCompletedSession ?? null,
           unlockedByScore: previousProgress.unlockedByScore || passed,
           prizeWon: previousProgress.prizeWon || passed,
           buyAccessAvailable: !passed && correctCount + wrongCount >= totalChallenges,
@@ -258,7 +275,7 @@ export function PlayerStateProvider({ children }) {
     }
   }
 
-  async function persistPlayerState(nextPlayerState, { silent = false } = {}) {
+  const persistPlayerState = useCallback(async (nextPlayerState, { silent = false } = {}) => {
     if (!accessCodeRef.current) {
       return { ok: false }
     }
@@ -285,9 +302,9 @@ export function PlayerStateProvider({ children }) {
         setIsSyncing(false)
       }
     }
-  }
+  }, [])
 
-  function commitPlayerState(nextPlayerState, { persist = 'immediate' } = {}) {
+  const commitPlayerState = useCallback((nextPlayerState, { persist = 'immediate' } = {}) => {
     playerStateRef.current = nextPlayerState
     setPlayerState(nextPlayerState)
 
@@ -308,9 +325,9 @@ export function PlayerStateProvider({ children }) {
 
     void persistPlayerState(nextPlayerState)
     return nextPlayerState
-  }
+  }, [clearScheduledSave, persistPlayerState])
 
-  function updatePlayerState(updater, options) {
+  const updatePlayerState = useCallback((updater, options) => {
     const currentState = playerStateRef.current
     const nextPlayerState = typeof updater === 'function' ? updater(currentState) : updater
 
@@ -319,7 +336,7 @@ export function PlayerStateProvider({ children }) {
     }
 
     return commitPlayerState(nextPlayerState, options)
-  }
+  }, [commitPlayerState])
 
   async function login(nextCode) {
     const normalizedCode = nextCode.trim()
@@ -388,17 +405,22 @@ export function PlayerStateProvider({ children }) {
   }
 
   const registerRoomOutcome = useCallback(async ({
-    categoryId, correctCount, wrongCount, totalChallenges, unlockedCategoryIds = [],
+    categoryId, challengeResults = {}, correctCount, wrongCount, totalChallenges, unlockedCategoryIds = [],
   }) => {
     const nextPlayerState = buildRoomOutcomePlayerState(playerStateRef.current, {
-      categoryId, correctCount, wrongCount, totalChallenges, unlockedCategoryIds,
+      categoryId,
+      challengeResults,
+      correctCount,
+      wrongCount,
+      totalChallenges,
+      unlockedCategoryIds,
     })
     playerStateRef.current = nextPlayerState
     setPlayerState(nextPlayerState)
     if (!accessCodeRef.current) return { ok: true }
     clearScheduledSave()
     return persistPlayerState(nextPlayerState)
-  }, [])
+  }, [clearScheduledSave, persistPlayerState])
 
   function addCredits(amount) {
     if (amount <= 0) {
@@ -549,6 +571,88 @@ export function PlayerStateProvider({ children }) {
     markRoomStarted('musica')
   }
 
+  function queuePendingBridge({ sourceCategoryId, targetCategoryId }) {
+    if (!sourceCategoryId || !targetCategoryId) {
+      return
+    }
+
+    updatePlayerState(
+      (currentState) => {
+        const currentPendingBridge = currentState.transitionState?.pendingBridge ?? null
+
+        if (
+          currentPendingBridge?.sourceCategoryId === sourceCategoryId &&
+          currentPendingBridge?.targetCategoryId === targetCategoryId
+        ) {
+          return currentState
+        }
+
+        return {
+          ...currentState,
+          transitionState: {
+            pendingBridge: {
+              sourceCategoryId,
+              targetCategoryId,
+              createdAt: new Date().toISOString(),
+              bridgeCompletedAt: null,
+            },
+          },
+          lastPlayedAt: new Date().toISOString(),
+        }
+      },
+      { persist: 'immediate' },
+    )
+  }
+
+  function markPendingBridgeSeen() {
+    updatePlayerState(
+      (currentState) => {
+        const currentPendingBridge = currentState.transitionState?.pendingBridge ?? null
+
+        if (!currentPendingBridge || currentPendingBridge.bridgeCompletedAt) {
+          return currentState
+        }
+
+        return {
+          ...currentState,
+          transitionState: {
+            pendingBridge: {
+              ...currentPendingBridge,
+              bridgeCompletedAt: new Date().toISOString(),
+            },
+          },
+          lastPlayedAt: new Date().toISOString(),
+        }
+      },
+      { persist: 'immediate' },
+    )
+  }
+
+  function clearPendingBridge(targetCategoryId) {
+    updatePlayerState(
+      (currentState) => {
+        const currentPendingBridge = currentState.transitionState?.pendingBridge ?? null
+
+        if (!currentPendingBridge) {
+          return currentState
+        }
+
+        if (targetCategoryId && currentPendingBridge.targetCategoryId !== targetCategoryId) {
+          return currentState
+        }
+
+        return {
+          ...currentState,
+          transitionState: {
+            pendingBridge: null,
+          },
+          lastPlayedAt: new Date().toISOString(),
+        }
+      },
+      { persist: 'immediate' },
+    )
+  }
+
   function buyRoomAccess(categoryId, cost) {
     const currentState = playerStateRef.current
 
@@ -560,6 +664,10 @@ export function PlayerStateProvider({ children }) {
       ...currentState,
       credits: currentState.credits - cost,
       unlockedCategoryIds: Array.from(new Set([...currentState.unlockedCategoryIds, categoryId])),
+      transitionState:
+        currentState.transitionState?.pendingBridge?.targetCategoryId === categoryId
+          ? { pendingBridge: null }
+          : currentState.transitionState,
       lastPlayedAt: new Date().toISOString(),
     })
 
@@ -645,7 +753,7 @@ export function PlayerStateProvider({ children }) {
       },
       { persist: persistMode },
     )
-  }, [])
+  }, [updatePlayerState])
 
   const clearActiveSession = useCallback(function clearActiveSession() {
     updatePlayerState((currentState) => {
@@ -660,7 +768,7 @@ export function PlayerStateProvider({ children }) {
         activeSession: null,
       }
     })
-  }, [])
+  }, [updatePlayerState])
 
   function resetCurrentPosition() {
     updatePlayerState((currentState) => resetCurrentPositionInPlayerState(currentState))
@@ -766,6 +874,9 @@ export function PlayerStateProvider({ children }) {
     resetPlayerStateForCode,
     resetMusicRoomIntro,
     markMusicRoomIntroSeen,
+    queuePendingBridge,
+    markPendingBridgeSeen,
+    clearPendingBridge,
     markRoomStarted,
     buyRoomAccess,
     buyCategoryBundle,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ChallengeCompleted from '../components/challenges/ChallengeCompleted.jsx'
 import ChallengeFeedback from '../components/challenges/ChallengeFeedback.jsx'
 import ChallengeHintPanel from '../components/challenges/ChallengeHintPanel.jsx'
@@ -23,6 +23,7 @@ import { useFearEffects } from '../hooks/useFearEffects'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
 import { sendMusicPrizeMail1, sendMusicPrizeMail2 } from '../lib/emailApi'
+import { getRoomTransition } from '../lib/roomTransitions'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
 import { getAttemptsRemaining, getLivesRemaining } from '../lib/playerStateSnapshot'
 import { getRoomCharacterBySpeaker } from '../lib/roomSpeakers'
@@ -149,6 +150,7 @@ function ZoneChallengeNavigator({
 }
 
 function PlayCategorySession({ category, preferredChallengeId }) {
+  const navigate = useNavigate()
   const [infoModalChallengeId, setInfoModalChallengeId] = useState('')
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
   const [hintModalChallengeId, setHintModalChallengeId] = useState('')
@@ -171,6 +173,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     canAttemptQuiz,
     getCredits,
     isRoomIntroPending,
+    queuePendingBridge,
     syncActiveSessionSnapshot,
   } = usePlayerState()
   const { activePanel, resultComment, showComment, dismissPanel, clearResultComment } = useCharacterComments(
@@ -180,6 +183,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const { isFearActive, stopWrongAnswerEffect, triggerWrongAnswerEffect } = useFearEffects(category)
   const persistedSession = playerState.activeSession?.categoryId === category.id
     ? playerState.activeSession
+    : null
+  const roomProgress = playerState.roomProgress[category.id] ?? null
+  const archivedSession = !persistedSession && roomProgress?.lastCompletedSession
+    ? {
+        ...roomProgress.lastCompletedSession,
+        categoryId: category.id,
+        sessionCorrectCount: roomProgress.lastCompletedSession.correctCount ?? 0,
+        sessionWrongCount: roomProgress.lastCompletedSession.wrongCount ?? 0,
+        currentChallengeId:
+          preferredChallengeId ||
+          roomProgress.lastCompletedSession.currentChallengeId ||
+          category.challenges[0]?.id ||
+          '',
+      }
     : null
   const {
     challengeResults,
@@ -209,7 +226,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     totalChallenges,
     updateChallengeState,
     updateDraftAnswer,
-  } = useChallengeSession(category, preferredChallengeId, persistedSession)
+  } = useChallengeSession(category, preferredChallengeId, persistedSession ?? archivedSession)
   const hasPersistedOutcomeRef = useRef(false)
   const isPersistingOutcomeRef = useRef(false)
   const hasTriggeredPrizeEmailsRef = useRef(false)
@@ -217,10 +234,26 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     () => roomUnlockTargets[category.id] ?? [],
     [category.id],
   )
+  const roomTransition = getRoomTransition(category.id)
   const isMusicRoom = category.id === 'musica'
-  const musicRoomProgress = playerState.roomProgress[category.id]
+  const musicRoomProgress = roomProgress
+  const archivedRoomReadOnly = Boolean(archivedSession)
+  const pendingBridge = playerState.transitionState?.pendingBridge ?? null
   const victoryModalAlreadySeen = musicRoomProgress?.victoryModalSeen ?? false
   const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 8 && !isComplete && !victoryModalAlreadySeen
+  const shouldShowRoomVictoryModal =
+    earlyMusicVictory ||
+    (isComplete && category.id === 'musica' && sessionCorrectCount >= 8 && !victoryModalAlreadySeen)
+  const roomTransitionTargetUnlocked = roomTransition
+    ? playerState.unlockedCategoryIds.includes(roomTransition.targetCategoryId)
+    : false
+  const shouldTriggerBridgeTransition =
+    isComplete &&
+    Boolean(roomTransition) &&
+    !roomTransitionTargetUnlocked &&
+    !shouldShowRoomVictoryModal &&
+    (!pendingBridge ||
+      (pendingBridge.sourceCategoryId === category.id && !pendingBridge.bridgeCompletedAt))
   const currentZoneId = currentChallenge?.zoneId ?? ''
   const zoneChallengeMap = useMemo(
     () =>
@@ -253,6 +286,19 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   )
 
   useEffect(() => {
+    if (!shouldTriggerBridgeTransition || !roomTransition) {
+      return
+    }
+
+    queuePendingBridge({
+      sourceCategoryId: category.id,
+      targetCategoryId: roomTransition.targetCategoryId,
+    })
+
+    navigate('/bridge', { replace: true })
+  }, [category.id, navigate, queuePendingBridge, roomTransition, shouldTriggerBridgeTransition])
+
+  useEffect(() => {
     const shouldPersist = isComplete || earlyMusicVictory
     if (!shouldPersist || hasPersistedOutcomeRef.current || isPersistingOutcomeRef.current) {
       return
@@ -264,6 +310,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     async function persistOutcomeAndSendPrizeEmails() {
       const result = await registerRoomOutcome({
         categoryId: category.id,
+        challengeResults,
         correctCount: sessionCorrectCount,
         wrongCount: sessionWrongCount,
         totalChallenges,
@@ -303,6 +350,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }, [
     accessCode,
     category.id,
+    challengeResults,
     earlyMusicVictory,
     immediateUnlockTargets,
     isComplete,
@@ -314,6 +362,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   function handleSubmit(event) {
     event.preventDefault()
+    if (archivedRoomReadOnly) {
+      return
+    }
     if (challengeMediaRef.current) {
       const mediaElements = challengeMediaRef.current.querySelectorAll('audio, video')
       mediaElements.forEach((mediaElement) => {
@@ -423,12 +474,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const shouldShowMusicIntro = category.id === 'musica' && isRoomIntroPending('musica')
 
   useEffect(() => {
-    if (isComplete) {
+    if (isComplete && !archivedRoomReadOnly) {
       clearActiveSession()
       return
     }
 
-    if (!currentChallenge || shouldShowMusicIntro) {
+    if (!currentChallenge || shouldShowMusicIntro || archivedRoomReadOnly) {
       return
     }
 
@@ -461,6 +512,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     sessionWrongCount,
     shouldShowMusicIntro,
     syncActiveSessionSnapshot,
+    archivedRoomReadOnly,
   ])
 
   const challengeMapLocked = !canAttemptQuiz() && !isComplete
@@ -473,7 +525,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isMusicRoom &&
     pendingIntroZoneId === currentZoneId &&
     Boolean(currentZoneId) &&
-    !challengeMapLocked
+    !challengeMapLocked &&
+    !archivedRoomReadOnly
   const shouldPauseHesitationTimer =
     category.id === 'musica' &&
     isChallengeIntroVisible &&
@@ -517,7 +570,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }
 
   // Show special victory modal for music room when 8+ correct (even before all 12 answered)
-  if (earlyMusicVictory || (isComplete && category.id === 'musica' && sessionCorrectCount >= 8 && !victoryModalAlreadySeen)) {
+  if (shouldShowRoomVictoryModal) {
     return (
       <MusicRoomVictoryModal
         category={category}
@@ -529,7 +582,25 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     )
   }
 
-  if (isComplete) {
+  if (isComplete && !archivedRoomReadOnly) {
+    if (shouldTriggerBridgeTransition) {
+      return (
+        <section className="space-y-6 rounded-[2rem] border border-amber-300/20 bg-slate-950/75 p-8 shadow-[0_0_90px_rgba(8,145,178,0.08)] backdrop-blur-xl sm:p-10">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-amber-300/80">
+              Passaggio in preparazione
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Le voci della mostra stanno richiamando il prossimo varco.
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+              La sala ha concluso tutto cio che doveva offrirti. Ora il passaggio prosegue nella Grotta delle Ombre.
+            </p>
+          </div>
+        </section>
+      )
+    }
+
     const passedRoom = sessionCorrectCount >= 8
 
     return (
@@ -562,7 +633,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isSubmitting ||
     hasFeedback ||
     isCurrentChallengeResolved ||
-    currentChallengeLocked
+    currentChallengeLocked ||
+    archivedRoomReadOnly
   const credits = getCredits()
   const attemptsRemaining = getAttemptsRemaining(playerState)
   const livesRemaining = getLivesRemaining(playerState)
@@ -581,6 +653,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const infoDisabled = roomInteractionsDisabled || !hasInfo
   const infoDisabledReason = !hasInfo
     ? 'Nessuna informazione disponibile per questa prova.'
+    : archivedRoomReadOnly
+      ? 'Sala completata: consultazione soltanto.'
     : challengeMapLocked
       ? 'Hai finito i tentativi per oggi.'
       : ''
@@ -588,10 +662,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const canAffordHint = credits >= (currentChallenge.hintCost ?? 0)
   const hintDisabled =
     roomInteractionsDisabled ||
+    archivedRoomReadOnly ||
     !hasHint ||
     (!isHintVisible && !canAffordHint)
   const hintDisabledReason = !hasHint
     ? 'Nessun indizio disponibile per questa prova.'
+    : archivedRoomReadOnly
+      ? 'Sala completata: gli indizi non sono più acquistabili.'
     : challengeMapLocked
       ? 'Hai finito i tentativi per oggi.'
       : !isHintVisible && !canAffordHint
@@ -615,6 +692,16 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       </p>
       <p className="mt-2 text-sm leading-6 text-amber-50/90">
         Hai finito i tentativi per oggi.
+      </p>
+    </div>
+  ) : null
+  const archivedBanner = archivedRoomReadOnly ? (
+    <div className="rounded-[1.4rem] border border-cyan-300/25 bg-cyan-400/10 px-4 py-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-100/80">
+        Sala completata
+      </p>
+      <p className="mt-2 text-sm leading-6 text-cyan-50/90">
+        Questa stanza è ora in sola consultazione. Puoi visitarla, ma le risposte non sono più modificabili.
       </p>
     </div>
   ) : null
@@ -664,7 +751,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         <>
           <RoomPlayLayout
             attemptsRemaining={attemptsRemaining}
-            banner={limitBanner}
+            banner={limitBanner || archivedBanner ? <div className="space-y-3">{limitBanner}{archivedBanner}</div> : null}
             category={category}
             credits={credits}
             infoDisabled={infoDisabled}
@@ -679,6 +766,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             onInfoClick={openInfoModal}
             onMapClick={() => setIsRoomMapVisible(true)}
             progressLabel={progressLabel}
+            sessionCorrectCount={sessionCorrectCount}
+            sessionWrongCount={sessionWrongCount}
           >
             {isChallengeIntroVisible ? (
               <div className="space-y-4">
@@ -862,9 +951,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               </div>
             ) : null}
 
+            {archivedBanner}
+
             <ChallengeProgress
               challengeNumber={challengeNumber}
               completedChallenges={resolvedChallengeCount}
+              sessionCorrectCount={sessionCorrectCount}
+              sessionWrongCount={sessionWrongCount}
               totalChallenges={totalChallenges}
               title={currentChallenge.title}
               type={currentChallenge.type}

@@ -4,6 +4,8 @@ function ChallengeProgress({
   challengeNumber,
   totalChallenges,
   completedChallenges,
+  sessionCorrectCount,
+  sessionWrongCount,
   title,
   type,
 }) {
@@ -17,12 +19,17 @@ function ChallengeProgress({
           Quiz {challengeNumber} di {totalChallenges}
         </p>
         <p className="mt-2 text-sm leading-6 text-slate-300">
-          {title || challengeTypeLabels[type] || type} · risolti {completedChallenges}/
-          {totalChallenges}
+          {title || challengeTypeLabels[type] || type} · corrette {sessionCorrectCount} · sbagliate {sessionWrongCount} · risolti {completedChallenges}/{totalChallenges}
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 sm:justify-end">
+        <span className="inline-flex w-fit items-center rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-100">
+          ✓ {sessionCorrectCount}
+        </span>
+        <span className="inline-flex w-fit items-center rounded-full border border-rose-300/20 bg-rose-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-rose-100">
+          ✗ {sessionWrongCount}
+        </span>
         <span className="inline-flex w-fit items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-100">
           {challengeTypeLabels[type] ?? type}
         </span>

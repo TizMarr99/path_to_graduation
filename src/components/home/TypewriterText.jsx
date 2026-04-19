@@ -116,23 +116,29 @@ function TypewriterText({
   useEffect(() => clearTimers, [])
 
   const isSkippable = isActive && !isComplete && visibleLength < text.length
+  const visibleTextClassName = [
+    'vip-typewriter',
+    alignment === 'left' ? 'vip-typewriter--left' : 'vip-typewriter--center',
+    isActive && !isComplete && visibleLength < text.length ? 'vip-typewriter--cursor' : '',
+  ].join(' ')
 
   return (
     <div className={className}>
-      <p
-        aria-label={isSkippable ? 'Messaggio in scrittura' : undefined}
-        className={isSkippable ? 'select-none' : ''}
-      >
-        <span
-          className={[
-            'vip-typewriter',
-            alignment === 'left' ? 'vip-typewriter--left' : 'vip-typewriter--center',
-            isActive && !isComplete && visibleLength < text.length ? 'vip-typewriter--cursor' : '',
-          ].join(' ')}
+      <div className="relative">
+        <p aria-hidden="true" className="pointer-events-none invisible select-none">
+          <span className="vip-typewriter">
+            {text}
+          </span>
+        </p>
+        <p
+          aria-label={isSkippable ? 'Messaggio in scrittura' : undefined}
+          className={['absolute inset-0', isSkippable ? 'select-none' : ''].join(' ')}
         >
-          {text.slice(0, visibleLength)}
-        </span>
-      </p>
+          <span className={visibleTextClassName}>
+            {text.slice(0, visibleLength)}
+          </span>
+        </p>
+      </div>
       {isSkippable ? (
         <button
           className="mt-3 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/6 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white"

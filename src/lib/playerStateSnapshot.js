@@ -21,11 +21,18 @@ export function createDefaultStats() {
   }
 }
 
+export function createDefaultTransitionState() {
+  return {
+    pendingBridge: null,
+  }
+}
+
 export function createDefaultRoomProgress(categoryId) {
   return {
     categoryId,
     startedAt: null,
     sessions: [],
+    lastCompletedSession: null,
     unlockedByScore: false,
     prizeWon: false,
     buyAccessAvailable: false,
@@ -45,6 +52,7 @@ export function createDefaultPlayerState() {
     currentChallengeId: '',
     activeSession: null,
     lastPlayedAt: null,
+    transitionState: createDefaultTransitionState(),
     rewardState: {},
     emailState: {},
   }
@@ -70,11 +78,52 @@ export function normalizeRoomProgress(roomProgress = {}) {
       ...baseProgress,
       ...rawProgress,
       sessions: Array.isArray(rawProgress?.sessions) ? rawProgress.sessions : [],
+      lastCompletedSession:
+        rawProgress?.lastCompletedSession && typeof rawProgress.lastCompletedSession === 'object'
+          ? {
+              ...rawProgress.lastCompletedSession,
+              challengeResults:
+                rawProgress.lastCompletedSession.challengeResults &&
+                typeof rawProgress.lastCompletedSession.challengeResults === 'object' &&
+                !Array.isArray(rawProgress.lastCompletedSession.challengeResults)
+                  ? rawProgress.lastCompletedSession.challengeResults
+                  : {},
+            }
+          : null,
       startedAt: rawProgress?.startedAt ?? null,
     }
 
     return accumulator
   }, {})
+}
+
+export function normalizeTransitionState(transitionState) {
+  const baseState = createDefaultTransitionState()
+
+  if (!transitionState || typeof transitionState !== 'object' || Array.isArray(transitionState)) {
+    return baseState
+  }
+
+  const pendingBridge = transitionState.pendingBridge
+
+  if (
+    !pendingBridge ||
+    typeof pendingBridge !== 'object' ||
+    Array.isArray(pendingBridge) ||
+    !pendingBridge.sourceCategoryId ||
+    !pendingBridge.targetCategoryId
+  ) {
+    return baseState
+  }
+
+  return {
+    pendingBridge: {
+      sourceCategoryId: pendingBridge.sourceCategoryId,
+      targetCategoryId: pendingBridge.targetCategoryId,
+      createdAt: pendingBridge.createdAt ?? new Date().toISOString(),
+      bridgeCompletedAt: pendingBridge.bridgeCompletedAt ?? null,
+    },
+  }
 }
 
 export function normalizeSnapshot(snapshot) {
@@ -108,6 +157,7 @@ export function normalizeSnapshot(snapshot) {
         progress?.current_challenge_id ?? progress?.active_session?.currentChallengeId ?? '',
       activeSession: progress?.active_session ?? null,
       lastPlayedAt: progress?.last_played_at ?? null,
+      transitionState: normalizeTransitionState(progress?.transition_state),
       rewardState: normalizeJsonObject(snapshot?.reward_state),
       emailState: normalizeJsonObject(snapshot?.email_state),
     },
@@ -122,6 +172,7 @@ export function buildProgressPayload(playerState) {
     current_challenge_id: playerState.currentChallengeId || null,
     room_progress: playerState.roomProgress,
     active_session: playerState.activeSession ?? null,
+    transition_state: playerState.transitionState,
   }
 }
 

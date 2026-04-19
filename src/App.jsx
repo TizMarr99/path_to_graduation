@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom'
 import { usePlayerState } from './hooks/usePlayerState'
+import BridgePage from './pages/BridgePage.jsx'
 import DevPage from './pages/DevPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import PlayPage from './pages/PlayPage.jsx'
@@ -86,6 +87,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route
+          path="/bridge"
+          element={(
+            <ProtectedRoute>
+              <BridgePage />
+            </ProtectedRoute>
+          )}
+        />
         <Route
           path="/shadows"
           element={(

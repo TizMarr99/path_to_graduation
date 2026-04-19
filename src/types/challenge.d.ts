@@ -484,13 +484,35 @@ export interface RoomSessionSummary {
   prizeAwarded: boolean
 }
 
+export interface RoomCompletedSessionSnapshot {
+  challengeResults: Record<string, ChallengeFeedback>
+  completedAt: number
+  currentChallengeId: string
+  correctCount: number
+  totalChallenges: number
+  wrongCount: number
+}
+
 export interface RoomProgress {
   categoryId: string
   startedAt: number | string | null
   sessions: RoomSessionSummary[]
+  lastCompletedSession: RoomCompletedSessionSnapshot | null
   unlockedByScore: boolean
   prizeWon: boolean
   buyAccessAvailable: boolean
+  victoryModalSeen?: boolean
+}
+
+export interface PendingBridgeTransition {
+  sourceCategoryId: string
+  targetCategoryId: string
+  createdAt: string
+  bridgeCompletedAt: string | null
+}
+
+export interface TransitionState {
+  pendingBridge: PendingBridgeTransition | null
 }
 
 export interface PlayerState {
@@ -504,6 +526,7 @@ export interface PlayerState {
   currentChallengeId: string
   activeSession: Record<string, unknown> | null
   lastPlayedAt: string | null
+  transitionState: TransitionState
   rewardState?: Record<string, unknown>
   emailState?: Record<string, unknown>
 }

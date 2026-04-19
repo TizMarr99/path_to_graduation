@@ -23,6 +23,8 @@ function FearVisualOverlay({ fearId, isActive }) {
 function RoomPlayLayout({
   category,
   progressLabel,
+  sessionCorrectCount,
+  sessionWrongCount,
   credits,
   attemptsRemaining,
   livesRemaining,
@@ -117,7 +119,15 @@ function RoomPlayLayout({
           >
             💡
           </button>
-          <span className="text-sm text-slate-300">{progressLabel}</span>
+          <div className="flex flex-1 flex-wrap items-center gap-2 text-sm text-slate-300">
+            <span className="inline-flex items-center rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-emerald-100">
+              ✓ {sessionCorrectCount}
+            </span>
+            <span className="inline-flex items-center rounded-full border border-rose-300/20 bg-rose-300/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-rose-100">
+              ✗ {sessionWrongCount}
+            </span>
+            <span>{progressLabel}</span>
+          </div>
         </div>
       </div>
     </section>
