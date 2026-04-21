@@ -234,7 +234,7 @@ function resolveSolutionLines(challenge) {
 
   if (challenge.type === 'face_morph') {
     return [
-      `Cantanti: ${challenge.singerGroups
+      `Personaggi: ${challenge.charactersGroups
         .map((group) => group.acceptedAnswers[0])
         .filter(Boolean)
         .join(' · ')}`,
@@ -476,13 +476,13 @@ export const challengeTypeRegistry = {
     evaluate: ({ challenge, draftAnswer, category }) => {
       const result = evaluateFaceMorphAnswers(
         draftAnswer.faceMorphAnswers,
-        challenge.singerGroups,
+        challenge.charactersGroups,
       )
       const isCorrect = result.matchedCount >= challenge.minimumCorrectGroups
 
       return buildFeedback(challenge, isCorrect, category, {
         scoreEarned: result.matchedCount,
-        maxScore: challenge.singerGroups.length,
+        maxScore: challenge.charactersGroups.length,
         metadata: result,
       })
     },

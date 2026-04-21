@@ -6,7 +6,6 @@ import ChallengeSubmitButton from '../common/ChallengeSubmitButton.jsx'
 function SpeedrunCharactersChallenge({
   challenge,
   draftAnswer,
-  challengeState,
   onDraftAnswerChange,
   onChallengeStateChange,
   onSubmit,
@@ -71,7 +70,6 @@ function SpeedrunCharactersChallenge({
     const character = challenge.characters[currentIndex]
     if (!character) return
 
-    const isCorrect = matchesAcceptedAnswer(inputValue, character.acceptedAnswers)
     setResults((prev) => ({ ...prev, [character.id]: inputValue }))
     setInputValue('')
     setCurrentIndex((prev) => prev + 1)

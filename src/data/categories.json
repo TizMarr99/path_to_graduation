@@ -773,17 +773,6 @@
         "height": 30
       },
       {
-        "id": "knowledge",
-        "label": "Sapere & Intrusi",
-        "description": "Scaffali polverosi contengono domande dirette e trabocchetti.",
-        "introPrompt": "Conosci davvero le serie e i film? Trova gli intrusi, rispondi alle domande, risolvi i puzzle narrativi.",
-        "icon": "🧠",
-        "x": 50,
-        "y": 15,
-        "width": 18,
-        "height": 35
-      },
-      {
         "id": "associations",
         "label": "Legami & Associazioni",
         "description": "La bacheca dei legami intreccia personaggi, casate e relazioni.",
@@ -804,6 +793,17 @@
         "y": 65,
         "width": 25,
         "height": 20
+      },
+      {
+        "id": "knowledge",
+        "label": "Sapere & Intrusi",
+        "description": "Scaffali polverosi contengono domande dirette e trabocchetti.",
+        "introPrompt": "Conosci davvero le serie e i film? Trova gli intrusi, rispondi alle domande, risolvi i puzzle narrativi.",
+        "icon": "🧠",
+        "x": 50,
+        "y": 15,
+        "width": 18,
+        "height": 35
       }
     ],
     "weightedScoring": {
@@ -869,29 +869,29 @@
     "buyAccessCost": 60,
     "characters": {
       "guardian": {
-        "id": "tim-burton",
-        "name": "Tim Burton",
+        "id": "benedict-bridgerton",
+        "name": "Benedict Bridgerton",
         "role": "Il Guardiano",
-        "imageSrc": "/images/tim-burton.png",
-        "fallbackImageSrc": "/images/tim-burton.png",
+        "imageSrc": "/images/benedict-bridgerton.png",
+        "fallbackImageSrc": "/images/benedict-bridgerton.png",
         "tone": "purple"
       },
       "inquisitor": {
-        "id": "stephen-king",
-        "name": "Stephen King",
+        "id": "joffrey-baratheon",
+        "name": "Joffrey Baratheon",
         "role": "L'Inquisitore",
-        "imageSrc": "/images/stephen-king.png",
-        "fallbackImageSrc": "/images/stephen-king.png",
+        "imageSrc": "/images/joffrey-baratheon.png",
+        "fallbackImageSrc": "/images/joffrey-baratheon.png",
         "tone": "red"
       }
     },
     "introNarrative": {
       "guardian": {
-        "name": "Tim Burton",
+        "name": "Benedict Bridgerton",
         "message": "Benvenuto nella sala degli schermi. Qui ogni immagine racconta una storia... se hai il coraggio di guardarla. Io sono il guardiano di questa ombra. Segui le scene."
       },
       "inquisitor": {
-        "name": "Stephen King",
+        "name": "Joffrey Baratheon",
         "message": "Ah, pensi di conoscere il cinema e le serie? Le storie non si limitano a essere viste, devono essere vissute. Vediamo se ricordi davvero... o se la paura ti ha fatto dimenticare tutto."
       }
     },
@@ -994,16 +994,129 @@
         "minimumCorrect": 10,
         "characters": [
           {
+            "id": "connor-walsh",
+            "showName": "How to Get Away with Murder",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/connor.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Connor",
+              "Connor Walsh"
+            ]
+          },
+          {
             "id": "eddie-munson",
             "showName": "Stranger Things",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/eddie_munson.jpg"
+                "src": "/serie-film/speedrun/eddie.jpg"
               }
             ],
             "acceptedAnswers": [
+              "Eddie",
               "Eddie Munson"
+            ]
+          },
+          {
+            "id": "tormund-giantsbane",
+            "showName": "Game of Thrones",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/tormund.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Tormund",
+              "Tormund Giantsbane"
+            ]
+          },
+          {
+            "id": "rhaenys-targaryen",
+            "showName": "House of the Dragon",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/rhaenys.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Rhaenys",
+              "Rhaenys Targaryen"
+            ]
+          },
+          {
+            "id": "mike-ehrmantraut",
+            "showName": "Breaking Bad",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/mike.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Mike",
+              "Mike Ehrmantraut"
+            ]
+          },
+          {
+            "id": "charlie-pace",
+            "showName": "Lost",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/charlie.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Charlie",
+              "Charlie Pace"
+            ]
+          },
+          {
+            "id": "desmond-hume",
+            "showName": "Lost",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/desmond.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Desmond",
+              "Desmond Hume"
+            ]
+          },
+          {
+            "id": "gale-hawthorne",
+            "showName": "The Hunger Games",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/gale.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Gale",
+              "Gale Hawthorne"
+            ]
+          },
+          {
+            "id": "jack-rooney",
+            "showName": "3 Body Problem",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/jack.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Jack",
+              "Jack Rooney"
             ]
           },
           {
@@ -1012,11 +1125,70 @@
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/fallon_carrington.jpg"
+                "src": "/serie-film/speedrun/fallon.jpg"
               }
             ],
             "acceptedAnswers": [
+              "Fallon",
               "Fallon Carrington"
+            ]
+          },
+          {
+            "id": "jenny-humphrey",
+            "showName": "Gossip Girl",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/jenny.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Jenny",
+              "Jenny Humphrey"
+            ]
+          },
+          {
+            "id": "mary-watson",
+            "showName": "Sherlock",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/mary.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Mary",
+              "Mary Watson",
+              "Mary Morstan"
+            ]
+          },
+          {
+            "id": "shuntaro-chishiya",
+            "showName": "Alice in Borderland",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/chishiya.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Chishiya",
+              "Shuntaro",
+              "Shuntaro Chishiya"
+            ]
+          },
+          {
+            "id": "amelia-shepherd",
+            "showName": "Grey's Anatomy",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/amelia.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Amelia",
+              "Amelia Shepherd"
             ]
           },
           {
@@ -1029,152 +1201,8 @@
               }
             ],
             "acceptedAnswers": [
-              "Cirilla"
-            ]
-          },
-          {
-            "id": "charlie-kelly",
-            "showName": "It's Always Sunny in Philadelphia",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/charlie_kelly.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Charlie Kelly"
-            ]
-          },
-          {
-            "id": "april-ludgate",
-            "showName": "Parks and Recreation",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/april_ludgate.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "April Ludgate"
-            ]
-          },
-          {
-            "id": "eleven",
-            "showName": "Stranger Things",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/eleven.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Eleven"
-            ]
-          },
-          {
-            "id": "geralt",
-            "showName": "The Witcher",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/geralt.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Geralt of Rivia"
-            ]
-          },
-          {
-            "id": "sheldon-cooper",
-            "showName": "The Big Bang Theory",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/sheldon_cooper.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Sheldon Cooper"
-            ]
-          },
-          {
-            "id": "walter-white",
-            "showName": "Breaking Bad",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/walter_white.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Walter White"
-            ]
-          },
-          {
-            "id": "tyrion-lannister",
-            "showName": "Game of Thrones",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/tyrion_lannister.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Tyrion Lannister"
-            ]
-          },
-          {
-            "id": "rachel-green",
-            "showName": "Friends",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/rachel_green.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Rachel Green"
-            ]
-          },
-          {
-            "id": "dexter-morgan",
-            "showName": "Dexter",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/dexter_morgan.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Dexter Morgan"
-            ]
-          },
-          {
-            "id": "benedict-bridgerton",
-            "showName": "Bridgerton",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/images/benedict_bridgerton 1.png"
-              }
-            ],
-            "acceptedAnswers": [
-              "Benedict Bridgerton",
-              "Benedict"
-            ]
-          },
-          {
-            "id": "joffrey-baratheon",
-            "showName": "Game of Thrones",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/images/joffrey_baratheon 1.png"
-              }
-            ],
-            "acceptedAnswers": [
-              "Joffrey Baratheon",
-              "Joffrey"
+              "Cirilla",
+              "Ciri"
             ]
           }
         ],
@@ -1187,7 +1215,7 @@
         "type": "face_morph",
         "quizSubType": "face_morph",
         "difficulty": "hard",
-        "title": "Face Morph Serie TV",
+        "title": "Face Morph Serie TV 1",
         "introText": "Tre personaggi sono stati fusi in un'unica immagine. Riconoscili tutti.",
         "assets": [
           {
@@ -1195,26 +1223,26 @@
             "src": "/serie-film/face-morph/face_morph_01.jpg"
           }
         ],
-        "singerGroups": [
+        "charactersGroups": [
           {
             "id": "group-1",
             "acceptedAnswers": [
-              "Jon Snow",
-              "Jon"
+              "Jon",
+              "Jon Snow"
             ]
           },
           {
             "id": "group-2",
             "acceptedAnswers": [
-              "Walter White",
-              "Heisenberg"
+              "Harvey",
+              "Harvey Specter"
             ]
           },
           {
             "id": "group-3",
             "acceptedAnswers": [
-              "Eleven",
-              "Undici"
+              "Frank",
+              "Frank Delfino"
             ]
           }
         ],
@@ -1227,7 +1255,7 @@
         "type": "face_morph",
         "quizSubType": "face_morph",
         "difficulty": "hard",
-        "title": "Face Morph Film",
+        "title": "Face Morph Serie TV 2",
         "introText": "Chi si nasconde dietro questi volti fusi?",
         "assets": [
           {
@@ -1235,27 +1263,26 @@
             "src": "/serie-film/face-morph/face_morph_02.jpg"
           }
         ],
-        "singerGroups": [
+        "charactersGroups": [
           {
             "id": "group-1",
             "acceptedAnswers": [
-              "Sheldon Cooper",
-              "Sheldon"
+              "Olivia",
+              "Olivia Pope"
             ]
           },
           {
             "id": "group-2",
             "acceptedAnswers": [
-              "Daenerys Targaryen",
-              "Daenerys",
-              "Khaleesi"
+              "Arya",
+              "Arya Stark"
             ]
           },
           {
             "id": "group-3",
             "acceptedAnswers": [
-              "Dexter Morgan",
-              "Dexter"
+              "Annalise",
+              "Annalise Keating"
             ]
           }
         ],
@@ -1344,172 +1371,32 @@
         "creditReward": 10
       },
       {
-        "id": "sf-intruso-01",
-        "zoneId": "knowledge",
-        "type": "intruder",
-        "quizSubType": "intruder",
-        "difficulty": "medium",
-        "title": "L'Intruso — Dynasty",
-        "prompt": "Trova l'intruso: chi di questi personaggi NON appartiene alla famiglia Carrington?",
-        "explanation": "Monica (e suo fratello Jeff) sono dei Colby. Fallon, Steven e Adam sono tutti figli di Blake Carrington.",
-        "items": [
-          {
-            "id": "fallon",
-            "text": "Fallon"
-          },
-          {
-            "id": "steven",
-            "text": "Steven"
-          },
-          {
-            "id": "monica",
-            "text": "Monica"
-          },
-          {
-            "id": "adam",
-            "text": "Adam"
-          }
-        ],
-        "intruderId": "monica",
-        "creditReward": 10
-      },
-      {
-        "id": "sf-intruso-02",
-        "zoneId": "knowledge",
-        "type": "intruder",
-        "quizSubType": "intruder",
+        "id": "sf-puzzle-04",
+        "zoneId": "enigmi",
+        "type": "free_text",
+        "quizSubType": "puzzle",
         "difficulty": "hard",
-        "title": "L'Intruso — Hunger Games",
-        "prompt": "Trova la coppia Nome–Distretto ERRATA:",
-        "explanation": "Gloss appartiene al Distretto 1, non al 2. Il Distretto 2 ha personaggi come Cato e Clove.",
-        "items": [
-          {
-            "id": "katniss",
-            "text": "Katniss Everdeen — Distretto 12"
-          },
-          {
-            "id": "johanna",
-            "text": "Johanna Mason — Distretto 7"
-          },
-          {
-            "id": "finnick",
-            "text": "Finnick Odair — Distretto 4"
-          },
-          {
-            "id": "gloss",
-            "text": "Gloss — Distretto 2"
-          }
-        ],
-        "intruderId": "gloss",
-        "creditReward": 10
-      },
-      {
-        "id": "sf-intruso-03",
-        "zoneId": "knowledge",
-        "type": "intruder",
-        "quizSubType": "intruder",
-        "difficulty": "hard",
-        "title": "L'Intruso — Attori Multi-Saga",
-        "prompt": "Tutti questi attori sono apparsi in almeno due grandi saghe (Marvel, GoT, Pirati dei Caraibi, Hunger Games, Harry Potter), tranne uno. Chi ha fatto parte di UNA SOLA?",
-        "explanation": "Johnny Depp ha fatto solo Pirati dei Caraibi tra queste saghe. Natalie Dormer (Marvel/GoT/HG), Richard Madden (Marvel/GoT), Bill Nighy (HP/Pirati).",
-        "items": [
-          {
-            "id": "natalie",
-            "text": "Natalie Dormer"
-          },
-          {
-            "id": "richard",
-            "text": "Richard Madden"
-          },
-          {
-            "id": "bill",
-            "text": "Bill Nighy"
-          },
-          {
-            "id": "johnny",
-            "text": "Johnny Depp"
-          }
-        ],
-        "intruderId": "johnny",
-        "creditReward": 12
-      },
-      {
-        "id": "sf-domanda-01",
-        "zoneId": "knowledge",
-        "type": "free_text",
-        "quizSubType": "domande_aperte",
-        "difficulty": "easy",
-        "title": "Domanda Aperta 1",
-        "prompt": "Come si chiama la nave di Jack Sparrow?",
+        "title": "Puzzle Film 4",
+        "prompt": "\"Tre soli. Nessuna orbita stabile. Nessuna soluzione. Solo caos — e loro stanno arrivando.\" Quale film/serie è?",
         "acceptedAnswers": [
-          "Black Pearl",
-          "La Black Pearl"
-        ],
-        "creditReward": 8
-      },
-      {
-        "id": "sf-domanda-02",
-        "zoneId": "knowledge",
-        "type": "free_text",
-        "quizSubType": "domande_aperte",
-        "difficulty": "easy",
-        "title": "Domanda Aperta 2",
-        "prompt": "Come si chiama l'ospedale in cui lavorano i protagonisti di Grey's Anatomy?",
-        "acceptedAnswers": [
-          "Grey Sloan Memorial Hospital",
-          "Grey Sloan",
-          "Grey Sloan Memorial"
-        ],
-        "creditReward": 8
-      },
-      {
-        "id": "sf-domanda-03",
-        "zoneId": "knowledge",
-        "type": "free_text",
-        "quizSubType": "domande_aperte",
-        "difficulty": "medium",
-        "title": "Domanda Aperta 3",
-        "prompt": "Come si chiamano i tre draghi di Daenerys? (Elencali tutti e tre)",
-        "acceptedAnswers": [
-          "Drogon, Rhaegal, Viserion",
-          "Drogon Rhaegal Viserion",
-          "Rhaegal, Drogon, Viserion",
-          "Viserion, Rhaegal, Drogon",
-          "Viserion, Drogon, Rhaegal",
-          "Rhaegal, Viserion, Drogon",
-          "Drogon, Viserion, Rhaegal"
+          "Il problema dei 3 corpi",
+          "Il problema dei tre corpi",
+          "3 Body Problem",
+          "Three body problem"
         ],
         "creditReward": 10
       },
       {
-        "id": "sf-domanda-04",
-        "zoneId": "knowledge",
+        "id": "sf-puzzle-05",
+        "zoneId": "enigmi",
         "type": "free_text",
-        "quizSubType": "domande_aperte",
-        "difficulty": "medium",
-        "title": "Domanda Aperta 4",
-        "prompt": "Come si chiama il migliore amico di Steve Rogers, creduto morto in \"Captain America: The First Avenger\"?",
-        "acceptedAnswers": [
-          "Bucky Barnes",
-          "Bucky",
-          "Barnes",
-          "James Barnes",
-          "Winter Soldier"
-        ],
-        "creditReward": 8
-      },
-      {
-        "id": "sf-domanda-05",
-        "zoneId": "knowledge",
-        "type": "free_text",
-        "quizSubType": "domande_aperte",
+        "quizSubType": "puzzle",
         "difficulty": "hard",
-        "title": "Domanda Aperta 5",
-        "prompt": "Qual è la sequenza di numeri che compare continuamente nella serie \"LOST\"?",
+        "title": "Puzzle Film 5",
+        "prompt": "\"Durante la guerra, lui costruì una macchina per ascoltare i segreti del nemico. Ma il segreto più grande era lui stesso.\" Quale film è?",
         "acceptedAnswers": [
-          "4 8 15 16 23 42",
-          "4, 8, 15, 16, 23, 42",
-          "4-8-15-16-23-42"
+          "The Imitation Game",
+          "Imitation Game"
         ],
         "creditReward": 10
       },
@@ -1564,32 +1451,32 @@
           {
             "id": "stark",
             "label": "Stark",
-            "icon": "/serie-film/associazioni/got/stark.png"
+            "icon": "/serie-film/associazioni/got/stark.jpg"
           },
           {
             "id": "lannister",
             "label": "Lannister",
-            "icon": "/serie-film/associazioni/got/lannister.png"
+            "icon": "/serie-film/associazioni/got/lannister.jpg"
           },
           {
             "id": "targaryen",
             "label": "Targaryen",
-            "icon": "/serie-film/associazioni/got/targaryen.png"
+            "icon": "/serie-film/associazioni/got/targaryen.jpg"
           },
           {
             "id": "greyjoy",
             "label": "Greyjoy",
-            "icon": "/serie-film/associazioni/got/greyjoy.png"
+            "icon": "/serie-film/associazioni/got/greyjoy.jpg"
           },
           {
             "id": "baratheon",
             "label": "Baratheon",
-            "icon": "/serie-film/associazioni/got/baratheon.png"
+            "icon": "/serie-film/associazioni/got/baratheon.jpg"
           },
           {
             "id": "martell",
             "label": "Martell",
-            "icon": "/serie-film/associazioni/got/martell.png"
+            "icon": "/serie-film/associazioni/got/martell.jpg"
           }
         ],
         "creditReward": 12
@@ -1609,18 +1496,6 @@
         ],
         "rows": [
           {
-            "id": "jonas",
-            "correctOrder": [
-              "jonas_young",
-              "jonas_adult",
-              "jonas_old"
-            ],
-            "bonusNameAcceptedAnswers": [
-              "Jonas Kahnwald",
-              "Jonas"
-            ]
-          },
-          {
             "id": "claudia",
             "correctOrder": [
               "claudia_young",
@@ -1628,8 +1503,20 @@
               "claudia_old"
             ],
             "bonusNameAcceptedAnswers": [
-              "Claudia Tiedemann",
-              "Claudia"
+              "Claudia",
+              "Claudia Tiedemann"
+            ]
+          },
+          {
+            "id": "ines",
+            "correctOrder": [
+              "ines_young",
+              "ines_adult",
+              "ines_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Ines",
+              "Ines Kahnwald"
             ]
           },
           {
@@ -1659,36 +1546,6 @@
         ],
         "cells": [
           {
-            "id": "jonas_young",
-            "column": 0,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/associazioni/dark/jonas_young.jpg"
-              }
-            ]
-          },
-          {
-            "id": "jonas_adult",
-            "column": 1,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/associazioni/dark/jonas_adult.jpg"
-              }
-            ]
-          },
-          {
-            "id": "jonas_old",
-            "column": 2,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/associazioni/dark/jonas_old.jpg"
-              }
-            ]
-          },
-          {
             "id": "claudia_young",
             "column": 0,
             "assets": [
@@ -1715,6 +1572,36 @@
               {
                 "kind": "image",
                 "src": "/serie-film/associazioni/dark/claudia_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ines_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ines_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ines_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ines_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ines_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ines_old.jpg"
               }
             ]
           },
@@ -1783,11 +1670,11 @@
           [
             "helge_young",
             "claudia_young",
-            "jonas_young",
+            "ines_young",
             "ulrich_young"
           ],
           [
-            "jonas_adult",
+            "ines_adult",
             "claudia_adult",
             "ulrich_adult",
             "helge_adult"
@@ -1796,7 +1683,7 @@
             "claudia_old",
             "helge_old",
             "ulrich_old",
-            "jonas_old"
+            "ines_old"
           ]
         ],
         "lockedColumns": [
@@ -1816,64 +1703,64 @@
         "introText": "Associa ogni gioco di Alice in Borderland alla carta corrispondente (numero e seme).",
         "items": [
           {
-            "id": "3-clubs",
-            "label": "3♣",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/associazioni/aib/3_clubs.webp"
-              }
-            ],
-            "correctNumber": "3",
-            "correctSuit": "clubs"
-          },
-          {
-            "id": "5-spades",
-            "label": "5♠",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/associazioni/aib/5_spades.webp"
-              }
-            ],
-            "correctNumber": "5",
-            "correctSuit": "spades"
-          },
-          {
-            "id": "7-hearts",
-            "label": "7♥",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/associazioni/aib/7_hearts.webp"
-              }
-            ],
-            "correctNumber": "7",
-            "correctSuit": "hearts"
-          },
-          {
-            "id": "j-hearts",
+            "id": "jack-of-hearts",
             "label": "J♥",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/associazioni/aib/j_hearts.webp"
+                "src": "/serie-film/associazioni/aib/jack-of-hearts.jpg"
               }
             ],
             "correctNumber": "J",
             "correctSuit": "hearts"
           },
           {
-            "id": "q-spades",
+            "id": "king-of-clubs",
+            "label": "K♣",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/aib/king-of-clubs.jpg"
+              }
+            ],
+            "correctNumber": "K",
+            "correctSuit": "clubs"
+          },
+          {
+            "id": "king-of-diamonds",
+            "label": "K♦",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/aib/king-of-diamonds.jpg"
+              }
+            ],
+            "correctNumber": "K",
+            "correctSuit": "diamonds"
+          },
+          {
+            "id": "queen-of-spades",
             "label": "Q♠",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/associazioni/aib/q_spades.webp"
+                "src": "/serie-film/associazioni/aib/queen-of-spades.jpg"
               }
             ],
             "correctNumber": "Q",
             "correctSuit": "spades"
+          },
+          {
+            "id": "seven-of-hearts",
+            "label": "7♥",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/aib/seven-of-hearts.jpg"
+              }
+            ],
+            "correctNumber": "7",
+            "correctSuit": "hearts"
           }
         ],
         "numberOptions": [
@@ -1991,6 +1878,7 @@
         "options": [
           {
             "id": "song-01",
+            "label": "Traccia 1",
             "assets": [
               {
                 "kind": "audio",
@@ -2000,6 +1888,7 @@
           },
           {
             "id": "song-02",
+            "label": "Traccia 2",
             "assets": [
               {
                 "kind": "audio",
@@ -2009,6 +1898,7 @@
           },
           {
             "id": "song-03",
+            "label": "Traccia 3",
             "assets": [
               {
                 "kind": "audio",
@@ -2018,6 +1908,7 @@
           },
           {
             "id": "song-04",
+            "label": "Traccia 4",
             "assets": [
               {
                 "kind": "audio",
@@ -2027,6 +1918,7 @@
           },
           {
             "id": "song-05",
+            "label": "Traccia 5",
             "assets": [
               {
                 "kind": "audio",
@@ -2036,6 +1928,7 @@
           },
           {
             "id": "song-06",
+            "label": "Traccia 6",
             "assets": [
               {
                 "kind": "audio",
@@ -2045,6 +1938,7 @@
           },
           {
             "id": "song-07",
+            "label": "Traccia 7",
             "assets": [
               {
                 "kind": "audio",
@@ -2056,13 +1950,13 @@
         "creditReward": 10
       },
       {
-        "id": "sf-love-matching-01",
+        "id": "sf-love-grey-01",
         "zoneId": "associations",
         "type": "column_reorder_matching",
         "quizSubType": "love_matching",
         "difficulty": "medium",
-        "title": "Coppie Iconiche",
-        "introText": "Riordina la colonna sinistra per formare le coppie iconiche di serie e film.",
+        "title": "Grey's Anatomy: Coppie Iconiche",
+        "introText": "Riordina la colonna sinistra per ricomporre le coppie iconiche di Grey's Anatomy.",
         "columns": [
           "Personaggio",
           "Partner"
@@ -2104,41 +1998,6 @@
             "correctOrder": [
               "callie",
               "arizona"
-            ]
-          },
-          {
-            "id": "simon-daphne",
-            "correctOrder": [
-              "simon",
-              "daphne"
-            ]
-          },
-          {
-            "id": "anthony-kate",
-            "correctOrder": [
-              "anthony",
-              "kate"
-            ]
-          },
-          {
-            "id": "colin-penelope",
-            "correctOrder": [
-              "colin",
-              "penelope"
-            ]
-          },
-          {
-            "id": "john-francesca",
-            "correctOrder": [
-              "john",
-              "francesca"
-            ]
-          },
-          {
-            "id": "giorgio-charlotte",
-            "correctOrder": [
-              "giorgio",
-              "charlotte"
             ]
           }
         ],
@@ -2194,56 +2053,6 @@
             ]
           },
           {
-            "id": "simon",
-            "column": 0,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/love/bridgerton/simon.jpg"
-              }
-            ]
-          },
-          {
-            "id": "anthony",
-            "column": 0,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/love/bridgerton/anthony.jpg"
-              }
-            ]
-          },
-          {
-            "id": "colin",
-            "column": 0,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/love/bridgerton/colin.jpg"
-              }
-            ]
-          },
-          {
-            "id": "john",
-            "column": 0,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/love/bridgerton/john.jpg"
-              }
-            ]
-          },
-          {
-            "id": "giorgio",
-            "column": 0,
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/love/bridgerton/giorgio.jpg"
-              }
-            ]
-          },
-          {
             "id": "meredith",
             "column": 1,
             "assets": [
@@ -2290,6 +2099,130 @@
               {
                 "kind": "image",
                 "src": "/serie-film/love/grey_s_anatomy/arizona.jpg"
+              }
+            ]
+          }
+        ],
+        "shuffledColumnOrders": [
+          [
+            "mark",
+            "callie",
+            "derek",
+            "jackson",
+            "ben"
+          ],
+          [
+            "meredith",
+            "lexie",
+            "april",
+            "miranda",
+            "arizona"
+          ]
+        ],
+        "minimumCorrectRows": 4,
+        "bonusNameCredit": 0,
+        "creditReward": 8
+      },
+      {
+        "id": "sf-love-bridgerton-01",
+        "zoneId": "associations",
+        "type": "column_reorder_matching",
+        "quizSubType": "love_matching",
+        "difficulty": "medium",
+        "title": "Bridgerton: Coppie Iconiche",
+        "introText": "Riordina la colonna sinistra per ricomporre le coppie iconiche di Bridgerton.",
+        "columns": [
+          "Personaggio",
+          "Partner"
+        ],
+        "lockedColumns": [
+          1
+        ],
+        "rows": [
+          {
+            "id": "simon-daphne",
+            "correctOrder": [
+              "simon",
+              "daphne"
+            ]
+          },
+          {
+            "id": "anthony-kate",
+            "correctOrder": [
+              "anthony",
+              "kate"
+            ]
+          },
+          {
+            "id": "colin-penelope",
+            "correctOrder": [
+              "colin",
+              "penelope"
+            ]
+          },
+          {
+            "id": "john-francesca",
+            "correctOrder": [
+              "john",
+              "francesca"
+            ]
+          },
+          {
+            "id": "giorgio-charlotte",
+            "correctOrder": [
+              "giorgio",
+              "charlotte"
+            ]
+          }
+        ],
+        "cells": [
+          {
+            "id": "simon",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/love/bridgerton/simon.jpg"
+              }
+            ]
+          },
+          {
+            "id": "anthony",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/love/bridgerton/anthony.jpg"
+              }
+            ]
+          },
+          {
+            "id": "colin",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/love/bridgerton/colin.jpg"
+              }
+            ]
+          },
+          {
+            "id": "john",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/love/bridgerton/john.jpg"
+              }
+            ]
+          },
+          {
+            "id": "giorgio",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/love/bridgerton/giorgio.jpg"
               }
             ]
           },
@@ -2346,23 +2279,13 @@
         ],
         "shuffledColumnOrders": [
           [
-            "mark",
-            "callie",
             "john",
             "anthony",
-            "derek",
             "giorgio",
             "simon",
-            "jackson",
-            "colin",
-            "ben"
+            "colin"
           ],
           [
-            "meredith",
-            "lexie",
-            "april",
-            "miranda",
-            "arizona",
             "daphne",
             "kate",
             "penelope",
@@ -2370,9 +2293,9 @@
             "charlotte"
           ]
         ],
-        "minimumCorrectRows": 7,
+        "minimumCorrectRows": 4,
         "bonusNameCredit": 0,
-        "creditReward": 15
+        "creditReward": 8
       },
       {
         "id": "sf-citazione-01",
@@ -2392,7 +2315,8 @@
         ],
         "acceptedTitleAnswers": [
           "Game of Thrones",
-          "Il Trono di Spade"
+          "Il Trono di Spade",
+          "GOT"
         ],
         "acceptedAuthorAnswers": [
           "Tyrion Lannister",
@@ -2435,94 +2359,6 @@
           "partialMatchRatio": 1
         },
         "creditReward": 12
-      },
-      {
-        "id": "sf-colonna-01",
-        "zoneId": "audio-challenges",
-        "type": "free_text",
-        "quizSubType": "colonna_sonora",
-        "difficulty": "easy",
-        "title": "Colonna Sonora 1",
-        "prompt": "Ascolta il tema musicale e indovina a quale film appartiene.",
-        "assets": [
-          {
-            "kind": "audio",
-            "src": "/serie-film/colonna-sonora/big_hero_6.mp3"
-          }
-        ],
-        "acceptedAnswers": [
-          "Big Hero 6"
-        ],
-        "creditReward": 10
-      },
-      {
-        "id": "sf-colonna-02",
-        "zoneId": "audio-challenges",
-        "type": "free_text",
-        "quizSubType": "colonna_sonora",
-        "difficulty": "easy",
-        "title": "Colonna Sonora 2",
-        "prompt": "Ascolta il tema musicale e indovina a quale film appartiene.",
-        "assets": [
-          {
-            "kind": "audio",
-            "src": "/serie-film/colonna-sonora/guardiani_della_galassia.mp3"
-          }
-        ],
-        "acceptedAnswers": [
-          "Guardiani della Galassia",
-          "Guardians of the Galaxy"
-        ],
-        "creditReward": 10
-      },
-      {
-        "id": "sf-colonna-03",
-        "zoneId": "audio-challenges",
-        "type": "free_text",
-        "quizSubType": "colonna_sonora",
-        "difficulty": "easy",
-        "title": "Colonna Sonora 3",
-        "prompt": "Ascolta il tema musicale e indovina a quale film/serie appartiene.",
-        "assets": [
-          {
-            "kind": "audio",
-            "src": "/serie-film/colonna-sonora/hercules.mp3"
-          }
-        ],
-        "acceptedAnswers": [
-          "Hercules",
-          "Ercole"
-        ],
-        "creditReward": 10
-      },
-      {
-        "id": "sf-puzzle-04",
-        "zoneId": "enigmi",
-        "type": "free_text",
-        "quizSubType": "puzzle",
-        "difficulty": "hard",
-        "title": "Puzzle Film 4",
-        "prompt": "\"Tre soli. Nessuna orbita stabile. Nessuna soluzione. Solo caos — e loro stanno arrivando.\" Quale film/serie è?",
-        "acceptedAnswers": [
-          "Il problema dei 3 corpi",
-          "Il problema dei tre corpi",
-          "3 Body Problem"
-        ],
-        "creditReward": 10
-      },
-      {
-        "id": "sf-puzzle-05",
-        "zoneId": "enigmi",
-        "type": "free_text",
-        "quizSubType": "puzzle",
-        "difficulty": "hard",
-        "title": "Puzzle Film 5",
-        "prompt": "\"Durante la guerra, lui costruì una macchina per ascoltare i segreti del nemico. Ma il segreto più grande era lui stesso.\" Quale film è?",
-        "acceptedAnswers": [
-          "The Imitation Game",
-          "Imitation Game"
-        ],
-        "creditReward": 10
       },
       {
         "id": "sf-citazione-03",
@@ -2604,12 +2440,12 @@
         ],
         "acceptedTitleAnswers": [
           "Captain America",
-          "Avengers",
-          "Marvel"
+          "Capitan America"
         ],
         "acceptedAuthorAnswers": [
           "Steve Rogers",
-          "Captain America"
+          "Captain America",
+          "Capitan America"
         ],
         "scoring": {
           "passThreshold": 1,
@@ -2617,6 +2453,66 @@
           "partialMatchRatio": 1
         },
         "creditReward": 12
+      },
+      {
+        "id": "sf-colonna-01",
+        "zoneId": "audio-challenges",
+        "type": "free_text",
+        "quizSubType": "colonna_sonora",
+        "difficulty": "easy",
+        "title": "Colonna Sonora 1",
+        "prompt": "Ascolta il tema musicale e indovina a quale film appartiene.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/serie-film/colonna-sonora/big_hero_6.mp3"
+          }
+        ],
+        "acceptedAnswers": [
+          "Big Hero 6",
+          "Big Hero Six"
+        ],
+        "creditReward": 10
+      },
+      {
+        "id": "sf-colonna-02",
+        "zoneId": "audio-challenges",
+        "type": "free_text",
+        "quizSubType": "colonna_sonora",
+        "difficulty": "easy",
+        "title": "Colonna Sonora 2",
+        "prompt": "Ascolta il tema musicale e indovina a quale film appartiene.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/serie-film/colonna-sonora/guardiani_della_galassia.mp3"
+          }
+        ],
+        "acceptedAnswers": [
+          "Guardiani della Galassia",
+          "Guardians of the Galaxy"
+        ],
+        "creditReward": 10
+      },
+      {
+        "id": "sf-colonna-03",
+        "zoneId": "audio-challenges",
+        "type": "free_text",
+        "quizSubType": "colonna_sonora",
+        "difficulty": "easy",
+        "title": "Colonna Sonora 3",
+        "prompt": "Ascolta il tema musicale e indovina a quale film/serie appartiene.",
+        "assets": [
+          {
+            "kind": "audio",
+            "src": "/serie-film/colonna-sonora/hercules.mp3"
+          }
+        ],
+        "acceptedAnswers": [
+          "Hercules",
+          "Ercole"
+        ],
+        "creditReward": 10
       },
       {
         "id": "sf-colonna-04",
@@ -2657,61 +2553,174 @@
         "creditReward": 10
       },
       {
-        "id": "sf-errore-01",
+        "id": "sf-intruso-01",
         "zoneId": "knowledge",
-        "type": "free_text",
-        "quizSubType": "trova_errore",
-        "difficulty": "hard",
-        "title": "Trova l'Errore 1",
-        "prompt": "Osserva bene questa immagine: c'è qualcosa che non va. Cosa c'è di sbagliato?",
-        "assets": [
+        "type": "intruder",
+        "quizSubType": "intruder",
+        "difficulty": "medium",
+        "title": "L'Intruso — Dynasty",
+        "prompt": "Trova l'intruso: chi di questi personaggi NON appartiene alla famiglia Carrington?",
+        "explanation": "Monica (e suo fratello Jeff) sono dei Colby. Fallon, Steven e Adam sono tutti figli di Blake Carrington.",
+        "items": [
           {
-            "kind": "image",
-            "src": "/images/serie-film-error1.jpg"
+            "id": "fallon",
+            "text": "Fallon"
+          },
+          {
+            "id": "steven",
+            "text": "Steven"
+          },
+          {
+            "id": "monica",
+            "text": "Monica"
+          },
+          {
+            "id": "adam",
+            "text": "Adam"
           }
         ],
-        "acceptedAnswers": [
-          "TODO"
+        "intruderId": "monica",
+        "creditReward": 10
+      },
+      {
+        "id": "sf-intruso-02",
+        "zoneId": "knowledge",
+        "type": "intruder",
+        "quizSubType": "intruder",
+        "difficulty": "hard",
+        "title": "L'Intruso — Hunger Games",
+        "prompt": "Trova la coppia Nome–Distretto ERRATA:",
+        "explanation": "Gloss appartiene al Distretto 1, non al 2. Il Distretto 2 ha personaggi come Cato e Clove.",
+        "items": [
+          {
+            "id": "katniss",
+            "text": "Katniss Everdeen — Distretto 12"
+          },
+          {
+            "id": "johanna",
+            "text": "Johanna Mason — Distretto 7"
+          },
+          {
+            "id": "finnick",
+            "text": "Finnick Odair — Distretto 4"
+          },
+          {
+            "id": "gloss",
+            "text": "Gloss — Distretto 2"
+          }
         ],
+        "intruderId": "gloss",
+        "creditReward": 10
+      },
+      {
+        "id": "sf-intruso-03",
+        "zoneId": "knowledge",
+        "type": "intruder",
+        "quizSubType": "intruder",
+        "difficulty": "hard",
+        "title": "L'Intruso — Attori Multi-Saga",
+        "prompt": "Tutti questi attori sono apparsi in almeno due grandi saghe (Marvel, GoT, Pirati dei Caraibi, Hunger Games, Harry Potter), tranne uno. Chi ha fatto parte di UNA SOLA?",
+        "explanation": "Johnny Depp ha fatto solo Pirati dei Caraibi tra queste saghe. Natalie Dormer (Marvel/GoT/HG), Richard Madden (Marvel/GoT), Bill Nighy (HP/Pirati).",
+        "items": [
+          {
+            "id": "natalie",
+            "text": "Natalie Dormer"
+          },
+          {
+            "id": "richard",
+            "text": "Richard Madden"
+          },
+          {
+            "id": "bill",
+            "text": "Bill Nighy"
+          },
+          {
+            "id": "johnny",
+            "text": "Johnny Depp"
+          }
+        ],
+        "intruderId": "johnny",
         "creditReward": 12
       },
       {
-        "id": "sf-errore-02",
+        "id": "sf-domanda-01",
         "zoneId": "knowledge",
         "type": "free_text",
-        "quizSubType": "trova_errore",
-        "difficulty": "hard",
-        "title": "Trova l'Errore 2",
-        "prompt": "Osserva bene questa immagine: c'è qualcosa che non va. Cosa c'è di sbagliato?",
-        "assets": [
-          {
-            "kind": "image",
-            "src": "/images/serie-film-error2.png"
-          }
-        ],
+        "quizSubType": "domande_aperte",
+        "difficulty": "easy",
+        "title": "Domanda Aperta 1",
+        "prompt": "Come si chiama la nave di Jack Sparrow?",
         "acceptedAnswers": [
-          "TODO"
+          "Black Pearl",
+          "Perla Nera"
         ],
-        "creditReward": 12
+        "creditReward": 8
       },
       {
-        "id": "sf-errore-03",
+        "id": "sf-domanda-02",
         "zoneId": "knowledge",
         "type": "free_text",
-        "quizSubType": "trova_errore",
-        "difficulty": "hard",
-        "title": "Trova l'Errore 3",
-        "prompt": "Osserva bene questa immagine: c'è qualcosa che non va. Cosa c'è di sbagliato?",
-        "assets": [
-          {
-            "kind": "image",
-            "src": "/images/serie-film-errore3.png"
-          }
-        ],
+        "quizSubType": "domande_aperte",
+        "difficulty": "easy",
+        "title": "Domanda Aperta 2",
+        "prompt": "Come si chiama l'ospedale in cui lavorano i protagonisti di Grey's Anatomy?",
         "acceptedAnswers": [
-          "TODO"
+          "Grey Sloan Memorial Hospital",
+          "Grey Sloan",
+          "Grey Sloan Memorial"
         ],
-        "creditReward": 12
+        "creditReward": 8
+      },
+      {
+        "id": "sf-domanda-03",
+        "zoneId": "knowledge",
+        "type": "free_text",
+        "quizSubType": "domande_aperte",
+        "difficulty": "medium",
+        "title": "Domanda Aperta 3",
+        "prompt": "Come si chiamano i tre draghi di Daenerys? (Elencali tutti e tre)",
+        "acceptedAnswers": [
+          "Drogon, Rhaegal, Viserion",
+          "Drogon Rhaegal Viserion",
+          "Rhaegal, Drogon, Viserion",
+          "Viserion, Rhaegal, Drogon",
+          "Viserion, Drogon, Rhaegal",
+          "Rhaegal, Viserion, Drogon",
+          "Drogon, Viserion, Rhaegal"
+        ],
+        "creditReward": 10
+      },
+      {
+        "id": "sf-domanda-04",
+        "zoneId": "knowledge",
+        "type": "free_text",
+        "quizSubType": "domande_aperte",
+        "difficulty": "medium",
+        "title": "Domanda Aperta 4",
+        "prompt": "Come si chiama il migliore amico di Steve Rogers, creduto morto in \"Captain America: The First Avenger\"?",
+        "acceptedAnswers": [
+          "Bucky Barnes",
+          "Bucky",
+          "Barnes",
+          "James Barnes",
+          "Winter Soldier"
+        ],
+        "creditReward": 8
+      },
+      {
+        "id": "sf-domanda-05",
+        "zoneId": "knowledge",
+        "type": "free_text",
+        "quizSubType": "domande_aperte",
+        "difficulty": "hard",
+        "title": "Domanda Aperta 5",
+        "prompt": "Qual è la sequenza di numeri che compare continuamente nella serie \"LOST\"?",
+        "acceptedAnswers": [
+          "4 8 15 16 23 42",
+          "4, 8, 15, 16, 23, 42",
+          "4-8-15-16-23-42"
+        ],
+        "creditReward": 10
       },
       {
         "id": "sf-domanda-06",
@@ -2783,7 +2792,7 @@
         "difficulty": "medium",
         "title": "L'Intruso — Nolan / Zimmer",
         "prompt": "Quale di questi film non è stato diretto da Nolan né ha le musiche di Hans Zimmer?",
-        "explanation": "Avatar non è di Nolan (è di James Cameron) né ha musiche di Zimmer (colonna sonora di James Horner). Madagascar è DreamWorks/Powell&Barrett. Il Codice Da Vinci ha musiche di Hans Zimmer! Memento è di Nolan.",
+        "explanation": "Avatar non è di Nolan (è di James Cameron) né ha musiche di Zimmer (colonna sonora di James Horner). Madagascar è DreamWorks/Powell&Barrett. Il Gladiatore ha musiche di Hans Zimmer! Memento è di Nolan.",
         "items": [
           {
             "id": "memento",
@@ -2794,8 +2803,8 @@
             "text": "Madagascar"
           },
           {
-            "id": "da-vinci",
-            "text": "Il Codice Da Vinci"
+            "id": "gladiatore",
+            "text": "Il Gladiatore"
           },
           {
             "id": "avatar",
@@ -2836,25 +2845,5 @@
         "creditReward": 12
       }
     ]
-  },
-  {
-    "id": "ritratto-spezzato",
-    "kind": "side_game",
-    "title": "Ritratto Spezzato",
-    "ghost": "La Curatrice delle Cornici",
-    "description": "Gioco sbloccabile dopo la Sala delle Frequenze. Placeholder in attesa di design e contenuti reali.",
-    "unlockCost": 0,
-    "buyAccessCost": 60,
-    "challenges": []
-  },
-  {
-    "id": "archivio-vivente",
-    "kind": "side_game",
-    "title": "Archivio Vivente",
-    "ghost": "Il Copista senza volto",
-    "description": "Secondo gioco sbloccabile dalla stanza musica. Placeholder per il futuro flusso di gioco.",
-    "unlockCost": 0,
-    "buyAccessCost": 60,
-    "challenges": []
   }
 ]

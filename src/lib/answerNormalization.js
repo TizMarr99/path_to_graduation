@@ -11,6 +11,66 @@ export function normalizeAnswer(value) {
     .replace(/\s+/g, ' ')
 }
 
+const ARTICLE_STOP_WORDS = new Set([
+  'a',
+  'al',
+  'alla',
+  'alle',
+  'allo',
+  'an',
+  'd',
+  'da',
+  'dagli',
+  'dai',
+  'dal',
+  'dalla',
+  'dalle',
+  'dallo',
+  'degli',
+  'dei',
+  'del',
+  'della',
+  'delle',
+  'dello',
+  'di',
+  'e',
+  'ed',
+  'gli',
+  'i',
+  'il',
+  'l',
+  'la',
+  'le',
+  'lo',
+  'o',
+  'of',
+  'the',
+  'un',
+  'una',
+  'uno',
+])
+
+/**
+ * @param {string} value
+ * @returns {string[]}
+ */
+function tokenizeAnswer(value) {
+  return normalizeAnswer(value)
+    .split(/[^a-z0-9]+/)
+    .map((token) => token.trim())
+    .filter(Boolean)
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function normalizeArticleInsensitiveAnswer(value) {
+  return tokenizeAnswer(value)
+    .filter((token) => !ARTICLE_STOP_WORDS.has(token))
+    .join('')
+}
+
 /**
  * @param {string} value
  * @returns {string}
@@ -26,14 +86,22 @@ export function normalizeCompactAnswer(value) {
  */
 export function matchesAcceptedAnswer(inputValue, acceptedAnswers = []) {
   const normalizedInput = normalizeCompactAnswer(inputValue)
+  const normalizedArticleInsensitiveInput = normalizeArticleInsensitiveAnswer(inputValue)
 
   if (!normalizedInput) {
     return false
   }
 
-  return acceptedAnswers.some(
-    (answer) => normalizeCompactAnswer(answer) === normalizedInput,
-  )
+  return acceptedAnswers.some((answer) => {
+    if (normalizeCompactAnswer(answer) === normalizedInput) {
+      return true
+    }
+
+    return (
+      Boolean(normalizedArticleInsensitiveInput) &&
+      normalizeArticleInsensitiveAnswer(answer) === normalizedArticleInsensitiveInput
+    )
+  })
 }
 
 /**
@@ -43,12 +111,22 @@ export function matchesAcceptedAnswer(inputValue, acceptedAnswers = []) {
  */
 export function matchesAcceptedAnswerLoose(inputValue, acceptedAnswers = []) {
   const normalizedInput = normalizeAnswer(inputValue)
+  const normalizedArticleInsensitiveInput = normalizeArticleInsensitiveAnswer(inputValue)
 
   if (!normalizedInput) {
     return false
   }
 
-  return acceptedAnswers.some((answer) => normalizeAnswer(answer) === normalizedInput)
+  return acceptedAnswers.some((answer) => {
+    if (normalizeAnswer(answer) === normalizedInput) {
+      return true
+    }
+
+    return (
+      Boolean(normalizedArticleInsensitiveInput) &&
+      normalizeArticleInsensitiveAnswer(answer) === normalizedArticleInsensitiveInput
+    )
+  })
 }
 
 /**
@@ -120,17 +198,17 @@ export function evaluateTitleAuthorMatch(
 
 /**
  * @param {string[]} answers
- * @param {import('../types/challenge').AcceptedAnswerGroup[]} singerGroups
+ * @param {import('../types/challenge').AcceptedAnswerGroup[]} charactersGroups
  * @returns {{ matchedGroupIds: string[], matchedCount: number }}
  */
-export function evaluateFaceMorphAnswers(answers = [], singerGroups = []) {
+export function evaluateFaceMorphAnswers(answers = [], charactersGroups = []) {
   const normalizedAnswers = answers
     .map((answer) => normalizeCompactAnswer(answer))
     .filter(Boolean)
   const availableAnswers = [...normalizedAnswers]
   const matchedGroupIds = []
 
-  singerGroups.forEach((group) => {
+  charactersGroups.forEach((group) => {
     const matchingIndex = availableAnswers.findIndex((candidate) =>
       group.acceptedAnswers.some(
         (acceptedAnswer) => normalizeCompactAnswer(acceptedAnswer) === candidate,
@@ -189,7 +267,6 @@ export function evaluateColumnReorderMatching(columnOrders = [], rows = [], bonu
   rows.forEach((row) => {
     const isRowCorrect = row.correctOrder.every((cellId, colIndex) => {
       const columnOrder = columnOrders[colIndex] ?? []
-      const rowIndexInColumn = row.correctOrder.indexOf(cellId)
       const expectedRowPosition = rows.findIndex((r) => r.id === row.id)
       return columnOrder[expectedRowPosition] === cellId
     })

@@ -78,6 +78,7 @@ function normalizeHintCost(rawHintCost, creditReward) {
  */
 function createChallengeBase(rawChallenge) {
   const creditReward = rawChallenge.creditReward ?? 10
+  const prompt = rawChallenge.prompt ?? rawChallenge.introText ?? ''
 
   return {
     id: rawChallenge.id,
@@ -85,8 +86,8 @@ function createChallengeBase(rawChallenge) {
     difficulty: rawChallenge.difficulty,
     type: resolveChallengeType(rawChallenge),
     title: rawChallenge.title ?? '',
-    prompt: rawChallenge.prompt,
-    infoText: rawChallenge.infoText ?? rawChallenge.prompt,
+    prompt,
+    infoText: rawChallenge.infoText ?? prompt,
     assets: normalizeAssets(rawChallenge.assets),
     hint: rawChallenge.hint ?? '',
     explanation: rawChallenge.explanation ?? '',
@@ -187,7 +188,7 @@ function normalizeChallenge(rawChallenge) {
     return {
       ...baseChallenge,
       type: 'face_morph',
-      singerGroups: rawChallenge.singerGroups ?? [],
+      charactersGroups: rawChallenge.charactersGroups ?? rawChallenge.singerGroups ?? [],
       answerSlots: rawChallenge.answerSlots ?? 3,
       minimumCorrectGroups: rawChallenge.minimumCorrectGroups ?? 2,
       placeholder: rawChallenge.placeholder ?? '',

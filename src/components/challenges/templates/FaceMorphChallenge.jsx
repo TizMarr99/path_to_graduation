@@ -32,7 +32,7 @@ function FaceMorphChallenge({
               disabled={disabled}
               id={`${challenge.id}-slot-${index}`}
               onChange={(event) => handleAnswerChange(index, event.target.value)}
-              placeholder={`${challenge.placeholder || 'Inserisci un cantante'}`}
+              placeholder={`${challenge.placeholder || 'Inserisci un personaggio'}`}
               type="text"
               value={answer}
             />
@@ -40,7 +40,7 @@ function FaceMorphChallenge({
         </div>
 
         <p className="text-sm leading-6 text-slate-300">
-          Ne bastano {challenge.minimumCorrectGroups} su {challenge.singerGroups.length}. Sono ammessi anche i cognomi quando previsti.
+          Ne bastano {challenge.minimumCorrectGroups} su {challenge.charactersGroups.length}. Sono ammessi anche i cognomi quando previsti.
         </p>
       </div>
 

@@ -208,7 +208,7 @@ export interface GuessTitleAuthorChallenge
 }
 
 export interface FaceMorphChallenge extends ChallengeBase<'face_morph'> {
-  singerGroups: AcceptedAnswerGroup[]
+  charactersGroups: AcceptedAnswerGroup[]
   answerSlots: number
   minimumCorrectGroups: number
   placeholder?: string
@@ -455,7 +455,8 @@ export interface RawChallengeBase {
   type?: ChallengeType
   mode?: 'multiple_choice' | 'free_text'
   title?: string
-  prompt: string
+  prompt?: string
+  introText?: string
   infoText?: string
   assets?: Array<string | ChallengeAsset>
   hint?: string
@@ -521,6 +522,7 @@ export interface RawGuessTitleAuthorChallenge extends RawChallengeBase {
 
 export interface RawFaceMorphChallenge extends RawChallengeBase {
   type: 'face_morph'
+  charactersGroups?: AcceptedAnswerGroup[]
   singerGroups?: AcceptedAnswerGroup[]
   answerSlots?: number
   minimumCorrectGroups?: number
