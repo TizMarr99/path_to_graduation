@@ -34,7 +34,7 @@
       {
         "id": "face-morph",
         "label": "Face morph",
-        "description": "Il banco centrale mescola volti e identita da ricomporre.",
+        "description": "Il banco centrale mescola volti e identità da ricomporre.",
         "introPrompt": "I volti si piegano l'uno sull'altro. Guarda bene il morph e separa gli artisti nascosti dentro la stessa immagine.",
         "icon": "🖼️",
         "x": 18,
@@ -187,7 +187,7 @@
         },
         {
           "speaker": "inquisitor",
-          "text": "Il play non si consuma, ma la mia pazienza si."
+          "text": "Il play non si consuma, ma la mia pazienza sì."
         },
         {
           "speaker": "inquisitor",
@@ -260,7 +260,7 @@
         ],
         "titlePlaceholder": "Titolo del brano",
         "authorPlaceholder": "Autore o artista",
-        "hint": "L'artista e britannico e il brano parla di guardare le stelle. Pensa al cielo notturno.",
+        "hint": "L'artista è britannico e il brano parla di guardare le stelle. Pensa al cielo notturno.",
         "explanation": "'Stargazing' di Myles Smith: un successo virale del 2024, con chitarra acustica e un ritornello che cita letteralmente le stelle.",
         "speaker": "guardian",
         "creditReward": 10,
@@ -309,7 +309,7 @@
         "answerSlots": 3,
         "minimumCorrectGroups": 2,
         "placeholder": "Inserisci un cantante",
-        "hint": "Una delle tre e famosa per cantare con una parrucca bionda che le copre gli occhi. Un altro ha recitato in Stranger Things.",
+        "hint": "Una delle tre è famosa per cantare con una parrucca bionda che le copre gli occhi. Un altro ha recitato in Stranger Things.",
         "explanation": "I tre volti fusi sono Adele (vincitrice di Grammy), Sia (nota per la parrucca) e Joe Keery (attore e musicista, Steve in Stranger Things).",
         "speaker": "neutral",
         "creditReward": 10,
@@ -354,7 +354,7 @@
         "answerSlots": 3,
         "minimumCorrectGroups": 2,
         "placeholder": "Inserisci un cantante",
-        "hint": "Uno dei tre e scozzese ed e noto per brani strappalacrime. Un altro e un rapper italiano. Il terzo e un cantautore dai capelli rossi.",
+        "hint": "Uno dei tre è scozzese ed è noto per brani strappalacrime. Un altro e un rapper italiano. Il terzo e un cantautore dai capelli rossi.",
         "explanation": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
         "speaker": "neutral",
         "creditReward": 10,
@@ -366,7 +366,7 @@
         "difficulty": "medium",
         "type": "fill_lyrics",
         "title": "Completa il testo",
-        "prompt": "Ascolta il frammento e completa il verso nel modo piu fedele possibile.",
+        "prompt": "Ascolta il frammento e completa il verso nel modo più fedele possibile.",
         "assets": [
           {
             "kind": "audio",
@@ -376,7 +376,7 @@
         ],
         "solutionText": "Anche se ti mancano, non ti mancano come ti manco io",
         "placeholder": "Completa qui il verso",
-        "hint": "Il verso gioca su un doppio significato della parola 'mancano'. Pensa a qualcuno che sente la mancanza piu di altri.",
+        "hint": "Il verso gioca su un doppio significato della parola 'mancano'. Pensa a qualcuno che sente la mancanza più di altri.",
         "explanation": "Il verso completo e 'Anche se ti mancano, non ti mancano come ti manco io' — un gioco di parole tra assenza e desiderio.",
         "speaker": "inquisitor",
         "creditReward": 10,
@@ -392,7 +392,7 @@
         "difficulty": "medium",
         "type": "fill_lyrics",
         "title": "Completa il testo",
-        "prompt": "Ascolta il frammento e completa il verso nel modo piu fedele possibile.",
+        "prompt": "Ascolta il frammento e completa il verso nel modo più fedele possibile.",
         "assets": [
           {
             "kind": "audio",
@@ -402,7 +402,7 @@
         ],
         "solutionText": "Che piacevo a tua mamma?",
         "placeholder": "Completa qui il verso",
-        "hint": "E una frase breve, quasi una domanda retorica. Si parla di una mamma e di fare colpo.",
+        "hint": "È una frase breve, quasi una domanda retorica. Si parla di una mamma e di fare colpo.",
         "explanation": "'Che piacevo a tua mamma?' — un verso ironico e diretto, tipico del rap italiano contemporaneo.",
         "speaker": "inquisitor",
         "creditReward": 10,
@@ -418,7 +418,7 @@
         "difficulty": "hard",
         "type": "fill_lyrics",
         "title": "Completa il testo",
-        "prompt": "Ascolta il frammento e completa il verso nel modo piu fedele possibile.",
+        "prompt": "Ascolta il frammento e completa il verso nel modo più fedele possibile.",
         "assets": [
           {
             "kind": "audio",
@@ -428,7 +428,7 @@
         ],
         "solutionText": "Please, don't forget about me",
         "placeholder": "Completa qui il verso",
-        "hint": "E una frase di cinque parole in inglese. Qualcuno chiede di non essere dimenticato.",
+        "hint": "È una frase di cinque parole in inglese. Qualcuno chiede di non essere dimenticato.",
         "explanation": "'Please, don't forget about me' — un verso che esprime la paura dell'oblio, comune nel pop-rock emotivo.",
         "speaker": "inquisitor",
         "creditReward": 15,
@@ -480,7 +480,7 @@
           "Ordinary"
         ],
         "placeholder": "Titolo del brano",
-        "hint": "Il titolo e una singola parola inglese. L'artista non e mainstream.",
+        "hint": "Il titolo è una singola parola inglese. L'artista non e mainstream.",
         "explanation": "'Ordinary' — un brano dal tono rilassato. Invertito, il ritmo della voce resta il miglior indizio per riconoscerlo.",
         "speaker": "guardian",
         "creditReward": 10,
@@ -718,7 +718,7 @@
           "hitster-track-3",
           "hitster-track-4"
         ],
-        "hint": "Metti i brani in ordine dal piu vecchio al piu recente. Il pezzo dei Coldplay e precedente al 2010.",
+        "hint": "Metti i brani in ordine dal più vecchio al più recente. Il pezzo dei Coldplay è precedente al 2010.",
         "explanation": "L'ordine corretto e: Viva La Vida (2008), Rolling in the Deep (2010), 7 Years (2015), That's What I Like (2016), Bad Guy (2019).",
         "speaker": "neutral",
         "creditReward": 15,
@@ -1383,7 +1383,7 @@
           }
         ],
         "minimumCorrectGroups": 2,
-        "hint": "Uno dei tre porta addosso un Nord severo, uno vive di completi impeccabili, uno ha un'aria molto piu ambigua che eroica.",
+        "hint": "Uno dei tre porta addosso un Nord severo, uno vive di completi impeccabili, uno ha un'aria molto più ambigua che eroica.",
         "hintCost": 18,
         "creditReward": 12
       },
@@ -1425,7 +1425,7 @@
           }
         ],
         "minimumCorrectGroups": 2,
-        "hint": "Qui conta il contrasto: potere politico, istinto di sopravvivenza e autorita morale convivono nello stesso volto fuso.",
+        "hint": "Qui conta il contrasto: potere politico, istinto di sopravvivenza e autorità morale convivono nello stesso volto fuso.",
         "hintCost": 12,
         "creditReward": 12
       },
@@ -1440,7 +1440,7 @@
         "acceptedAnswers": [
           "Inception"
         ],
-        "hint": "Non leggere gli emoji come oggetti: leggili come livelli di realta che si piegano uno dentro l'altro.",
+        "hint": "Non leggere gli emoji come oggetti: leggili come livelli di realtà che si piegano uno dentro l'altro.",
         "hintCost": 15,
         "creditReward": 8
       },
@@ -1457,7 +1457,7 @@
           "Il diavolo veste Prada",
           "The Devil Wears Prada"
         ],
-        "hint": "Qui il tono vale piu della trama: lusso, moda e un potere che entra in scena con i tacchi.",
+        "hint": "Qui il tono vale più della trama: lusso, moda e un potere che entra in scena con i tacchi.",
         "hintCost": 18,
         "creditReward": 8
       },
@@ -1473,7 +1473,7 @@
           "Aladdin",
           "Aladino"
         ],
-        "hint": "Il titolo coincide con il protagonista, non con l'oggetto magico piu famoso della storia.",
+        "hint": "Il titolo coincide con il protagonista, non con l'oggetto magico più famoso della storia.",
         "hintCost": 18,
         "creditReward": 8
       },
@@ -1488,7 +1488,7 @@
         "acceptedAnswers": [
           "In Time"
         ],
-        "hint": "La chiave non e morale ma letterale: qui cio che scade non e il denaro.",
+        "hint": "La chiave non è morale ma letterale: qui ciò che scade non è il denaro.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -1552,7 +1552,7 @@
           "The Imitation Game",
           "Imitation Game"
         ],
-        "hint": "La guerra e solo il contesto: il centro della storia e un uomo che nasconde quasi tutto di se.",
+        "hint": "La guerra è solo il contesto: il centro della storia è un uomo che nasconde quasi tutto di sé.",
         "hintCost": 12,
         "creditReward": 10
       },
@@ -1635,7 +1635,7 @@
             "icon": "/serie-film/associazioni/got/martell.jpg"
           }
         ],
-        "hint": "Non partire dalle immagini delle casate: parti dai motti piu celebri. Inverno, ruggito e fuoco ti danno gia tre ancore solide.",
+        "hint": "Non partire dalle immagini delle casate: parti dai motti più celebri. Inverno, ruggito e fuoco ti danno già tre ancore solide.",
         "hintCost": 12,
         "creditReward": 12
       },
@@ -2109,7 +2109,7 @@
             ]
           }
         ],
-        "hint": "Una traccia esplode in energia rock — perfetta per una scena di sfogo e ribellione; un'altra è fragile e sospesa, scelta per i momenti più cupi e introspettivi.",
+        "hint": "Una traccia esplode in energia rock — perfetta per una scena di sfogo e ribellione; un'altra è fragile e sospesa, scelta per i momenti più̀ cupi e introspettivi.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -2461,7 +2461,7 @@
         ],
         "minimumCorrectRows": 4,
         "bonusNameCredit": 0,
-        "hint": "Ragiona per stagioni e per centralita narrativa: le coppie principali di Bridgerton si riconoscono prima dal periodo che dai volti.",
+        "hint": "Ragiona per stagioni e per centralità narrativa: le coppie principali di Bridgerton si riconoscono prima dal periodo che dai volti.",
         "hintCost": 12,
         "creditReward": 8
       },
@@ -2495,7 +2495,7 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
-        "hint": "La voce e tagliente, ironica, piu incline all'intelligenza che alla spada. Il personaggio si riconosce quasi prima del titolo.",
+        "hint": "La voce è tagliente, ironica, più incline all'intelligenza che alla spada. Il personaggio si riconosce quasi prima del titolo.",
         "hintCost": 15,
         "creditReward": 12
       },
@@ -2594,7 +2594,7 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
-        "hint": "Qui il personaggio e spesso piu facile del titolo: basta ascoltare il modo in cui piega le parole con sicurezza teatrale.",
+        "hint": "Qui il personaggio è spesso più facile del titolo: basta ascoltare il modo in cui piega le parole con sicurezza teatrale.",
         "hintCost": 12,
         "creditReward": 12
       },
@@ -2650,7 +2650,7 @@
           "Big Hero 6",
           "Big Hero Six"
         ],
-        "hint": "Il brano ha un'energia tenera e tecnologica: non viene da un classico antico ma da un'animazione molto piu recente.",
+        "hint": "Il brano ha un'energia tenera e tecnologica: non viene da un classico antico ma da un'animazione molto più recente.",
         "hintCost": 12,
         "creditReward": 10
       },
@@ -2672,7 +2672,7 @@
           "Guardiani della Galassia",
           "Guardians of the Galaxy"
         ],
-        "hint": "Qui il tono e avventuroso e spaziale, ma piu scanzonato che epico.",
+        "hint": "Qui il tono è avventuroso è spaziale, ma più scanzonato che epico.",
         "hintCost": 12,
         "creditReward": 10
       },
@@ -2694,7 +2694,7 @@
           "Hercules",
           "Ercole"
         ],
-        "hint": "L'impronta e decisamente disneyana, ma con una teatralita quasi gospel.",
+        "hint": "L'impronta è decisamente disneyana, ma con una teatralità quasi gospel.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -2736,7 +2736,7 @@
         "acceptedAnswers": [
           "Sherlock"
         ],
-        "hint": "La traccia ha un'eleganza nervosa e brillante, perfetta per qualcuno che corre piu veloce di chiunque altro nel ragionamento.",
+        "hint": "La traccia ha un'eleganza nervosa e brillante, perfetta per qualcuno che corre più veloce di chiunque altro nel ragionamento.",
         "hintCost": 18,
         "creditReward": 10
       },
@@ -2800,7 +2800,7 @@
           }
         ],
         "intruderId": "gloss",
-        "hint": "Controlla soprattutto i distretti dei tributi professionisti: l'errore si nasconde li.",
+        "hint": "Controlla soprattutto i distretti dei tributi professionisti: l'errore si nasconde lì.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -2832,7 +2832,7 @@
           }
         ],
         "intruderId": "johnny",
-        "hint": "L'intruso non e quello meno famoso: e quello meno distribuito tra le saghe citate.",
+        "hint": "L'intruso non è quello meno famoso: è quello meno distribuito tra le saghe citate.",
         "hintCost": 15,
         "creditReward": 12
       },
@@ -2865,7 +2865,7 @@
           "Grey Sloan",
           "Grey Sloan Memorial"
         ],
-        "hint": "Non pensare alle primissime stagioni: il nome con cui e noto piu avanti nella serie e quello che ti serve qui.",
+        "hint": "Non pensare alle primissime stagioni: il nome con cui è noto più avanti nella serie è quello che ti serve qui.",
         "hintCost": 12,
         "creditReward": 8
       },
@@ -2886,7 +2886,7 @@
           "Rhaegal, Viserion, Drogon",
           "Drogon, Viserion, Rhaegal"
         ],
-        "hint": "Uno porta il nome del marito, uno del fratello e uno sembra il riflesso piu diretto della sua rabbia.",
+        "hint": "Uno porta il nome del marito, uno del fratello e uno sembra il riflesso più diretto della sua rabbia.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -2905,7 +2905,7 @@
           "James Barnes",
           "Winter Soldier"
         ],
-        "hint": "Se ti viene in mente il suo nome piu tardo, sei gia molto vicina alla risposta.",
+        "hint": "Se ti viene in mente il suo nome più tardo, sei già molto vicina alla risposta.",
         "hintCost": 12,
         "creditReward": 8
       },
@@ -2945,7 +2945,7 @@
           "The Adjustment Bureau",
           "Agente del destino"
         ],
-        "hint": "Il titolo suggerisce piu controllo invisibile che azione spettacolare.",
+        "hint": "Il titolo suggerisce più controllo invisibile che azione spettacolare.",
         "hintCost": 10,
         "creditReward": 8
       },
@@ -2969,7 +2969,7 @@
           "Da Vinci Code",
           "The Da Vinci Code"
         ],
-        "hint": "Il centro non e il pittore in se, ma il mistero che il suo nome lascia dietro di se.",
+        "hint": "Il centro non è il pittore in sé, ma il mistero che il suo nome lascia dietro di sé.",
         "hintCost": 15,
         "creditReward": 8
       },
@@ -3022,7 +3022,7 @@
           }
         ],
         "intruderId": "avatar",
-        "hint": "Non fermarti al regista: anche la colonna sonora puo eliminare quasi subito una delle opzioni.",
+        "hint": "Non fermarti al regista: anche la colonna sonora può eliminare quasi subito una delle opzioni.",
         "hintCost": 12,
         "creditReward": 10
       },
@@ -3054,7 +3054,7 @@
           }
         ],
         "intruderId": "quattro",
-        "hint": "L'intruso sembra plausibile proprio perche richiama Conan Doyle, ma il numero e quello da osservare bene.",
+        "hint": "L'intruso sembra plausibile proprio perché richiama Conan Doyle, ma il numero è quello da osservare bene.",
         "hintCost": 18,
         "creditReward": 12
       }
