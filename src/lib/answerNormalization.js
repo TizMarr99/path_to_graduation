@@ -159,3 +159,80 @@ export function countCorrectPlacements(currentOrder = [], correctOrder = []) {
     return count + Number(itemId === correctOrder[index])
   }, 0)
 }
+
+/**
+ * @param {Record<string, string>} selections
+ * @param {{ id: string, correctOptionId: string }[]} items
+ * @returns {{ matchedItemIds: string[], matchedCount: number }}
+ */
+export function evaluateImageOptionMatching(selections = {}, items = []) {
+  const matchedItemIds = items
+    .filter((item) => selections[item.id] === item.correctOptionId)
+    .map((item) => item.id)
+
+  return {
+    matchedItemIds,
+    matchedCount: matchedItemIds.length,
+  }
+}
+
+/**
+ * @param {string[][]} columnOrders
+ * @param {{ id: string, correctOrder: string[], bonusNameAcceptedAnswers?: string[] }[]} rows
+ * @param {Record<string, string>} bonusNames
+ * @returns {{ matchedRowIds: string[], matchedCount: number, bonusNameMatches: number }}
+ */
+export function evaluateColumnReorderMatching(columnOrders = [], rows = [], bonusNames = {}) {
+  const matchedRowIds = []
+  let bonusNameMatches = 0
+
+  rows.forEach((row) => {
+    const isRowCorrect = row.correctOrder.every((cellId, colIndex) => {
+      const columnOrder = columnOrders[colIndex] ?? []
+      const rowIndexInColumn = row.correctOrder.indexOf(cellId)
+      const expectedRowPosition = rows.findIndex((r) => r.id === row.id)
+      return columnOrder[expectedRowPosition] === cellId
+    })
+
+    if (isRowCorrect) {
+      matchedRowIds.push(row.id)
+    }
+
+    if (
+      row.bonusNameAcceptedAnswers?.length &&
+      bonusNames[row.id] &&
+      matchesAcceptedAnswer(bonusNames[row.id], row.bonusNameAcceptedAnswers)
+    ) {
+      bonusNameMatches += 1
+    }
+  })
+
+  return {
+    matchedRowIds,
+    matchedCount: matchedRowIds.length,
+    bonusNameMatches,
+  }
+}
+
+/**
+ * @param {Record<string, { number: string, suit: string }>} selections
+ * @param {{ id: string, correctNumber: string, correctSuit: string }[]} items
+ * @returns {{ matchedItemIds: string[], matchedCount: number }}
+ */
+export function evaluateCardMatching(selections = {}, items = []) {
+  const matchedItemIds = items
+    .filter((item) => {
+      const sel = selections[item.id]
+      if (!sel) return false
+      return (
+        normalizeCompactAnswer(sel.number) === normalizeCompactAnswer(item.correctNumber) &&
+        normalizeCompactAnswer(sel.suit) === normalizeCompactAnswer(item.correctSuit)
+      )
+    })
+    .map((item) => item.id)
+
+  return {
+    matchedItemIds,
+    matchedCount: matchedItemIds.length,
+  }
+}

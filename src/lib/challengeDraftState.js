@@ -7,6 +7,8 @@ export function createChallengeRuntimeState(runtimeState = {}) {
     revealedStageCount: runtimeState.revealedStageCount ?? 0,
     musicalChainStageIndex: runtimeState.musicalChainStageIndex ?? 0,
     hitsterRevealedTrackCount: runtimeState.hitsterRevealedTrackCount ?? 0,
+    speedrunCurrentIndex: runtimeState.speedrunCurrentIndex ?? 0,
+    speedrunTimeRemaining: runtimeState.speedrunTimeRemaining ?? 0,
   }
 }
 
@@ -25,6 +27,12 @@ export function createChallengeDraftAnswer() {
     faceMorphAnswers: [],
     hitsterTrackAnswers: {},
     hitsterTrackOrderIds: [],
+    speedrunAnswers: {},
+    speedrunSkippedIds: [],
+    imageOptionSelections: {},
+    columnOrders: [],
+    columnBonusNames: {},
+    cardSelections: {},
   }
 }
 
@@ -74,6 +82,40 @@ export function createInitialDraftAnswerForChallenge(challenge) {
     }
   }
 
+  if (challenge.type === 'speedrun_characters') {
+    return {
+      ...baseDraft,
+      speedrunAnswers: {},
+      speedrunSkippedIds: [],
+    }
+  }
+
+  if (challenge.type === 'image_option_matching') {
+    return {
+      ...baseDraft,
+      imageOptionSelections: {},
+    }
+  }
+
+  if (challenge.type === 'column_reorder_matching') {
+    const columnOrders = challenge.shuffledColumnOrders.length
+      ? challenge.shuffledColumnOrders.map((order) => [...order])
+      : challenge.columns.map(() => [])
+
+    return {
+      ...baseDraft,
+      columnOrders,
+      columnBonusNames: {},
+    }
+  }
+
+  if (challenge.type === 'card_matching') {
+    return {
+      ...baseDraft,
+      cardSelections: {},
+    }
+  }
+
   return baseDraft
 }
 
@@ -101,6 +143,13 @@ export function createInitialRuntimeStateForChallenge(challenge) {
   if (challenge.type === 'hitster') {
     return createChallengeRuntimeState({
       hitsterRevealedTrackCount: 0,
+    })
+  }
+
+  if (challenge.type === 'speedrun_characters') {
+    return createChallengeRuntimeState({
+      speedrunCurrentIndex: 0,
+      speedrunTimeRemaining: challenge.timerSeconds ?? 30,
     })
   }
 

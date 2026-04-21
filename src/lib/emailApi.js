@@ -130,6 +130,54 @@ export async function sendMusicPrizeMail2(accessCode) {
 }
 
 /**
+ * Send Serie & Film Room Prize Mail
+ *
+ * @param {string} accessCode - Player's access code
+ * @returns {Promise<{success: boolean, emailId?: string, userMessage: string, sentAt?: string}>}
+ * @throws {Error} with userMessage property on failure
+ */
+export async function sendSerieFilmPrizeMail(accessCode) {
+  if (!accessCode) {
+    const error = new Error('Access code is required');
+    error.userMessage = 'Codice di accesso mancante.';
+    throw error;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/mail/serie-film-prize`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ accessCode }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = new Error(data.error || 'Failed to send email');
+      error.userMessage = data.userMessage || "Impossibile inviare l'email.";
+      error.statusCode = response.status;
+      error.details = data.details;
+      throw error;
+    }
+
+    return {
+      success: data.success,
+      emailId: data.emailId,
+      userMessage: data.userMessage || 'Email inviata con successo!',
+      sentAt: data.sentAt,
+      warning: data.warning,
+    };
+  } catch (error) {
+    if (!error.userMessage) {
+      error.userMessage = 'Errore di connessione. Verifica la tua connessione internet.';
+    }
+    throw error;
+  }
+}
+
+/**
  * Example usage:
  *
  * // In a React component:

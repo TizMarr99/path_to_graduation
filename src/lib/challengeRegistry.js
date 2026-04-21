@@ -1,19 +1,26 @@
 import { createElement } from 'react'
 import ChallengeTemplateFallback from '../components/challenges/common/ChallengeTemplateFallback.jsx'
+import CardMatchingChallenge from '../components/challenges/templates/CardMatchingChallenge.jsx'
+import ColumnReorderMatchingChallenge from '../components/challenges/templates/ColumnReorderMatchingChallenge.jsx'
 import FaceMorphChallenge from '../components/challenges/templates/FaceMorphChallenge.jsx'
 import FillLyricsChallenge from '../components/challenges/templates/FillLyricsChallenge.jsx'
 import FreeTextChallenge from '../components/challenges/templates/FreeTextChallenge.jsx'
 import GuessTitleAuthorChallenge from '../components/challenges/templates/GuessTitleAuthorChallenge.jsx'
 import HitsterChallenge from '../components/challenges/templates/HitsterChallenge.jsx'
+import ImageOptionMatchingChallenge from '../components/challenges/templates/ImageOptionMatchingChallenge.jsx'
 import IntruderChallenge from '../components/challenges/templates/IntruderChallenge.jsx'
 import MultiStageProgressiveRevealChallenge from '../components/challenges/templates/MultiStageProgressiveRevealChallenge.jsx'
 import MusicalChainChallenge from '../components/challenges/templates/MusicalChainChallenge.jsx'
 import MultipleChoiceChallenge from '../components/challenges/templates/MultipleChoiceChallenge.jsx'
 import OrderingChallenge from '../components/challenges/templates/OrderingChallenge.jsx'
 import SequenceReconstructionChallenge from '../components/challenges/templates/SequenceReconstructionChallenge.jsx'
+import SpeedrunCharactersChallenge from '../components/challenges/templates/SpeedrunCharactersChallenge.jsx'
 import {
   countCorrectPlacements,
+  evaluateCardMatching,
+  evaluateColumnReorderMatching,
   evaluateFaceMorphAnswers,
+  evaluateImageOptionMatching,
   evaluateLyricsWordMatch,
   evaluateTitleAuthorMatch,
   matchesAcceptedAnswer,
@@ -32,6 +39,10 @@ export const challengeTypeLabels = {
   fill_lyrics: 'Completa il testo',
   musical_chain: 'Catena musicale',
   hitster: 'Hitster',
+  speedrun_characters: 'Speedrun personaggi',
+  image_option_matching: 'Abbinamento immagini',
+  column_reorder_matching: 'Riordino colonne',
+  card_matching: 'Abbinamento carte',
 }
 
 function renderMultipleChoiceChallenge(props) {
@@ -76,6 +87,22 @@ function renderMusicalChainChallenge(props) {
 
 function renderHitsterChallenge(props) {
   return createElement(HitsterChallenge, props)
+}
+
+function renderSpeedrunCharactersChallenge(props) {
+  return createElement(SpeedrunCharactersChallenge, props)
+}
+
+function renderImageOptionMatchingChallenge(props) {
+  return createElement(ImageOptionMatchingChallenge, props)
+}
+
+function renderColumnReorderMatchingChallenge(props) {
+  return createElement(ColumnReorderMatchingChallenge, props)
+}
+
+function renderCardMatchingChallenge(props) {
+  return createElement(CardMatchingChallenge, props)
 }
 
 /**
@@ -227,6 +254,31 @@ function resolveSolutionLines(challenge) {
   if (challenge.type === 'hitster') {
     return challenge.tracks.map(
       (track) => `${track.year} · ${track.artist} · ${track.title}`,
+    )
+  }
+
+  if (challenge.type === 'speedrun_characters') {
+    return [
+      `Personaggi: ${challenge.characters.map((c) => c.acceptedAnswers[0] ?? c.id).join(', ')}`,
+    ]
+  }
+
+  if (challenge.type === 'image_option_matching') {
+    const optionsById = new Map(challenge.options.map((o) => [o.id, o.label || o.id]))
+    return challenge.items.map(
+      (item) => `${item.label} → ${optionsById.get(item.correctOptionId) ?? '?'}`,
+    )
+  }
+
+  if (challenge.type === 'column_reorder_matching') {
+    return challenge.rows.map(
+      (row) => `Riga ${row.id}: ${row.correctOrder.join(' · ')}`,
+    )
+  }
+
+  if (challenge.type === 'card_matching') {
+    return challenge.items.map(
+      (item) => `${item.id}: ${item.correctNumber} di ${item.correctSuit}`,
     )
   }
 
@@ -488,6 +540,78 @@ export const challengeTypeRegistry = {
         metadata: {
           correctPlacements,
         },
+      })
+    },
+  },
+  speedrun_characters: {
+    render: renderSpeedrunCharactersChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const answers = draftAnswer.speedrunAnswers ?? {}
+      let correctCount = 0
+
+      challenge.characters.forEach((character) => {
+        if (answers[character.id] && matchesAcceptedAnswer(answers[character.id], character.acceptedAnswers)) {
+          correctCount += 1
+        }
+      })
+
+      const isCorrect = correctCount >= challenge.minimumCorrect
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: correctCount,
+        maxScore: challenge.characters.length,
+        metadata: { correctCount, skippedCount: (draftAnswer.speedrunSkippedIds ?? []).length },
+      })
+    },
+  },
+  image_option_matching: {
+    render: renderImageOptionMatchingChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateImageOptionMatching(
+        draftAnswer.imageOptionSelections,
+        challenge.items,
+      )
+      const isCorrect = result.matchedCount >= challenge.minimumCorrectPairs
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: result.matchedCount,
+        maxScore: challenge.items.length,
+        metadata: result,
+      })
+    },
+  },
+  column_reorder_matching: {
+    render: renderColumnReorderMatchingChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateColumnReorderMatching(
+        draftAnswer.columnOrders,
+        challenge.rows,
+        draftAnswer.columnBonusNames,
+      )
+      const baseScore = result.matchedCount
+      const bonusScore = result.bonusNameMatches * (challenge.bonusNameCredit ?? 0)
+      const isCorrect = result.matchedCount >= challenge.minimumCorrectRows
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: baseScore + bonusScore,
+        maxScore: challenge.rows.length + (challenge.rows.filter((r) => r.bonusNameAcceptedAnswers?.length).length * (challenge.bonusNameCredit ?? 0)),
+        metadata: { ...result, bonusScore },
+      })
+    },
+  },
+  card_matching: {
+    render: renderCardMatchingChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateCardMatching(
+        draftAnswer.cardSelections,
+        challenge.items,
+      )
+      const isCorrect = result.matchedCount >= challenge.minimumCorrect
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: result.matchedCount,
+        maxScore: challenge.items.length,
+        metadata: result,
       })
     },
   },

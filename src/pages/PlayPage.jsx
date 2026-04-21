@@ -22,12 +22,13 @@ import { useChallengeSession } from '../hooks/useChallengeSession'
 import { useFearEffects } from '../hooks/useFearEffects'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
-import { sendMusicPrizeMail1, sendMusicPrizeMail2 } from '../lib/emailApi'
+import { sendMusicPrizeMail1, sendMusicPrizeMail2, sendSerieFilmPrizeMail } from '../lib/emailApi'
 import { getRoomTransition } from '../lib/roomTransitions'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
 import { getAttemptsRemaining, getLivesRemaining } from '../lib/playerStateSnapshot'
 import { getRoomCharacterBySpeaker } from '../lib/roomSpeakers'
 import {
+  computeWeightedRoomScore,
   resolveChallengeCreditBaseReward,
   resolveChallengeCreditReward,
 } from '../lib/challengeRewards'
@@ -236,14 +237,24 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   )
   const roomTransition = getRoomTransition(category.id)
   const isMusicRoom = category.id === 'musica'
+  const isImmersiveRoom = Boolean(category.mapHotspots?.length)
+  const hasWeightedScoring = Boolean(category.weightedScoring)
   const musicRoomProgress = roomProgress
   const archivedRoomReadOnly = Boolean(archivedSession)
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
   const victoryModalAlreadySeen = musicRoomProgress?.victoryModalSeen ?? false
+  const weightedResult = useMemo(() => {
+    if (!hasWeightedScoring) return null
+    const feedbackMap = new Map(Object.entries(challengeResults))
+    return computeWeightedRoomScore(category, feedbackMap)
+  }, [category, challengeResults, hasWeightedScoring])
   const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 8 && !isComplete && !victoryModalAlreadySeen
+  const passedRoom = hasWeightedScoring
+    ? (weightedResult?.isPassing ?? false)
+    : sessionCorrectCount >= 8
   const shouldShowRoomVictoryModal =
     earlyMusicVictory ||
-    (isComplete && category.id === 'musica' && sessionCorrectCount >= 8 && !victoryModalAlreadySeen)
+    (isComplete && passedRoom && !victoryModalAlreadySeen)
   const roomTransitionTargetUnlocked = roomTransition
     ? playerState.unlockedCategoryIds.includes(roomTransition.targetCategoryId)
     : false
@@ -340,6 +351,15 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         void sendMusicPrizeMail1(accessCode).catch(() => {})
         void sendMusicPrizeMail2(accessCode).catch(() => {})
       }
+
+      if (
+        category.id === 'serie-film' &&
+        passedRoom &&
+        !hasTriggeredPrizeEmailsRef.current
+      ) {
+        hasTriggeredPrizeEmailsRef.current = true
+        void sendSerieFilmPrizeMail(accessCode).catch(() => {})
+      }
     }
 
     void persistOutcomeAndSendPrizeEmails()
@@ -354,6 +374,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     earlyMusicVictory,
     immediateUnlockTargets,
     isComplete,
+    passedRoom,
     registerRoomOutcome,
     sessionCorrectCount,
     sessionWrongCount,
@@ -471,7 +492,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     restartSession()
   }
 
-  const shouldShowMusicIntro = category.id === 'musica' && isRoomIntroPending('musica')
+  const shouldShowRoomIntro = isImmersiveRoom && isRoomIntroPending(category.id)
 
   useEffect(() => {
     if (isComplete && !archivedRoomReadOnly) {
@@ -479,7 +500,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       return
     }
 
-    if (!currentChallenge || shouldShowMusicIntro || archivedRoomReadOnly) {
+    if (!currentChallenge || shouldShowRoomIntro || archivedRoomReadOnly) {
       return
     }
 
@@ -510,7 +531,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     resolvedChallengeIds,
     sessionCorrectCount,
     sessionWrongCount,
-    shouldShowMusicIntro,
+    shouldShowRoomIntro,
     syncActiveSessionSnapshot,
     archivedRoomReadOnly,
   ])
@@ -522,13 +543,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     !isCurrentChallengeResolved
 
   const isChallengeIntroVisible =
-    isMusicRoom &&
+    isImmersiveRoom &&
     pendingIntroZoneId === currentZoneId &&
     Boolean(currentZoneId) &&
     !challengeMapLocked &&
     !archivedRoomReadOnly
   const shouldPauseHesitationTimer =
-    category.id === 'musica' &&
+    isImmersiveRoom &&
     isChallengeIntroVisible &&
     !isCurrentChallengeResolved &&
     canAttemptQuiz() &&
@@ -557,10 +578,10 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     return () => clearTimeout(id)
   }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, shouldPauseHesitationTimer, showComment])
 
-  useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, isChallengeIntroVisible)
+  useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, isImmersiveRoom && isChallengeIntroVisible)
 
-  // Music room intro narrative gate (shown once)
-  if (shouldShowMusicIntro) {
+  // Immersive room intro narrative gate (shown once)
+  if (shouldShowRoomIntro) {
     return (
       <MusicRoomNarrative
         category={category}
@@ -569,7 +590,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     )
   }
 
-  // Show special victory modal for music room when 8+ correct (even before all 12 answered)
+  // Show special victory modal when passing threshold reached
   if (shouldShowRoomVictoryModal) {
     return (
       <MusicRoomVictoryModal
@@ -600,8 +621,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         </section>
       )
     }
-
-    const passedRoom = sessionCorrectCount >= 8
 
     return (
       <ChallengeCompleted
@@ -747,7 +766,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   return (
     <>
-      {isMusicRoom ? (
+      {isImmersiveRoom ? (
         <>
           <RoomPlayLayout
             attemptsRemaining={attemptsRemaining}

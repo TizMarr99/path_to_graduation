@@ -318,6 +318,79 @@ function normalizeChallenge(rawChallenge) {
     }
   }
 
+  if (challengeType === 'speedrun_characters') {
+    return {
+      ...baseChallenge,
+      type: 'speedrun_characters',
+      timerSeconds: rawChallenge.timerSeconds ?? 30,
+      minimumCorrect: rawChallenge.minimumCorrect ?? 7,
+      characters: (rawChallenge.characters ?? []).map((character) => ({
+        id: character.id,
+        showName: character.showName ?? '',
+        assets: normalizeAssets(character.assets),
+        acceptedAnswers: character.acceptedAnswers ?? [],
+      })),
+    }
+  }
+
+  if (challengeType === 'image_option_matching') {
+    return {
+      ...baseChallenge,
+      type: 'image_option_matching',
+      items: (rawChallenge.items ?? []).map((item) => ({
+        id: item.id,
+        label: item.label ?? '',
+        assets: normalizeAssets(item.assets),
+        correctOptionId: item.correctOptionId ?? '',
+      })),
+      options: (rawChallenge.options ?? []).map((option) => ({
+        id: option.id,
+        label: option.label ?? '',
+        icon: resolveStaticAssetPath(option.icon ?? ''),
+        assets: normalizeAssets(option.assets),
+      })),
+      minimumCorrectPairs: rawChallenge.minimumCorrectPairs ?? 3,
+    }
+  }
+
+  if (challengeType === 'column_reorder_matching') {
+    return {
+      ...baseChallenge,
+      type: 'column_reorder_matching',
+      columns: rawChallenge.columns ?? [],
+      rows: (rawChallenge.rows ?? []).map((row) => ({
+        id: row.id,
+        correctOrder: row.correctOrder ?? [],
+        bonusNameAcceptedAnswers: row.bonusNameAcceptedAnswers ?? [],
+      })),
+      cells: (rawChallenge.cells ?? []).map((cell) => ({
+        id: cell.id,
+        column: cell.column ?? 0,
+        assets: normalizeAssets(cell.assets),
+      })),
+      shuffledColumnOrders: rawChallenge.shuffledColumnOrders ?? [],
+      lockedColumns: rawChallenge.lockedColumns ?? [],
+      minimumCorrectRows: rawChallenge.minimumCorrectRows ?? 3,
+      bonusNameCredit: rawChallenge.bonusNameCredit ?? 0,
+    }
+  }
+
+  if (challengeType === 'card_matching') {
+    return {
+      ...baseChallenge,
+      type: 'card_matching',
+      items: (rawChallenge.items ?? []).map((item) => ({
+        id: item.id,
+        assets: normalizeAssets(item.assets),
+        correctNumber: item.correctNumber ?? '',
+        correctSuit: item.correctSuit ?? '',
+      })),
+      numberOptions: rawChallenge.numberOptions ?? ['1','2','3','4','5','6','7','8','9','10','J','Q','K'],
+      suitOptions: rawChallenge.suitOptions ?? ['hearts','diamonds','clubs','spades'],
+      minimumCorrect: rawChallenge.minimumCorrect ?? 3,
+    }
+  }
+
   return {
     ...baseChallenge,
     type: 'free_text',
@@ -347,6 +420,8 @@ function normalizeCategory(rawCategory) {
     characters: rawCategory.characters ?? null,
     introNarrative: rawCategory.introNarrative ?? null,
     characterComments: rawCategory.characterComments ?? null,
+    weightedScoring: rawCategory.weightedScoring ?? null,
+    subPrizes: rawCategory.subPrizes ?? [],
     challenges: (rawCategory.challenges ?? rawCategory.questions ?? []).map(normalizeChallenge),
   }
 }

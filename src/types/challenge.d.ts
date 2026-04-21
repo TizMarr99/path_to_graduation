@@ -10,6 +10,10 @@ export type ChallengeType =
   | 'fill_lyrics'
   | 'musical_chain'
   | 'hitster'
+  | 'speedrun_characters'
+  | 'image_option_matching'
+  | 'column_reorder_matching'
+  | 'card_matching'
 
 export type ChallengeDifficulty = 'easy' | 'medium' | 'hard'
 export type ChallengeSpeaker = 'guardian' | 'inquisitor' | 'curator' | 'critic' | 'neutral'
@@ -229,6 +233,75 @@ export interface HitsterChallenge extends ChallengeBase<'hitster'> {
   scoring: HitsterScoring
 }
 
+export interface SpeedrunCharacter {
+  id: string
+  showName: string
+  assets: ChallengeAsset[]
+  acceptedAnswers: string[]
+}
+
+export interface SpeedrunCharactersChallenge extends ChallengeBase<'speedrun_characters'> {
+  timerSeconds: number
+  minimumCorrect: number
+  characters: SpeedrunCharacter[]
+}
+
+export interface ImageOptionMatchingItem {
+  id: string
+  label?: string
+  assets: ChallengeAsset[]
+  correctOptionId: string
+}
+
+export interface ImageOptionMatchingOption {
+  id: string
+  label: string
+  icon?: string
+  assets?: ChallengeAsset[]
+}
+
+export interface ImageOptionMatchingChallenge extends ChallengeBase<'image_option_matching'> {
+  items: ImageOptionMatchingItem[]
+  options: ImageOptionMatchingOption[]
+  minimumCorrectPairs: number
+}
+
+export interface ColumnReorderRow {
+  id: string
+  correctOrder: string[]
+  bonusNameAcceptedAnswers?: string[]
+}
+
+export interface ColumnReorderCell {
+  id: string
+  column: number
+  assets: ChallengeAsset[]
+}
+
+export interface ColumnReorderMatchingChallenge extends ChallengeBase<'column_reorder_matching'> {
+  columns: string[]
+  rows: ColumnReorderRow[]
+  cells: ColumnReorderCell[]
+  shuffledColumnOrders: string[][]
+  lockedColumns?: number[]
+  minimumCorrectRows: number
+  bonusNameCredit?: number
+}
+
+export interface CardMatchingItem {
+  id: string
+  assets: ChallengeAsset[]
+  correctNumber: string
+  correctSuit: string
+}
+
+export interface CardMatchingChallenge extends ChallengeBase<'card_matching'> {
+  items: CardMatchingItem[]
+  numberOptions: string[]
+  suitOptions: string[]
+  minimumCorrect: number
+}
+
 export type Challenge =
   | MultipleChoiceChallenge
   | FreeTextChallenge
@@ -241,6 +314,10 @@ export type Challenge =
   | FillLyricsChallenge
   | MusicalChainChallenge
   | HitsterChallenge
+  | SpeedrunCharactersChallenge
+  | ImageOptionMatchingChallenge
+  | ColumnReorderMatchingChallenge
+  | CardMatchingChallenge
 
 export interface ChallengeDraftAnswer {
   selectedChoiceId: string
@@ -253,12 +330,20 @@ export interface ChallengeDraftAnswer {
   faceMorphAnswers: string[]
   hitsterTrackAnswers: Record<string, { titleAnswer: string; artistAnswer: string }>
   hitsterTrackOrderIds: string[]
+  speedrunAnswers: Record<string, string>
+  speedrunSkippedIds: string[]
+  imageOptionSelections: Record<string, string>
+  columnOrders: string[][]
+  columnBonusNames: Record<string, string>
+  cardSelections: Record<string, { number: string; suit: string }>
 }
 
 export interface ChallengeRuntimeState {
   revealedStageCount: number
   musicalChainStageIndex: number
   hitsterRevealedTrackCount: number
+  speedrunCurrentIndex: number
+  speedrunTimeRemaining: number
 }
 
 export interface ChallengeFeedback {
@@ -291,7 +376,36 @@ export interface Category {
   characters?: CategoryCharacters
   introNarrative?: CategoryIntroNarrative
   characterComments?: CategoryCharacterComments
+  weightedScoring?: WeightedScoringConfig | null
+  subPrizes?: SubPrize[]
   challenges: Challenge[]
+}
+
+export interface WeightedScoringConfig {
+  passingThreshold: number
+  typeWeights: Record<string, number>
+}
+
+export interface SubPrizeCondition {
+  type: 'zone_clear' | 'type_threshold' | 'min_weighted_score' | 'perfect_type'
+  zoneId?: string
+  quizTypes?: string[]
+  minPassed?: number
+  minScore?: number
+  quizType?: string
+}
+
+export interface SubPrize {
+  id: string
+  label: string
+  description?: string
+  condition: SubPrizeCondition
+}
+
+export interface TypeResult {
+  passed: number
+  total: number
+  score: number
 }
 
 export interface CategoryCharacterInfo {
@@ -451,6 +565,67 @@ export interface RawHitsterChallenge extends RawChallengeBase {
   scoring?: Partial<HitsterScoring>
 }
 
+export interface RawSpeedrunCharacter {
+  id: string
+  showName: string
+  assets?: Array<string | ChallengeAsset>
+  acceptedAnswers: string[]
+}
+
+export interface RawSpeedrunCharactersChallenge extends RawChallengeBase {
+  type: 'speedrun_characters'
+  timerSeconds?: number
+  minimumCorrect?: number
+  characters?: RawSpeedrunCharacter[]
+}
+
+export interface RawImageOptionMatchingItem {
+  id: string
+  label?: string
+  assets?: Array<string | ChallengeAsset>
+  correctOptionId: string
+}
+
+export interface RawImageOptionMatchingOption {
+  id: string
+  label: string
+  icon?: string
+  assets?: Array<string | ChallengeAsset>
+}
+
+export interface RawImageOptionMatchingChallenge extends RawChallengeBase {
+  type: 'image_option_matching'
+  items?: RawImageOptionMatchingItem[]
+  options?: RawImageOptionMatchingOption[]
+  minimumCorrectPairs?: number
+}
+
+export interface RawColumnReorderMatchingChallenge extends RawChallengeBase {
+  type: 'column_reorder_matching'
+  columns?: string[]
+  rows?: ColumnReorderRow[]
+  cells?: ColumnReorderCell[]
+  shuffledColumnOrders?: string[][]
+  lockedColumns?: number[]
+  minimumCorrectRows?: number
+  bonusNameCredit?: number
+}
+
+export interface RawCardMatchingItem {
+  id: string
+  assets?: Array<string | ChallengeAsset>
+  correctNumber: string
+  correctSuit: string
+}
+
+export interface RawCardMatchingChallenge extends RawChallengeBase {
+  type: 'card_matching'
+  items?: RawCardMatchingItem[]
+  numberOptions?: string[]
+  suitOptions?: string[]
+  minimumCorrect?: number
+}
+
 export type RawChallenge =
   | RawMultipleChoiceChallenge
   | RawFreeTextChallenge
@@ -463,6 +638,10 @@ export type RawChallenge =
   | RawFillLyricsChallenge
   | RawMusicalChainChallenge
   | RawHitsterChallenge
+  | RawSpeedrunCharactersChallenge
+  | RawImageOptionMatchingChallenge
+  | RawColumnReorderMatchingChallenge
+  | RawCardMatchingChallenge
 
 export interface DailyStats {
   date: string
