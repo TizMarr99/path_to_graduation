@@ -381,24 +381,44 @@ export interface Category {
   challenges: Challenge[]
 }
 
+export interface WeightedScoringGroupConfig {
+  id: string
+  label?: string
+  weight: number
+  quizTypes?: string[]
+  challengeIds?: string[]
+  passingThreshold?: number
+}
+
 export interface WeightedScoringConfig {
   passingThreshold: number
-  typeWeights: Record<string, number>
+  typeWeights?: Record<string, number>
+  scoreGroups?: WeightedScoringGroupConfig[]
 }
 
 export interface SubPrizeCondition {
-  type: 'zone_clear' | 'type_threshold' | 'min_weighted_score' | 'perfect_type'
+  type:
+    | 'zone_clear'
+    | 'type_threshold'
+    | 'min_weighted_score'
+    | 'perfect_type'
+    | 'group_clear'
+    | 'groups_threshold'
   zoneId?: string
   quizTypes?: string[]
+  groupIds?: string[]
   minPassed?: number
   minScore?: number
   quizType?: string
+  threshold?: number
 }
 
 export interface SubPrize {
   id: string
   label: string
   description?: string
+  familyId?: string
+  tierRank?: number
   condition: SubPrizeCondition
 }
 
@@ -406,6 +426,21 @@ export interface TypeResult {
   passed: number
   total: number
   score: number
+}
+
+export interface ScoreGroupResult extends TypeResult {
+  weight: number
+  normalizedScore: number
+  passingThreshold: number
+  isPassing: boolean
+}
+
+export interface RoomOutcomeSummary {
+  weightedScore?: number | null
+  passedByScore?: boolean
+  subPrizesWon?: string[]
+  typeResults?: Record<string, TypeResult>
+  groupResults?: Record<string, ScoreGroupResult>
 }
 
 export interface CategoryCharacterInfo {
@@ -663,6 +698,7 @@ export interface RoomSessionSummary {
   passed: boolean
   unlockedCategoryIds: string[]
   prizeAwarded: boolean
+  outcomeSummary?: RoomOutcomeSummary | null
 }
 
 export interface RoomCompletedSessionSnapshot {
@@ -672,6 +708,7 @@ export interface RoomCompletedSessionSnapshot {
   correctCount: number
   totalChallenges: number
   wrongCount: number
+  outcomeSummary?: RoomOutcomeSummary | null
 }
 
 export interface RoomProgress {
@@ -682,6 +719,7 @@ export interface RoomProgress {
   unlockedByScore: boolean
   prizeWon: boolean
   buyAccessAvailable: boolean
+  lastOutcomeSummary?: RoomOutcomeSummary | null
   victoryModalSeen?: boolean
 }
 
@@ -728,6 +766,8 @@ export interface RawCategory {
   characters?: CategoryCharacters
   introNarrative?: CategoryIntroNarrative
   characterComments?: CategoryCharacterComments
+  weightedScoring?: WeightedScoringConfig | null
+  subPrizes?: SubPrize[]
   challenges?: RawChallenge[]
   questions?: Array<RawMultipleChoiceChallenge | RawFreeTextChallenge>
 }

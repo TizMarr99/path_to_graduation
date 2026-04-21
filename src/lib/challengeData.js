@@ -79,6 +79,7 @@ function normalizeHintCost(rawHintCost, creditReward) {
 function createChallengeBase(rawChallenge) {
   const creditReward = rawChallenge.creditReward ?? 10
   const prompt = rawChallenge.prompt ?? rawChallenge.introText ?? ''
+  const hint = rawChallenge.hint ?? ''
 
   return {
     id: rawChallenge.id,
@@ -89,14 +90,14 @@ function createChallengeBase(rawChallenge) {
     prompt,
     infoText: rawChallenge.infoText ?? prompt,
     assets: normalizeAssets(rawChallenge.assets),
-    hint: rawChallenge.hint ?? '',
+    hint,
     explanation: rawChallenge.explanation ?? '',
     introNarration: rawChallenge.introNarration ?? '',
     successMessage: rawChallenge.successMessage ?? '',
     failureMessage: rawChallenge.failureMessage ?? '',
     speaker: normalizeSpeaker(rawChallenge),
     creditReward,
-    hintCost: normalizeHintCost(rawChallenge.hintCost, creditReward),
+    hintCost: hint ? normalizeHintCost(rawChallenge.hintCost, creditReward) : undefined,
   }
 }
 

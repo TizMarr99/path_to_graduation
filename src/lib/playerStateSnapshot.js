@@ -33,6 +33,7 @@ export function createDefaultRoomProgress(categoryId) {
     startedAt: null,
     sessions: [],
     lastCompletedSession: null,
+    lastOutcomeSummary: null,
     unlockedByScore: false,
     prizeWon: false,
     buyAccessAvailable: false,

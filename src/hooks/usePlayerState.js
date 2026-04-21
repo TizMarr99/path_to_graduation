@@ -221,9 +221,11 @@ export function PlayerStateProvider({ children }) {
     correctCount,
     wrongCount,
     totalChallenges,
+    passedOverride,
+    outcomeSummary = null,
     unlockedCategoryIds = [],
   }) {
-    const passed = correctCount >= 8
+    const passed = typeof passedOverride === 'boolean' ? passedOverride : correctCount >= 8
     const previousProgress =
       currentState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
     const startedAt = previousProgress.startedAt ?? Date.now()
@@ -247,6 +249,7 @@ export function PlayerStateProvider({ children }) {
               passed,
               unlockedCategoryIds: passed ? unlockedCategoryIds : [],
               prizeAwarded: passed,
+              outcomeSummary,
             },
           ],
           lastCompletedSession:
@@ -258,8 +261,10 @@ export function PlayerStateProvider({ children }) {
                   correctCount,
                   totalChallenges,
                   wrongCount,
+                  outcomeSummary,
                 }
               : previousProgress.lastCompletedSession ?? null,
+          lastOutcomeSummary: outcomeSummary ?? previousProgress.lastOutcomeSummary ?? null,
           unlockedByScore: previousProgress.unlockedByScore || passed,
           prizeWon: previousProgress.prizeWon || passed,
           buyAccessAvailable: !passed && correctCount + wrongCount >= totalChallenges,
@@ -405,7 +410,14 @@ export function PlayerStateProvider({ children }) {
   }
 
   const registerRoomOutcome = useCallback(async ({
-    categoryId, challengeResults = {}, correctCount, wrongCount, totalChallenges, unlockedCategoryIds = [],
+    categoryId,
+    challengeResults = {},
+    correctCount,
+    wrongCount,
+    totalChallenges,
+    passedOverride,
+    outcomeSummary = null,
+    unlockedCategoryIds = [],
   }) => {
     const nextPlayerState = buildRoomOutcomePlayerState(playerStateRef.current, {
       categoryId,
@@ -413,6 +425,8 @@ export function PlayerStateProvider({ children }) {
       correctCount,
       wrongCount,
       totalChallenges,
+      passedOverride,
+      outcomeSummary,
       unlockedCategoryIds,
     })
     playerStateRef.current = nextPlayerState

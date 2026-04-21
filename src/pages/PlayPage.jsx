@@ -16,13 +16,19 @@ import MusicRoomVictoryModal from '../components/music-room/MusicRoomVictoryModa
 import ResultModal from '../components/music-room/ResultModal.jsx'
 import RoomMapModal from '../components/music-room/RoomMapModal.jsx'
 import RoomPlayLayout from '../components/music-room/RoomPlayLayout.jsx'
+import SeriesFilmVictoryModal from '../components/music-room/SeriesFilmVictoryModal.jsx'
 import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { useCharacterComments } from '../hooks/useCharacterComments'
 import { useChallengeSession } from '../hooks/useChallengeSession'
 import { useFearEffects } from '../hooks/useFearEffects'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
-import { sendMusicPrizeMail1, sendMusicPrizeMail2, sendSerieFilmPrizeMail } from '../lib/emailApi'
+import {
+  sendMusicPrizeMail1,
+  sendMusicPrizeMail2,
+  sendSerieFilmArtifactMail,
+  sendSerieFilmPrizeMail,
+} from '../lib/emailApi'
 import { getRoomTransition } from '../lib/roomTransitions'
 import { challengeTypeLabels } from '../lib/challengeRegistry'
 import { getAttemptsRemaining, getLivesRemaining } from '../lib/playerStateSnapshot'
@@ -239,15 +245,28 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const isMusicRoom = category.id === 'musica'
   const isImmersiveRoom = Boolean(category.mapHotspots?.length)
   const hasWeightedScoring = Boolean(category.weightedScoring)
-  const musicRoomProgress = roomProgress
+  const currentRoomProgress = roomProgress?.[category.id] ?? null
   const archivedRoomReadOnly = Boolean(archivedSession)
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
-  const victoryModalAlreadySeen = musicRoomProgress?.victoryModalSeen ?? false
+  const victoryModalAlreadySeen = currentRoomProgress?.victoryModalSeen ?? false
   const weightedResult = useMemo(() => {
     if (!hasWeightedScoring) return null
     const feedbackMap = new Map(Object.entries(challengeResults))
     return computeWeightedRoomScore(category, feedbackMap)
   }, [category, challengeResults, hasWeightedScoring])
+  const roomOutcomeSummary = useMemo(() => {
+    if (!weightedResult) {
+      return null
+    }
+
+    return {
+      weightedScore: weightedResult.weightedScore,
+      passedByScore: weightedResult.isPassing,
+      subPrizesWon: weightedResult.subPrizesWon,
+      typeResults: weightedResult.typeResults,
+      groupResults: weightedResult.groupResults,
+    }
+  }, [weightedResult])
   const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 8 && !isComplete && !victoryModalAlreadySeen
   const passedRoom = hasWeightedScoring
     ? (weightedResult?.isPassing ?? false)
@@ -325,6 +344,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         correctCount: sessionCorrectCount,
         wrongCount: sessionWrongCount,
         totalChallenges,
+        passedOverride: passedRoom,
+        outcomeSummary: roomOutcomeSummary,
         unlockedCategoryIds: immediateUnlockTargets,
       })
 
@@ -354,10 +375,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
       if (
         category.id === 'serie-film' &&
+        isComplete &&
         passedRoom &&
         !hasTriggeredPrizeEmailsRef.current
       ) {
         hasTriggeredPrizeEmailsRef.current = true
+        void sendSerieFilmArtifactMail(accessCode).catch(() => {})
         void sendSerieFilmPrizeMail(accessCode).catch(() => {})
       }
     }
@@ -376,6 +399,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isComplete,
     passedRoom,
     registerRoomOutcome,
+    roomOutcomeSummary,
     sessionCorrectCount,
     sessionWrongCount,
     totalChallenges,
@@ -592,6 +616,19 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   // Show special victory modal when passing threshold reached
   if (shouldShowRoomVictoryModal) {
+    if (category.id === 'serie-film') {
+      return (
+        <SeriesFilmVictoryModal
+          category={category}
+          onClose={() => markVictoryModalSeen(category.id)}
+          sessionCorrectCount={sessionCorrectCount}
+          sessionWrongCount={sessionWrongCount}
+          totalChallenges={totalChallenges}
+          wonSubPrizeIds={weightedResult?.subPrizesWon ?? []}
+        />
+      )
+    }
+
     return (
       <MusicRoomVictoryModal
         category={category}

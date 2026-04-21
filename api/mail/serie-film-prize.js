@@ -6,6 +6,30 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+const PRIZE_COPY = {
+  'fixed-association-prize': {
+    eyebrow: 'Premio fisso',
+    title: 'Premio fisso della sala',
+    description:
+      'Hai domato le quattro prove di associazione principali, la parte più tecnica dell’intera sala. Questo riconoscimento resta legato al cuore del percorso che hai superato.',
+  },
+  'cinema-ticket-base': {
+    eyebrow: 'Premio incrementale',
+    title: 'Cinema Base',
+    description: 'Hai conquistato il livello base: un biglietto cinema.',
+  },
+  'cinema-ticket-premium': {
+    eyebrow: 'Premio incrementale',
+    title: 'Cinema Premium',
+    description: 'Hai conquistato il livello premium: biglietto cinema con aperitivo in sala.',
+  },
+  'cinema-ticket-diamond': {
+    eyebrow: 'Premio incrementale',
+    title: 'Cinema Diamond',
+    description: 'Hai conquistato il livello diamond: biglietto cinema con pranzo o cena in sala.',
+  },
+};
+
 function normalizeJsonObject(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return {};
@@ -19,6 +43,68 @@ function applyCorsHeaders(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Max-Age', '86400');
   res.setHeader('Vary', 'Origin');
+}
+
+function resolveWonPrizeIds(serieFilmProgress) {
+  const persistedSummary = normalizeJsonObject(serieFilmProgress?.lastOutcomeSummary);
+  const completedSessionSummary = normalizeJsonObject(serieFilmProgress?.lastCompletedSession?.outcomeSummary);
+  const summary = Object.keys(persistedSummary).length > 0 ? persistedSummary : completedSessionSummary;
+  const rawPrizeIds = Array.isArray(summary?.subPrizesWon) ? summary.subPrizesWon : [];
+
+  const hasDiamond = rawPrizeIds.includes('cinema-ticket-diamond');
+  const hasPremium = rawPrizeIds.includes('cinema-ticket-premium');
+  const hasBase = rawPrizeIds.includes('cinema-ticket-base');
+
+  const filteredPrizeIds = rawPrizeIds.filter((prizeId) => {
+    if (prizeId === 'cinema-ticket-base') {
+      return !hasPremium && !hasDiamond;
+    }
+
+    if (prizeId === 'cinema-ticket-premium') {
+      return !hasDiamond;
+    }
+
+    return true;
+  });
+
+  if (!hasBase && !hasPremium && !hasDiamond) {
+    return filteredPrizeIds;
+  }
+
+  return filteredPrizeIds;
+}
+
+function buildPrizeBlocks(prizeIds) {
+  return prizeIds
+    .map((prizeId) => {
+      const prizeCopy = PRIZE_COPY[prizeId];
+
+      if (!prizeCopy) {
+        return '';
+      }
+
+      return `
+        <tr>
+          <td style="padding:0 24px 14px 24px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#1a1a2e;border-radius:8px;border:1px solid #2a2a44;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a78bfa;">
+                    ${prizeCopy.eyebrow}
+                  </p>
+                  <p style="margin:0;font-size:16px;font-weight:600;color:#ffffff;">
+                    ${prizeCopy.title}
+                  </p>
+                  <p style="margin:8px 0 0 0;font-size:13px;line-height:1.6;color:#c5c5dd;">
+                    ${prizeCopy.description}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`;
+    })
+    .join('');
 }
 
 /**
@@ -126,6 +212,7 @@ export default async function handler(req, res) {
 
     const emailState = normalizeJsonObject(progressRow?.email_state);
     const serieFilmPrizeState = normalizeJsonObject(emailState.serie_film_prize);
+    const wonPrizeIds = resolveWonPrizeIds(serieFilmProgress);
 
     if (!serieFilmProgress || !serieFilmProgress.prizeWon) {
       return res.status(403).json({
@@ -151,7 +238,15 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!wonPrizeIds.length) {
+      return res.status(403).json({
+        error: 'No real prize won',
+        userMessage: 'Nessun premio reale sbloccato per questa sala.',
+      });
+    }
+
     const baseUrl = process.env.VITE_BASE_URL || 'https://la-mostra-delle-ombre.vercel.app';
+    const prizeBlocksHtml = buildPrizeBlocks(wonPrizeIds);
 
     const emailHtml = `
   <!DOCTYPE html>
@@ -184,36 +279,36 @@ export default async function handler(req, res) {
             Ciao Francesca,
           </p>
           <p style="margin:0 0 12px 0;font-size:14px;line-height:1.6;color:#c5c5dd;">
-            hai attraversato la <strong>Sala delle Serie &amp; Film</strong> e superato
-            tutte le prove che l'Inquisitore ti ha posto. Le ombre di personaggi iconici
-            si sono piegate al tuo sapere.
+            hai portato a termine la <strong>Sala delle Serie &amp; Film</strong> e il percorso
+            ha convertito ciò che hai sbloccato in premi reali. Le immagini ora hanno lasciato
+            qualcosa anche fuori dallo schermo.
           </p>
           <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#9f9fb8;">
-            Ogni scena riconosciuta, ogni casata abbinata, ogni citazione svelata:
-            la sala ha preso nota di tutto.
+            Qui sotto trovi solo ciò che hai davvero conquistato in questa corsa.
           </p>
           </td>
         </tr>
 
-        <!-- Prize -->
+        ${prizeBlocksHtml}
+
         <tr>
-          <td style="padding:16px 24px;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#1a1a2e;border-radius:8px;border:1px solid #2a2a44;">
-            <tr>
-            <td style="padding:16px 20px;">
-              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a78bfa;">
-              Artefatto sbloccato
-              </p>
-              <p style="margin:0;font-size:16px;font-weight:600;color:#ffffff;">
-              🎬 L'Archivio Segreto
-              </p>
-              <p style="margin:8px 0 0 0;font-size:13px;line-height:1.5;color:#c5c5dd;">
-              Un frammento di conoscenza cinematografica che solo un vero intenditore
-              poteva guadagnare. Custodiscilo con cura.
-              </p>
-            </td>
-            </tr>
-          </table>
+          <td style="padding:8px 24px 20px 24px;">
+            <p style="margin:0;font-size:13px;line-height:1.7;color:#9f9fb8;">
+              Se vorrai, potrai usare questo riepilogo come traccia per ricordare esattamente
+              quale livello del premio incrementale hai raggiunto.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:0 24px 24px 24px;">
+            <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#c5c5dd;">
+              A presto,
+            </p>
+            <p style="margin:0;font-size:13px;line-height:1.6;color:#e5e5f5;">
+              <strong>Andrea</strong><br />
+              Curatrice della Mostra delle Ombre
+            </p>
           </td>
         </tr>
 
@@ -236,7 +331,7 @@ export default async function handler(req, res) {
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'La Mostra <noreply@la-mostra-delle-ombre.vercel.app>',
       to: [playerEmail],
-      subject: "🎬 L'Archivio Segreto — Sala Serie & Film completata",
+      subject: 'Premi reali sbloccati - Sala Serie & Film',
       html: emailHtml,
     });
 

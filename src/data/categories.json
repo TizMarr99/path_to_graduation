@@ -808,60 +808,197 @@
     ],
     "weightedScoring": {
       "passingThreshold": 0.6,
-      "typeWeights": {
-        "speedrun_characters": 10,
-        "face_morph": 8,
-        "emoji_guess": 6,
-        "intruder": 12,
-        "got_matching": 10,
-        "dark_matching": 12,
-        "aib_matching": 10,
-        "st_matching": 8,
-        "love_matching": 8,
-        "citazioni": 8,
-        "colonna_sonora": 6,
-        "puzzle": 6,
-        "domande_aperte": 6
-      }
+      "scoreGroups": [
+        {
+          "id": "speedrun",
+          "label": "Speedrun personaggi",
+          "weight": 9,
+          "challengeIds": [
+            "sf-speedrun-01"
+          ]
+        },
+        {
+          "id": "face-morph",
+          "label": "Face morph",
+          "weight": 4,
+          "quizTypes": [
+            "face_morph"
+          ]
+        },
+        {
+          "id": "emoji",
+          "label": "Emoji quiz",
+          "weight": 4,
+          "quizTypes": [
+            "emoji_guess"
+          ]
+        },
+        {
+          "id": "puzzle",
+          "label": "Puzzle narrativi",
+          "weight": 6,
+          "quizTypes": [
+            "puzzle"
+          ]
+        },
+        {
+          "id": "got-association",
+          "label": "Game of Thrones",
+          "weight": 11,
+          "challengeIds": [
+            "sf-got-matching-01"
+          ]
+        },
+        {
+          "id": "dark-association",
+          "label": "Dark",
+          "weight": 12,
+          "challengeIds": [
+            "sf-dark-matching-01"
+          ]
+        },
+        {
+          "id": "aib-association",
+          "label": "Alice in Borderland",
+          "weight": 10,
+          "challengeIds": [
+            "sf-aib-matching-01"
+          ]
+        },
+        {
+          "id": "st-association",
+          "label": "Stranger Things",
+          "weight": 8,
+          "challengeIds": [
+            "sf-st-matching-01"
+          ]
+        },
+        {
+          "id": "love-grey",
+          "label": "Love matching Grey's Anatomy",
+          "weight": 4,
+          "challengeIds": [
+            "sf-love-grey-01"
+          ]
+        },
+        {
+          "id": "love-bridgerton",
+          "label": "Love matching Bridgerton",
+          "weight": 4,
+          "challengeIds": [
+            "sf-love-bridgerton-01"
+          ]
+        },
+        {
+          "id": "citazioni",
+          "label": "Citazioni audio",
+          "weight": 8,
+          "quizTypes": [
+            "citazioni"
+          ]
+        },
+        {
+          "id": "colonne-sonore",
+          "label": "Colonne sonore",
+          "weight": 5,
+          "quizTypes": [
+            "colonna_sonora"
+          ]
+        },
+        {
+          "id": "intruso",
+          "label": "Intrusi",
+          "weight": 5,
+          "quizTypes": [
+            "intruder"
+          ]
+        },
+        {
+          "id": "domande-aperte",
+          "label": "Domande aperte",
+          "weight": 8,
+          "quizTypes": [
+            "domande_aperte"
+          ]
+        }
+      ]
     },
     "subPrizes": [
       {
-        "id": "master-associations",
-        "label": "Maestro dei Legami",
-        "description": "Hai superato tutte le sfide di associazione.",
+        "id": "fixed-association-prize",
+        "label": "Premio fisso",
+        "description": "Si ottiene superando i quattro sottogiochi di associazione principali.",
         "condition": {
-          "type": "zone_clear",
-          "quizTypes": [
-            "got_matching",
-            "dark_matching",
-            "aib_matching",
-            "st_matching",
-            "love_matching"
+          "type": "group_clear",
+          "groupIds": [
+            "dark-association",
+            "got-association",
+            "aib-association",
+            "st-association"
           ]
         }
       },
       {
-        "id": "eagle-eye",
-        "label": "Occhio d'Aquila",
-        "description": "Hai riconosciuto tutti i personaggi e i volti.",
+        "id": "cinema-ticket-base",
+        "familyId": "cinema-experience",
+        "tierRank": 1,
+        "label": "Cinema Base",
+        "description": "Biglietto cinema.",
         "condition": {
-          "type": "zone_clear",
-          "quizTypes": [
-            "speedrun_characters",
-            "face_morph"
-          ]
-        }
-      },
-      {
-        "id": "golden-ear",
-        "label": "Orecchio d'Oro",
-        "description": "Hai superato tutte le sfide audio.",
-        "condition": {
-          "type": "zone_clear",
-          "quizTypes": [
+          "type": "groups_threshold",
+          "groupIds": [
+            "dark-association",
+            "got-association",
+            "aib-association",
+            "st-association",
+            "speedrun",
             "citazioni",
-            "colonna_sonora"
-          ]
+            "domande-aperte",
+            "puzzle"
+          ],
+          "threshold": 3
+        }
+      },
+      {
+        "id": "cinema-ticket-premium",
+        "familyId": "cinema-experience",
+        "tierRank": 2,
+        "label": "Cinema Premium",
+        "description": "Biglietto cinema con aperitivo in sala.",
+        "condition": {
+          "type": "groups_threshold",
+          "groupIds": [
+            "dark-association",
+            "got-association",
+            "aib-association",
+            "st-association",
+            "speedrun",
+            "citazioni",
+            "domande-aperte",
+            "puzzle"
+          ],
+          "threshold": 5
+        }
+      },
+      {
+        "id": "cinema-ticket-diamond",
+        "familyId": "cinema-experience",
+        "tierRank": 3,
+        "label": "Cinema Diamond",
+        "description": "Biglietto cinema con pranzo o cena in sala.",
+        "condition": {
+          "type": "groups_threshold",
+          "groupIds": [
+            "dark-association",
+            "got-association",
+            "aib-association",
+            "st-association",
+            "speedrun",
+            "citazioni",
+            "domande-aperte",
+            "puzzle"
+          ],
+          "threshold": 7
         }
       }
     ],
@@ -899,85 +1036,85 @@
       "onCorrect": [
         {
           "speaker": "guardian",
-          "text": "Eccellente! Hai un occhio per i dettagli."
+          "text": "Splendido. Hai colto il dettaglio prima che la scena potesse svanire."
         },
         {
           "speaker": "guardian",
-          "text": "Il Guardiano annuisce: questa scena l'hai riconosciuta perfettamente."
+          "text": "Benedict accenna un sorriso: questa inquadratura non poteva ingannarti."
         },
         {
           "speaker": "guardian",
-          "text": "Bravo! La sala proietta il tuo successo."
+          "text": "Ben fatto. La sala ti restituisce esattamente ciò che hai saputo vedere."
         },
         {
           "speaker": "guardian",
-          "text": "Hai una memoria visiva notevole. Continua così."
+          "text": "Hai memoria per i volti e grazia nel ricomporli. Continua così."
         },
         {
           "speaker": "guardian",
-          "text": "Le immagini ti guidano bene. Prosegui."
+          "text": "Le immagini si stanno aprendo con eleganza davanti a te. Prosegui."
         }
       ],
       "onWrong": [
         {
           "speaker": "inquisitor",
-          "text": "Sbagliato. Completamente sbagliato."
+          "text": "No. Ed è quasi offensivo quanto tu fossi convinta del contrario."
         },
         {
           "speaker": "inquisitor",
-          "text": "L'Inquisitore scuote la testa: non hai capito nulla."
+          "text": "Joffrey ti guarda con disgusto: davvero questa sarebbe stata la tua intuizione?"
         },
         {
           "speaker": "inquisitor",
-          "text": "Forse guardare film non basta... bisogna ricordarli."
+          "text": "Guardare non basta. Bisogna anche ricordare, e tu hai appena dimostrato il contrario."
         },
         {
           "speaker": "inquisitor",
-          "text": "Questa risposta è peggio di un film di serie Z."
+          "text": "Questa risposta ha lo stesso fascino di un sequel che nessuno aveva chiesto."
         },
         {
           "speaker": "inquisitor",
-          "text": "Hmm, no. Prova a usare gli occhi la prossima volta."
+          "text": "No. La prossima volta prova almeno a meritarti lo schermo che hai davanti."
         }
       ],
       "onHintUsed": [
         {
           "speaker": "guardian",
-          "text": "Un piccolo aiuto dal Guardiano. Usalo saggiamente."
+          "text": "Ti lascio un dettaglio in più. Non sprecarlo in una lettura frettolosa."
         },
         {
           "speaker": "guardian",
-          "text": "Ecco un indizio... ma ti costerà qualche credito."
+          "text": "Un fotogramma meglio illuminato, nulla di più. Il resto spetta ancora a te."
         },
         {
           "speaker": "guardian",
-          "text": "Il Guardiano sussurra un suggerimento. Guarda con più attenzione."
+          "text": "Benedict abbassa la voce: guarda meglio il centro della scena, non il rumore attorno."
         },
         {
           "speaker": "guardian",
-          "text": "Un frammento per orientarti. Il resto tocca a te."
+          "text": "Ti offro un indizio con discrezione. La soluzione, però, deve restare tua."
         }
       ],
       "onHesitation": [
         {
           "speaker": "inquisitor",
-          "text": "Stai guardando o stai sognando a occhi aperti?"
+          "text": "Stai osservando davvero o ti sei persa nel velluto delle poltrone?"
         },
         {
           "speaker": "inquisitor",
-          "text": "Il film non si pausa da solo, ma la mia pazienza sì."
+          "text": "La scena non aspetta te. Purtroppo sono io costretto a farlo."
         },
         {
           "speaker": "inquisitor",
-          "text": "Quante volte ancora? Anche lo schermo si sta annoiando."
+          "text": "Ancora? Perfino lo schermo sembra stanco di ripetersi per te."
         },
         {
           "speaker": "inquisitor",
-          "text": "Prendi una decisione, il tempo scorre come i credits di un film."
+          "text": "Deciditi. I titoli di coda scorrono più in fretta della tua sicurezza."
         },
         {
           "speaker": "inquisitor",
-          "text": "L'Inquisitore sbadiglia rumorosamente."
+          "text": "Joffrey sbadiglia senza alcuna grazia. E in effetti gli stai dando un buon motivo."
         }
       ]
     },
@@ -1206,8 +1343,7 @@
             ]
           }
         ],
-        "creditReward": 15,
-        "hintCost": 20
+        "creditReward": 15
       },
       {
         "id": "sf-face-morph-01",
@@ -1247,6 +1383,8 @@
           }
         ],
         "minimumCorrectGroups": 2,
+        "hint": "Uno dei tre porta addosso un Nord severo, uno vive di completi impeccabili, uno ha un'aria molto piu ambigua che eroica.",
+        "hintCost": 18,
         "creditReward": 12
       },
       {
@@ -1287,6 +1425,8 @@
           }
         ],
         "minimumCorrectGroups": 2,
+        "hint": "Qui conta il contrasto: potere politico, istinto di sopravvivenza e autorita morale convivono nello stesso volto fuso.",
+        "hintCost": 12,
         "creditReward": 12
       },
       {
@@ -1300,6 +1440,8 @@
         "acceptedAnswers": [
           "Inception"
         ],
+        "hint": "Non leggere gli emoji come oggetti: leggili come livelli di realta che si piegano uno dentro l'altro.",
+        "hintCost": 15,
         "creditReward": 8
       },
       {
@@ -1315,6 +1457,8 @@
           "Il diavolo veste Prada",
           "The Devil Wears Prada"
         ],
+        "hint": "Qui il tono vale piu della trama: lusso, moda e un potere che entra in scena con i tacchi.",
+        "hintCost": 18,
         "creditReward": 8
       },
       {
@@ -1329,6 +1473,8 @@
           "Aladdin",
           "Aladino"
         ],
+        "hint": "Il titolo coincide con il protagonista, non con l'oggetto magico piu famoso della storia.",
+        "hintCost": 18,
         "creditReward": 8
       },
       {
@@ -1342,6 +1488,8 @@
         "acceptedAnswers": [
           "In Time"
         ],
+        "hint": "La chiave non e morale ma letterale: qui cio che scade non e il denaro.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -1355,6 +1503,8 @@
         "acceptedAnswers": [
           "Passengers"
         ],
+        "hint": "Pensa a un viaggio spaziale che diventa soprattutto una storia di isolamento e compagnia forzata.",
+        "hintCost": 18,
         "creditReward": 10
       },
       {
@@ -1368,6 +1518,8 @@
         "acceptedAnswers": [
           "Iron Man"
         ],
+        "hint": "La frase e diventata iconica nell'MCU, ma il dettaglio decisivo resta la caverna.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -1384,6 +1536,8 @@
           "3 Body Problem",
           "Three body problem"
         ],
+        "hint": "Il cuore del rebus non e 'stanno arrivando', ma il sistema cosmico impossibile descritto all'inizio.",
+        "hintCost": 12,
         "creditReward": 10
       },
       {
@@ -1398,6 +1552,8 @@
           "The Imitation Game",
           "Imitation Game"
         ],
+        "hint": "La guerra e solo il contesto: il centro della storia e un uomo che nasconde quasi tutto di se.",
+        "hintCost": 12,
         "creditReward": 10
       },
       {
@@ -1479,6 +1635,8 @@
             "icon": "/serie-film/associazioni/got/martell.jpg"
           }
         ],
+        "hint": "Non partire dalle immagini delle casate: parti dai motti piu celebri. Inverno, ruggito e fuoco ti danno gia tre ancore solide.",
+        "hintCost": 12,
         "creditReward": 12
       },
       {
@@ -1691,6 +1849,8 @@
         ],
         "minimumCorrectRows": 3,
         "bonusNameCredit": 3,
+        "hint": "Qui il trucco non e riconoscere tutti subito, ma inseguire i tratti che il tempo non riesce a cancellare del tutto.",
+        "hintCost": 10,
         "creditReward": 15
       },
       {
@@ -1785,6 +1945,8 @@
           "spades"
         ],
         "minimumCorrect": 3,
+        "hint": "Inizia dal seme, non dal numero: in Alice in Borderland ogni seme racconta il tipo di gioco prima ancora del valore della carta.",
+        "hintCost": 12,
         "creditReward": 12
       },
       {
@@ -1947,6 +2109,8 @@
             ]
           }
         ],
+        "hint": "Una traccia esplode in energia rock — perfetta per una scena di sfogo e ribellione; un'altra è fragile e sospesa, scelta per i momenti più cupi e introspettivi.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -2121,6 +2285,8 @@
         ],
         "minimumCorrectRows": 4,
         "bonusNameCredit": 0,
+        "hint": "Non pensare ai flirt: qui contano le coppie che hanno segnato stagioni intere e lasciato una ferita netta nella serie.",
+        "hintCost": 12,
         "creditReward": 8
       },
       {
@@ -2295,6 +2461,8 @@
         ],
         "minimumCorrectRows": 4,
         "bonusNameCredit": 0,
+        "hint": "Ragiona per stagioni e per centralita narrativa: le coppie principali di Bridgerton si riconoscono prima dal periodo che dai volti.",
+        "hintCost": 12,
         "creditReward": 8
       },
       {
@@ -2327,6 +2495,8 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
+        "hint": "La voce e tagliente, ironica, piu incline all'intelligenza che alla spada. Il personaggio si riconosce quasi prima del titolo.",
+        "hintCost": 15,
         "creditReward": 12
       },
       {
@@ -2358,6 +2528,8 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
+        "hint": "Se il nome del personaggio non ti arriva subito, pensa a una serie in cui il tempo, il destino e un'isola contano quasi quanto i protagonisti.",
+        "hintCost": 15,
         "creditReward": 12
       },
       {
@@ -2389,6 +2561,8 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
+        "hint": "La voce appartiene a qualcuno che ha trasformato sarcasmo e talento chirurgico in una firma precisa.",
+        "hintCost": 15,
         "creditReward": 12
       },
       {
@@ -2420,6 +2594,8 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
+        "hint": "Qui il personaggio e spesso piu facile del titolo: basta ascoltare il modo in cui piega le parole con sicurezza teatrale.",
+        "hintCost": 12,
         "creditReward": 12
       },
       {
@@ -2452,6 +2628,8 @@
           "fullMatchRatio": 2,
           "partialMatchRatio": 1
         },
+        "hint": "Non cercare un supereroe generico: la voce appartiene a qualcuno che porta addosso l'idea stessa di disciplina e sacrificio.",
+        "hintCost": 15,
         "creditReward": 12
       },
       {
@@ -2472,6 +2650,8 @@
           "Big Hero 6",
           "Big Hero Six"
         ],
+        "hint": "Il brano ha un'energia tenera e tecnologica: non viene da un classico antico ma da un'animazione molto piu recente.",
+        "hintCost": 12,
         "creditReward": 10
       },
       {
@@ -2492,6 +2672,8 @@
           "Guardiani della Galassia",
           "Guardians of the Galaxy"
         ],
+        "hint": "Qui il tono e avventuroso e spaziale, ma piu scanzonato che epico.",
+        "hintCost": 12,
         "creditReward": 10
       },
       {
@@ -2512,6 +2694,8 @@
           "Hercules",
           "Ercole"
         ],
+        "hint": "L'impronta e decisamente disneyana, ma con una teatralita quasi gospel.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -2531,6 +2715,8 @@
         "acceptedAnswers": [
           "Interstellar"
         ],
+        "hint": "Qui il suono non accompagna soltanto lo spazio: sembra allungare il tempo stesso.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -2550,6 +2736,8 @@
         "acceptedAnswers": [
           "Sherlock"
         ],
+        "hint": "La traccia ha un'eleganza nervosa e brillante, perfetta per qualcuno che corre piu veloce di chiunque altro nel ragionamento.",
+        "hintCost": 18,
         "creditReward": 10
       },
       {
@@ -2580,6 +2768,8 @@
           }
         ],
         "intruderId": "monica",
+        "hint": "Tre nomi condividono davvero il cognome che conta in quella dinastia. Uno no.",
+        "hintCost": 12,
         "creditReward": 10
       },
       {
@@ -2610,6 +2800,8 @@
           }
         ],
         "intruderId": "gloss",
+        "hint": "Controlla soprattutto i distretti dei tributi professionisti: l'errore si nasconde li.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -2640,6 +2832,8 @@
           }
         ],
         "intruderId": "johnny",
+        "hint": "L'intruso non e quello meno famoso: e quello meno distribuito tra le saghe citate.",
+        "hintCost": 15,
         "creditReward": 12
       },
       {
@@ -2654,6 +2848,8 @@
           "Black Pearl",
           "Perla Nera"
         ],
+        "hint": "Non e una nave qualsiasi: il nome richiama il colore e qualcosa di prezioso.",
+        "hintCost": 18,
         "creditReward": 8
       },
       {
@@ -2669,6 +2865,8 @@
           "Grey Sloan",
           "Grey Sloan Memorial"
         ],
+        "hint": "Non pensare alle primissime stagioni: il nome con cui e noto piu avanti nella serie e quello che ti serve qui.",
+        "hintCost": 12,
         "creditReward": 8
       },
       {
@@ -2688,6 +2886,8 @@
           "Rhaegal, Viserion, Drogon",
           "Drogon, Viserion, Rhaegal"
         ],
+        "hint": "Uno porta il nome del marito, uno del fratello e uno sembra il riflesso piu diretto della sua rabbia.",
+        "hintCost": 15,
         "creditReward": 10
       },
       {
@@ -2705,6 +2905,8 @@
           "James Barnes",
           "Winter Soldier"
         ],
+        "hint": "Se ti viene in mente il suo nome piu tardo, sei gia molto vicina alla risposta.",
+        "hintCost": 12,
         "creditReward": 8
       },
       {
@@ -2720,6 +2922,8 @@
           "4, 8, 15, 16, 23, 42",
           "4-8-15-16-23-42"
         ],
+        "hint": "Sono sei numeri, non pochi, e per chi ha visto la serie diventano quasi una formula ossessiva.",
+        "hintCost": 10,
         "creditReward": 10
       },
       {
@@ -2741,6 +2945,8 @@
           "The Adjustment Bureau",
           "Agente del destino"
         ],
+        "hint": "Il titolo suggerisce piu controllo invisibile che azione spettacolare.",
+        "hintCost": 10,
         "creditReward": 8
       },
       {
@@ -2763,6 +2969,8 @@
           "Da Vinci Code",
           "The Da Vinci Code"
         ],
+        "hint": "Il centro non e il pittore in se, ma il mistero che il suo nome lascia dietro di se.",
+        "hintCost": 15,
         "creditReward": 8
       },
       {
@@ -2782,6 +2990,8 @@
         "acceptedAnswers": [
           "Collateral Beauty"
         ],
+        "hint": "Il titolo accosta due idee che di solito non stanno bene insieme: ferita e grazia.",
+        "hintCost": 12,
         "creditReward": 8
       },
       {
@@ -2812,6 +3022,8 @@
           }
         ],
         "intruderId": "avatar",
+        "hint": "Non fermarti al regista: anche la colonna sonora puo eliminare quasi subito una delle opzioni.",
+        "hintCost": 12,
         "creditReward": 10
       },
       {
@@ -2842,6 +3054,8 @@
           }
         ],
         "intruderId": "quattro",
+        "hint": "L'intruso sembra plausibile proprio perche richiama Conan Doyle, ma il numero e quello da osservare bene.",
+        "hintCost": 18,
         "creditReward": 12
       }
     ]

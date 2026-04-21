@@ -13,8 +13,8 @@ function HintModal({
     return null
   }
 
-  const showCost = typeof hintCost === 'number'
   const isHintAvailable = Boolean(hint)
+  const showCost = isHintAvailable && typeof hintCost === 'number'
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/90 px-4 py-6" role="dialog" aria-modal="true">

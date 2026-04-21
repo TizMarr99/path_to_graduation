@@ -9,7 +9,7 @@ function ChallengeHintPanel({
   hintDisabledReason,
   hintCost,
 }) {
-  const showCost = typeof hintCost === 'number' && !isVisible
+  const showCost = Boolean(hint) && typeof hintCost === 'number' && !isVisible
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/60 px-5 py-4">
