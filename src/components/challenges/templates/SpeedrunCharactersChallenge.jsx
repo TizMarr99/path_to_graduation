@@ -154,6 +154,7 @@ function SpeedrunCharactersChallenge({
 
   const progressPercent = Math.max(0, (timeLeft / timerSeconds) * 100)
   const currentCharacter = !isFinished ? challenge.characters[currentIndex] : null
+  const didTimerExpire = timeLeft <= 0
 
   // Start screen — shown before the timer has begun
   if (!started) {
@@ -192,7 +193,7 @@ function SpeedrunCharactersChallenge({
         <div className="space-y-4">
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 px-5 py-5 text-center">
             <p className="text-lg font-semibold text-slate-100">
-              Tempo scaduto!
+              {didTimerExpire ? 'Tempo scaduto!' : 'Speedrun completato!'}
             </p>
             <p className="mt-2 text-sm text-slate-300">
               Hai indovinato <span className="font-bold text-cyan-300">{correctCount}</span> su{' '}

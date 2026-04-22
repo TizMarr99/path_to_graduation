@@ -1148,8 +1148,8 @@
         "quizSubType": "speedrun_characters",
         "difficulty": "medium",
         "title": "Speedrun Personaggi",
-        "introText": "Riconosci quanti più personaggi possibile in 90 secondi!",
-        "timerSeconds": 90,
+        "introText": "Riconosci quanti più personaggi possibile in 60 secondi!",
+        "timerSeconds": 60,
         "minimumCorrect": 10,
         "characters": [
           {

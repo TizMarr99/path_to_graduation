@@ -91,7 +91,29 @@ const HESITATION_CLEAR_THRESHOLD = 2
 const HESITATION_TIME_THRESHOLDS_MS = {
   hitster: 30_000,
   musical_chain: 40_000,
+  image_option_matching: 90_000,
+  column_reorder_matching: 90_000,
+  card_matching: 90_000,
   default: 50_000,
+}
+
+const HESITATION_TIME_THRESHOLDS_MS_BY_SUBTYPE = {
+  love_matching: 60_000,
+  dark_matching: 120_000,
+}
+
+function resolveHesitationDelayMs(challenge) {
+  if (!challenge) {
+    return HESITATION_TIME_THRESHOLDS_MS.default
+  }
+
+  const subTypeDelay = HESITATION_TIME_THRESHOLDS_MS_BY_SUBTYPE[challenge.quizSubType]
+
+  if (subTypeDelay) {
+    return subTypeDelay
+  }
+
+  return HESITATION_TIME_THRESHOLDS_MS[challenge.type] ?? HESITATION_TIME_THRESHOLDS_MS.default
 }
 
 const subgameLabels = {
@@ -786,11 +808,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   // Trigger hesitation after a time threshold if the user hasn't answered yet.
   useEffect(() => {
-    if (!currentChallenge || hasFeedback || isComplete || shouldPauseHesitationTimer) {
+    const isSpeedrunChallenge = currentChallenge?.type === 'speedrun_characters'
+
+    if (!currentChallenge || hasFeedback || isComplete || shouldPauseHesitationTimer || isSpeedrunChallenge) {
       if (hesitationTimerRef.current) clearTimeout(hesitationTimerRef.current)
       return
     }
-    const delay = HESITATION_TIME_THRESHOLDS_MS[currentChallenge.type] ?? HESITATION_TIME_THRESHOLDS_MS.default
+    const delay = resolveHesitationDelayMs(currentChallenge)
     const id = setTimeout(() => {
       if (!hesitationFiredRef.current) {
         hesitationFiredRef.current = true
