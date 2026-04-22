@@ -743,8 +743,8 @@
     "title": "Sala delle Serie e dei Film",
     "ghost": "Il Clown del Corridoio",
     "description": "Una sala di schermi spenti e poltrone vuote, dove le immagini di clown inquietanti e bambole assassine si confondono con i ricordi di jump scare inaspettati. Il Guardiano illumina le scene; l'Inquisitore le distorce in incubi vividi.",
-    "introHeadline": "Le immagini ti osservano.",
-    "introLead": "In questa sala gli schermi custodiscono memorie e inganni: il guardiano illumina la scena, l'inquisitore prova a confonderti.",
+    "introHeadline": "Il buio monta la scena.",
+    "introLead": "Qui non basta ricordare un titolo: devi ricomporre volti, citazioni e legami mentre la sala prova a tagliare via i dettagli giusti.",
     "backgroundImage": "/images/rooms/serie-film-bg.png",
     "ambientAudioSrc": "/audio/bg_serie_film_room.mp3",
     "mapImage": "/images/rooms/serie-film-map.png",
@@ -823,12 +823,12 @@
       }
     ],
     "weightedScoring": {
-      "passingThreshold": 0.6,
+      "passingThreshold": 0.7,
       "scoreGroups": [
         {
           "id": "speedrun",
           "label": "Speedrun personaggi",
-          "weight": 9,
+          "weight": 1,
           "challengeIds": [
             "sf-speedrun-01"
           ]
@@ -836,7 +836,8 @@
         {
           "id": "face-morph",
           "label": "Face morph",
-          "weight": 4,
+          "weight": 1,
+          "passingThreshold": 1,
           "quizTypes": [
             "face_morph"
           ]
@@ -844,7 +845,8 @@
         {
           "id": "emoji",
           "label": "Emoji quiz",
-          "weight": 4,
+          "weight": 1,
+          "passingThreshold": 0.6666666667,
           "quizTypes": [
             "emoji_guess"
           ]
@@ -852,7 +854,7 @@
         {
           "id": "puzzle",
           "label": "Puzzle narrativi",
-          "weight": 6,
+          "weight": 1,
           "quizTypes": [
             "puzzle"
           ]
@@ -860,7 +862,7 @@
         {
           "id": "got-association",
           "label": "Game of Thrones",
-          "weight": 11,
+          "weight": 1,
           "challengeIds": [
             "sf-got-matching-01"
           ]
@@ -868,7 +870,7 @@
         {
           "id": "dark-association",
           "label": "Dark",
-          "weight": 12,
+          "weight": 1,
           "challengeIds": [
             "sf-dark-matching-01"
           ]
@@ -876,7 +878,7 @@
         {
           "id": "aib-association",
           "label": "Alice in Borderland",
-          "weight": 10,
+          "weight": 1,
           "challengeIds": [
             "sf-aib-matching-01"
           ]
@@ -884,7 +886,7 @@
         {
           "id": "st-association",
           "label": "Stranger Things",
-          "weight": 8,
+          "weight": 1,
           "challengeIds": [
             "sf-st-matching-01"
           ]
@@ -892,7 +894,7 @@
         {
           "id": "love-grey",
           "label": "Love matching Grey's Anatomy",
-          "weight": 4,
+          "weight": 1,
           "challengeIds": [
             "sf-love-grey-01"
           ]
@@ -900,7 +902,7 @@
         {
           "id": "love-bridgerton",
           "label": "Love matching Bridgerton",
-          "weight": 4,
+          "weight": 1,
           "challengeIds": [
             "sf-love-bridgerton-01"
           ]
@@ -908,7 +910,7 @@
         {
           "id": "citazioni",
           "label": "Citazioni audio",
-          "weight": 8,
+          "weight": 1,
           "quizTypes": [
             "citazioni"
           ]
@@ -916,7 +918,7 @@
         {
           "id": "colonne-sonore",
           "label": "Colonne sonore",
-          "weight": 5,
+          "weight": 1,
           "quizTypes": [
             "colonna_sonora"
           ]
@@ -924,7 +926,7 @@
         {
           "id": "intruso",
           "label": "Intrusi",
-          "weight": 5,
+          "weight": 1,
           "quizTypes": [
             "intruder"
           ]
@@ -932,7 +934,7 @@
         {
           "id": "domande-aperte",
           "label": "Domande aperte",
-          "weight": 8,
+          "weight": 1,
           "quizTypes": [
             "domande_aperte"
           ]
@@ -943,23 +945,7 @@
       {
         "id": "fixed-association-prize",
         "label": "Premio fisso",
-        "description": "Si ottiene superando i quattro sottogiochi di associazione principali.",
-        "condition": {
-          "type": "group_clear",
-          "groupIds": [
-            "dark-association",
-            "got-association",
-            "aib-association",
-            "st-association"
-          ]
-        }
-      },
-      {
-        "id": "cinema-ticket-base",
-        "familyId": "cinema-experience",
-        "tierRank": 1,
-        "label": "Cinema Base",
-        "description": "Biglietto cinema.",
+        "description": "Si ottiene superando almeno 5 sottogiochi su 6 tra associazioni principali e love matching.",
         "condition": {
           "type": "groups_threshold",
           "groupIds": [
@@ -967,8 +953,27 @@
             "got-association",
             "aib-association",
             "st-association",
+            "love-grey",
+            "love-bridgerton"
+          ],
+          "threshold": 5
+        }
+      },
+      {
+        "id": "cinema-ticket-base",
+        "familyId": "cinema-experience",
+        "tierRank": 1,
+        "label": "Cinema Base",
+        "description": "Si ottiene superando almeno 3 degli 8 sottogiochi extra della sala.",
+        "condition": {
+          "type": "groups_threshold",
+          "groupIds": [
             "speedrun",
+            "face-morph",
+            "emoji",
             "citazioni",
+            "colonne-sonore",
+            "intruso",
             "domande-aperte",
             "puzzle"
           ],
@@ -980,16 +985,16 @@
         "familyId": "cinema-experience",
         "tierRank": 2,
         "label": "Cinema Premium",
-        "description": "Biglietto cinema con aperitivo in sala.",
+        "description": "Si ottiene superando almeno 5 degli 8 sottogiochi extra della sala.",
         "condition": {
           "type": "groups_threshold",
           "groupIds": [
-            "dark-association",
-            "got-association",
-            "aib-association",
-            "st-association",
             "speedrun",
+            "face-morph",
+            "emoji",
             "citazioni",
+            "colonne-sonore",
+            "intruso",
             "domande-aperte",
             "puzzle"
           ],
@@ -1001,16 +1006,16 @@
         "familyId": "cinema-experience",
         "tierRank": 3,
         "label": "Cinema Diamond",
-        "description": "Biglietto cinema con pranzo o cena in sala.",
+        "description": "Si ottiene superando almeno 7 degli 8 sottogiochi extra della sala.",
         "condition": {
           "type": "groups_threshold",
           "groupIds": [
-            "dark-association",
-            "got-association",
-            "aib-association",
-            "st-association",
             "speedrun",
+            "face-morph",
+            "emoji",
             "citazioni",
+            "colonne-sonore",
+            "intruso",
             "domande-aperte",
             "puzzle"
           ],
@@ -1042,11 +1047,11 @@
     "introNarrative": {
       "guardian": {
         "name": "Benedict Bridgerton",
-        "message": "Benvenuto nella sala degli schermi. Qui ogni immagine racconta una storia... se hai il coraggio di guardarla. Io sono il guardiano di questa ombra. Segui le scene."
+        "message": "Benvenuta nella sala degli schermi. Non entrare come semplice spettatrice. In questa sala le storie arrivano a frammenti: un volto, una battuta, un legame, una scena spezzata. Io terrò accesa la traccia; tu devi ricomporre tutto il resto."
       },
       "inquisitor": {
         "name": "Joffrey Baratheon",
-        "message": "Ah, pensi di conoscere il cinema e le serie? Le storie non si limitano a essere viste, devono essere vissute. Vediamo se ricordi davvero... o se la paura ti ha fatto dimenticare tutto."
+        "message": "Ti illudi che basti aver guardato abbastanza serie tv e film per capire una storia. Vediamo se sai riconoscerla quando perde il titolo, la voce e perfino il volto. Qui non vincono i fan: vincono quelli che non esitano."
       }
     },
     "characterComments": {

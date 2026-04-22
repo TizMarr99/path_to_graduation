@@ -99,12 +99,11 @@ function buildScoreGroupResult(challenges, feedbackMap, weight, defaultPassingTh
     if (feedback?.isCorrect) {
       result.passed += 1
     }
-
-    result.score += resolveNormalizedFeedbackScore(feedback)
   }
 
   if (result.total > 0) {
-    result.normalizedScore = result.score / result.total
+    result.score = result.passed
+    result.normalizedScore = result.passed / result.total
     result.isPassing = result.normalizedScore >= result.passingThreshold
   }
 
@@ -134,10 +133,11 @@ function buildFallbackGroupResults(typeResults, config) {
   const groupResults = {}
 
   for (const [quizType, result] of Object.entries(typeResults)) {
-    const normalizedScore = result.total > 0 ? result.score / result.total : 0
+    const normalizedScore = result.total > 0 ? result.passed / result.total : 0
     const passingThreshold = config.passingThreshold ?? 0.6
     groupResults[quizType] = {
       ...result,
+      score: result.passed,
       weight: typeWeights[quizType] ?? 1,
       normalizedScore,
       passingThreshold,
@@ -259,7 +259,7 @@ export function computeWeightedRoomScore(category, feedbackMap) {
 
   for (const result of Object.values(groupResults)) {
     totalWeight += result.weight
-    weightedScore += result.normalizedScore * result.weight
+    weightedScore += (result.isPassing ? 1 : 0) * result.weight
   }
 
   if (totalWeight > 0) {

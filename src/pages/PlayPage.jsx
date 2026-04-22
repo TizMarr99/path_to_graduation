@@ -41,6 +41,21 @@ import {
 
 const roomUnlockTargets = {}
 
+function resolveWeightedScoreGroupConfig(category, challenge) {
+  if (!category?.weightedScoring || !challenge) {
+    return null
+  }
+
+  const quizType = challenge.quizSubType ?? challenge.type
+
+  return category.weightedScoring.scoreGroups?.find((group) => {
+    const matchesById = group.challengeIds?.includes(challenge.id)
+    const matchesByType = group.quizTypes?.includes(quizType)
+
+    return Boolean(matchesById || matchesByType)
+  }) ?? null
+}
+
 function NotFoundState({ categoryId }) {
   return (
     <section className="rounded-[2rem] border border-rose-300/20 bg-slate-950/70 p-8 shadow-[0_0_80px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-10">
@@ -99,16 +114,25 @@ function getChallengeSubgameId(challenge) {
   return challenge?.quizSubType || challenge?.type || ''
 }
 
-function getChallengeSubgameKey(challenge) {
+function getCategoryChallengeSubgameId(category, challenge) {
+  return resolveWeightedScoreGroupConfig(category, challenge)?.id ?? getChallengeSubgameId(challenge)
+}
+
+function getChallengeSubgameKey(category, challenge) {
   if (!challenge?.zoneId) {
     return ''
   }
 
-  return `${challenge.zoneId}::${getChallengeSubgameId(challenge)}`
+  return `${challenge.zoneId}::${getCategoryChallengeSubgameId(category, challenge)}`
 }
 
-function getChallengeSubgameLabel(challenge) {
-  const subgameId = getChallengeSubgameId(challenge)
+function getChallengeSubgameLabel(category, challenge) {
+  const weightedGroup = resolveWeightedScoreGroupConfig(category, challenge)
+  if (weightedGroup?.label) {
+    return weightedGroup.label
+  }
+
+  const subgameId = getCategoryChallengeSubgameId(category, challenge)
 
   return subgameLabels[subgameId] ?? challenge?.title ?? challengeTypeLabels[challenge?.type] ?? 'Sottogioco'
 }
@@ -121,10 +145,10 @@ function DailyLimitOverlay() {
           Limite raggiunto
         </p>
         <h3 className="mt-3 text-xl font-semibold tracking-tight text-white sm:text-2xl">
-          Tentativi esauriti per questa sessione
+          Sessione bloccata per oggi
         </h3>
         <p className="mt-3 text-sm leading-6 text-slate-300">
-          I tentativi per oggi sono terminati. Riprova domani.
+          Non hai piu tentativi o vite disponibili per proseguire oggi. Riprova domani.
         </p>
       </div>
     </div>
@@ -186,7 +210,7 @@ function ZoneChallengeNavigator({
   )
 }
 
-function SubgameNavigator({ currentSubgameId, onSelect, resolvedChallengeIds, subgames }) {
+function SubgameNavigator({ currentSubgameId, lockedSubgameIds = [], onSelect, resolvedChallengeIds, subgames }) {
   if (subgames.length <= 1) {
     return null
   }
@@ -199,14 +223,16 @@ function SubgameNavigator({ currentSubgameId, onSelect, resolvedChallengeIds, su
       <div className="flex flex-wrap gap-2">
         {subgames.map((subgame) => {
           const isActive = subgame.id === currentSubgameId
+          const isLocked = lockedSubgameIds.includes(subgame.id) && !isActive
           const completedCount = subgame.challengeIds.filter((challengeId) => resolvedChallengeIds.includes(challengeId)).length
 
           return (
             <button
               key={subgame.id}
               aria-pressed={isActive}
+              disabled={isLocked}
               className={[
-                'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition',
+                'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition disabled:cursor-not-allowed disabled:opacity-45',
                 isActive
                   ? 'border-amber-200/70 bg-amber-300/18 text-amber-50'
                   : 'border-white/12 bg-white/5 text-slate-100 hover:border-cyan-300/45 hover:text-cyan-100',
@@ -356,8 +382,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     (!pendingBridge ||
       (pendingBridge.sourceCategoryId === category.id && !pendingBridge.bridgeCompletedAt))
   const currentZoneId = currentChallenge?.zoneId ?? ''
-  const currentSubgameId = getChallengeSubgameId(currentChallenge)
-  const currentSubgameKey = getChallengeSubgameKey(currentChallenge)
+  const currentSubgameId = getCategoryChallengeSubgameId(category, currentChallenge)
+  const currentSubgameKey = getChallengeSubgameKey(category, currentChallenge)
   const zoneChallengeMap = useMemo(
     () =>
       category.challenges.reduce((accumulator, challenge) => {
@@ -382,7 +408,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         }
 
         const zoneId = challenge.zoneId
-        const subgameId = getChallengeSubgameId(challenge)
+        const subgameId = getCategoryChallengeSubgameId(category, challenge)
 
         if (!accumulator[zoneId]) {
           accumulator[zoneId] = []
@@ -393,7 +419,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         if (!existingSubgame) {
           existingSubgame = {
             id: subgameId,
-            label: getChallengeSubgameLabel(challenge),
+            label: getChallengeSubgameLabel(category, challenge),
             fallbackPrompt: challenge.prompt || challenge.infoText || 'La prova ti aspetta.',
             introText: challenge.subgameIntroText || '',
             challengeIds: [],
@@ -408,7 +434,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         existingSubgame.challengeIds.push(challenge.id)
         return accumulator
       }, {}),
-    [category.challenges],
+    [category, category.challenges],
   )
   const currentZoneChallenges = useMemo(
     () => (zoneChallengeMap[currentZoneId] ?? [])
@@ -421,8 +447,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     [currentZoneId, zoneSubgameMap],
   )
   const currentSubgameChallenges = useMemo(
-    () => currentZoneChallenges.filter((challenge) => getChallengeSubgameId(challenge) === currentSubgameId),
-    [currentSubgameId, currentZoneChallenges],
+    () => currentZoneChallenges.filter((challenge) => getCategoryChallengeSubgameId(category, challenge) === currentSubgameId),
+    [category, currentSubgameId, currentZoneChallenges],
   )
   const currentSubgame = useMemo(
     () => currentZoneSubgames.find((subgame) => subgame.id === currentSubgameId) ?? null,
@@ -433,8 +459,16 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     [category.mapHotspots, currentZoneId],
   )
   const [pendingIntroSubgameKey, setPendingIntroSubgameKey] = useState(
-    () => (persistedSession ? '' : getChallengeSubgameKey(currentChallenge)),
+    () => (persistedSession ? '' : getChallengeSubgameKey(category, currentChallenge)),
   )
+  const currentSubgameResolvedCount = currentSubgameChallenges.filter(
+    (challenge) => resolvedChallengeIds.includes(challenge.id),
+  ).length
+  const isCurrentSubgameStarted = currentSubgameResolvedCount > 0
+  const isCurrentSubgameComplete =
+    currentSubgameChallenges.length > 0 && currentSubgameResolvedCount === currentSubgameChallenges.length
+  const canContinueCurrentSubgame = hasWeightedScoring && isCurrentSubgameStarted && !isCurrentSubgameComplete
+  const newSubgamesLocked = !canAttemptQuiz() && !isComplete
 
   useEffect(() => {
     if (!shouldTriggerBridgeTransition || !roomTransition) {
@@ -545,14 +579,46 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       return
     }
 
-    registerQuizAttempt()
     const feedbackChallenge =
       category.challenges.find((challenge) => challenge.id === nextFeedback.attemptedChallengeId) ?? currentChallenge
+    const nextChallengeResults = {
+      ...challengeResults,
+      [nextFeedback.attemptedChallengeId]: nextFeedback,
+    }
+    const feedbackSubgameId = getCategoryChallengeSubgameId(category, feedbackChallenge)
+    const feedbackSubgameChallenges = category.challenges.filter(
+      (challenge) => getCategoryChallengeSubgameId(category, challenge) === feedbackSubgameId,
+    )
+    const isFirstAttemptInSubgame = feedbackSubgameChallenges.every(
+      (challenge) => !challengeResults[challenge.id],
+    )
+    const isSubgameResolved = feedbackSubgameChallenges.every(
+      (challenge) => Boolean(nextChallengeResults[challenge.id]),
+    )
     const awardedCredits = resolveChallengeCreditReward(feedbackChallenge, nextFeedback)
+    let consumeLife = !nextFeedback.isCorrect
+
+    if (hasWeightedScoring) {
+      if (isFirstAttemptInSubgame) {
+        registerQuizAttempt()
+      }
+
+      consumeLife = false
+
+      if (isSubgameResolved) {
+        const nextWeightedResult = computeWeightedRoomScore(
+          category,
+          new Map(Object.entries(nextChallengeResults)),
+        )
+        consumeLife = nextWeightedResult.groupResults[feedbackSubgameId]?.isPassing === false
+      }
+    } else {
+      registerQuizAttempt()
+    }
 
     applyChallengeFeedbackOutcome({
       awardedCredits,
-      consumeLife: !nextFeedback.isCorrect,
+      consumeLife,
     })
 
     if (nextFeedback.isCorrect) {
@@ -681,7 +747,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     archivedRoomReadOnly,
   ])
 
-  const challengeMapLocked = !canAttemptQuiz() && !isComplete
+  const challengeMapLocked = newSubgamesLocked && !canContinueCurrentSubgame
   const currentChallengeLocked =
     challengeMapLocked &&
     !hasFeedback &&
@@ -698,7 +764,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isImmersiveRoom &&
     isChallengeIntroVisible &&
     !isCurrentChallengeResolved &&
-    canAttemptQuiz() &&
+    (canAttemptQuiz() || canContinueCurrentSubgame) &&
     !isComplete
   const currentZoneIntroText =
     currentSubgame?.introText ||
@@ -855,8 +921,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     ? 'Nessuna informazione disponibile per questa prova.'
     : archivedRoomReadOnly
       ? 'Sala completata: consultazione soltanto.'
-    : challengeMapLocked
-      ? 'Hai finito i tentativi per oggi.'
+    : newSubgamesLocked && !canContinueCurrentSubgame
+      ? 'Hai finito i tentativi disponibili per nuovi sottogiochi oggi.'
       : ''
   const hasHint = Boolean(currentChallenge.hint)
   const canAffordHint = credits >= (currentChallenge.hintCost ?? 0)
@@ -869,13 +935,15 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     ? 'Nessun indizio disponibile per questa prova.'
     : archivedRoomReadOnly
       ? 'Sala completata: gli indizi non sono più acquistabili.'
-    : challengeMapLocked
-      ? 'Hai finito i tentativi per oggi.'
+    : newSubgamesLocked && !canContinueCurrentSubgame
+      ? 'Hai finito i tentativi disponibili per nuovi sottogiochi oggi.'
       : !isHintVisible && !canAffordHint
           ? 'Crediti insufficienti per usare l\'indizio.'
           : ''
-  const mapDisabled = roomInteractionsDisabled
-  const mapDisabledReason = challengeMapLocked ? 'Hai finito i tentativi per oggi.' : ''
+  const mapDisabled = isSubmitting || hasFeedback || newSubgamesLocked
+  const mapDisabledReason = newSubgamesLocked
+    ? 'Puoi concludere il sottogioco in corso, ma non iniziarne altri oggi.'
+    : ''
   const challengeInfoText = currentChallenge.infoText || currentChallenge.prompt || ''
   const canPurchaseHint =
     !roomInteractionsDisabled &&
@@ -885,13 +953,15 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const isHintModalOpen = hintModalChallengeId === currentChallengeId && !hasFeedback
   const isInfoModalOpen = infoModalChallengeId === currentChallengeId && !hasFeedback
   const isRoomMapOpen = isRoomMapVisible && !hasFeedback
-  const limitBanner = challengeMapLocked ? (
+  const limitBanner = newSubgamesLocked ? (
     <div className="rounded-[1.4rem] border border-amber-300/25 bg-amber-300/10 px-4 py-4">
       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-100/80">
         Limite raggiunto
       </p>
       <p className="mt-2 text-sm leading-6 text-amber-50/90">
-        Hai finito i tentativi per oggi.
+        {canContinueCurrentSubgame
+          ? 'Puoi concludere il sottogioco in corso, ma non iniziarne altri oggi.'
+          : 'Non hai piu tentativi o vite disponibili per oggi.'}
       </p>
     </div>
   ) : null
@@ -919,11 +989,19 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     const nextChallenge =
       category.challenges.find((challenge) => challenge.id === nextChallengeId) ?? null
 
+    if (
+      newSubgamesLocked &&
+      nextChallenge &&
+      getCategoryChallengeSubgameId(category, nextChallenge) !== currentSubgameId
+    ) {
+      return
+    }
+
     clearResultComment()
     dismissFeedback()
     setInfoModalChallengeId('')
     setHintModalChallengeId('')
-    setPendingIntroSubgameKey(getChallengeSubgameKey(nextChallenge))
+    setPendingIntroSubgameKey(getChallengeSubgameKey(category, nextChallenge))
     selectChallenge(nextChallengeId, { openResolvedFeedback: false })
     setIsRoomMapVisible(false)
   }
@@ -932,6 +1010,10 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     const targetSubgame = currentZoneSubgames.find((subgame) => subgame.id === subgameId)
 
     if (!targetSubgame) {
+      return
+    }
+
+    if (newSubgamesLocked && subgameId !== currentSubgameId) {
       return
     }
 
@@ -945,8 +1027,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     dismissFeedback()
     setInfoModalChallengeId('')
     setHintModalChallengeId('')
-    if (getChallengeSubgameId(currentChallenge) !== subgameId) {
-      setPendingIntroSubgameKey(getChallengeSubgameKey(nextChallenge))
+    if (getCategoryChallengeSubgameId(category, currentChallenge) !== subgameId) {
+      setPendingIntroSubgameKey(getChallengeSubgameKey(category, nextChallenge))
     }
     selectChallenge(nextChallengeId, { openResolvedFeedback: false })
   }
@@ -973,6 +1055,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const subgameNavigator = (
     <SubgameNavigator
       currentSubgameId={currentSubgameId}
+      lockedSubgameIds={
+        newSubgamesLocked
+          ? currentZoneSubgames
+            .map((subgame) => subgame.id)
+            .filter((subgameId) => subgameId !== currentSubgameId)
+          : []
+      }
       onSelect={handleSelectSubgame}
       resolvedChallengeIds={resolvedChallengeIds}
       subgames={currentZoneSubgames}
@@ -1150,8 +1239,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               clearResultComment()
               const nextChallenge = goToNextChallenge()
 
-              if (nextChallenge && getChallengeSubgameKey(nextChallenge) !== currentSubgameKey) {
-                setPendingIntroSubgameKey(getChallengeSubgameKey(nextChallenge))
+              if (nextChallenge && getChallengeSubgameKey(category, nextChallenge) !== currentSubgameKey) {
+                setPendingIntroSubgameKey(getChallengeSubgameKey(category, nextChallenge))
               }
             }}
           />

@@ -110,7 +110,7 @@ export default function SeriesFilmVictoryModal({
                 color: 'rgba(196, 181, 253, 0.72)',
               }}
             >
-              Artefatto ottenuto
+              Premio stanza ottenuto
             </span>
             <div
               style={{
@@ -334,7 +334,7 @@ export default function SeriesFilmVictoryModal({
                 textAlign: 'center',
               }}
             >
-              📧 Andrea ti ha inviato una mail con l'artefatto e una seconda mail con i premi reali sbloccati.
+              📧 Andrea ti ha inviato una mail con il premio di stanza e una seconda mail con i premi extra sbloccati.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
               {wonPrizeLabels.map((label) => (
@@ -374,7 +374,7 @@ export default function SeriesFilmVictoryModal({
                 margin: 0,
               }}
             >
-              📧 Andrea ti ha inviato la mail di superamento stanza con il Fotogramma Maledetto.
+              📧 Andrea ti ha inviato la mail con il premio di stanza: il Fotogramma Maledetto.
             </p>
           </div>
         )}
