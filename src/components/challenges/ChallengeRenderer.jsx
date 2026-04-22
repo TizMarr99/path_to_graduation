@@ -11,6 +11,8 @@ function ChallengeRenderer({
   onDraftAnswerChange,
   onSubmit,
   showHeader = true,
+  credits,
+  onBuyTime,
 }) {
   return (
     <div className="space-y-5">
@@ -44,6 +46,8 @@ function ChallengeRenderer({
         onChallengeStateChange,
         onDraftAnswerChange,
         onSubmit,
+        credits,
+        onBuyTime,
       })}
     </div>
   )

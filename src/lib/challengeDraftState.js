@@ -9,6 +9,7 @@ export function createChallengeRuntimeState(runtimeState = {}) {
     hitsterRevealedTrackCount: runtimeState.hitsterRevealedTrackCount ?? 0,
     speedrunCurrentIndex: runtimeState.speedrunCurrentIndex ?? 0,
     speedrunTimeRemaining: runtimeState.speedrunTimeRemaining ?? 0,
+    speedrunStarted: runtimeState.speedrunStarted ?? false,
   }
 }
 
@@ -179,7 +180,8 @@ export function createInitialRuntimeStateForChallenge(challenge) {
   if (challenge.type === 'speedrun_characters') {
     return createChallengeRuntimeState({
       speedrunCurrentIndex: 0,
-      speedrunTimeRemaining: challenge.timerSeconds ?? 30,
+      speedrunTimeRemaining: challenge.timerSeconds ?? 40,
+      speedrunStarted: false,
     })
   }
 

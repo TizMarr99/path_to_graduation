@@ -187,7 +187,7 @@ export default async function handler(req, res) {
                   <tr>
                     <td style="padding:16px 18px 14px 18px;">
                       <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#b3b3ff;">
-                        Artefatto ottenuto
+                        Premio stanza ottenuto
                       </p>
                       <h2 style="margin:0 0 8px 0;font-size:18px;line-height:1.4;color:#ffffff;">
                         Fotogramma Maledetto
@@ -218,7 +218,7 @@ export default async function handler(req, res) {
                   come prova del fatto che hai saputo guardare oltre la superficie.
                 </p>
                 <p style="margin:0 0 10px 0;font-size:13px;line-height:1.7;color:#9f9fb8;">
-                  Se hai conquistato anche premi reali, troverai un'altra mail dedicata con il riepilogo di ciò che hai sbloccato.
+                  Se hai sbloccato anche premi extra, troverai un'altra mail dedicata con il riepilogo di ciò che hai conquistato.
                 </p>
               </td>
             </tr>
@@ -253,7 +253,7 @@ export default async function handler(req, res) {
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'La Mostra <noreply@la-mostra-delle-ombre.vercel.app>',
       to: [playerEmail],
-      subject: 'Il tuo artefatto dalla Sala Serie & Film - Path to Graduation',
+      subject: 'Il tuo premio stanza dalla Sala Serie & Film - Path to Graduation',
       html: emailHtml,
     });
 
@@ -282,7 +282,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       emailId: emailData?.id,
-      userMessage: 'Email artefatto Serie & Film inviata!',
+      userMessage: 'Email premio stanza Serie & Film inviata!',
       sentAt: nowIso,
     });
   } catch (error) {
