@@ -30,10 +30,32 @@ export function createChallengeDraftAnswer() {
     speedrunAnswers: {},
     speedrunSkippedIds: [],
     imageOptionSelections: {},
+    imageOptionItemOrderIds: [],
+    imageOptionSourceOrderIds: [],
     columnOrders: [],
     columnBonusNames: {},
     cardSelections: {},
   }
+}
+
+function shuffleIds(ids = []) {
+  const nextIds = [...ids]
+
+  for (let index = nextIds.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    const currentValue = nextIds[index]
+    nextIds[index] = nextIds[swapIndex]
+    nextIds[swapIndex] = currentValue
+  }
+
+  return nextIds
+}
+
+function shouldRandomizeImageOptionChallenge(challenge) {
+  return challenge?.type === 'image_option_matching' && [
+    'got_matching',
+    'st_matching',
+  ].includes(challenge.quizSubType)
 }
 
 /**
@@ -91,9 +113,17 @@ export function createInitialDraftAnswerForChallenge(challenge) {
   }
 
   if (challenge.type === 'image_option_matching') {
+    const shouldRandomizeOrder = shouldRandomizeImageOptionChallenge(challenge)
+
     return {
       ...baseDraft,
       imageOptionSelections: {},
+      imageOptionItemOrderIds: shouldRandomizeOrder
+        ? shuffleIds(challenge.items.map((item) => item.id))
+        : [],
+      imageOptionSourceOrderIds: shouldRandomizeOrder
+        ? shuffleIds(challenge.options.map((option) => option.id))
+        : [],
     }
   }
 

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
 import { getRoomTransition } from '../lib/roomTransitions'
@@ -35,14 +36,6 @@ const slotThemes = {
     revealOverlay: 'rgba(103,232,249,0.12)',
     lockedOverlay: 'rgba(2,6,23,0.34)',
   },
-}
-
-const defeatedPortalImages = {
-  musica: [
-    '/images/rooms/musica-error1.png',
-    '/images/rooms/musica-error2.png',
-    '/images/rooms/musica-error4.png',
-  ],
 }
 
 function resolvePortalScoreLabel(progress, activeSession = null) {
@@ -87,8 +80,8 @@ function resolvePortalOutcome(progress, activeSession = null) {
   }
 }
 
-function resolveDefeatedPortalImage(categoryId, outcome) {
-  const categoryImages = defeatedPortalImages[categoryId] ?? []
+function resolveDefeatedPortalImage(category, outcome) {
+  const categoryImages = category?.wrongAnswerImageSrcs ?? []
 
   if (!categoryImages.length || !outcome) {
     return null
@@ -419,12 +412,12 @@ export default function ShadowHallPage() {
     canAttemptQuiz,
     clearPendingBridge,
     getCredits,
+    isMusicEnabled,
     playerState,
   } = usePlayerState()
   const { unlockedCategoryIds, roomProgress } = playerState
   const navigate = useNavigate()
   const dailyBlocked = !canAttemptQuiz()
-  const bgAudioRef = useRef(null)
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
   const pendingTargetCategory = pendingBridge ? getCategoryById(pendingBridge.targetCategoryId) : null
   const pendingSourceTransition = pendingBridge ? getRoomTransition(pendingBridge.sourceCategoryId) : null
@@ -432,6 +425,8 @@ export default function ShadowHallPage() {
   const pendingRoomCost = pendingTargetCategory?.buyAccessCost ?? 0
   const hasCreditsForPendingRoom = credits >= pendingRoomCost
   const [purchaseModalBridgeKey, setPurchaseModalBridgeKey] = useState(null)
+
+  useBackgroundAudio({ src: '/audio/shadow-hall-ambient.mp3', volume: 0.28 }, isMusicEnabled)
 
   const musicProgress = roomProgress['musica']
   const activeMusicSession = playerState.activeSession?.categoryId === 'musica'
@@ -506,20 +501,6 @@ export default function ShadowHallPage() {
       setPurchaseModalBridgeKey(activeBridgeKey)
     }
   }
-
-  useEffect(() => {
-    const audio = new Audio('/audio/shadow-hall-ambient.mp3')
-    audio.loop = true
-    audio.volume = 0.28
-    bgAudioRef.current = audio
-    void audio.play().catch(() => {})
-
-    return () => {
-      audio.pause()
-      audio.src = ''
-      bgAudioRef.current = null
-    }
-  }, [])
 
   return (
     <div
@@ -602,10 +583,10 @@ export default function ShadowHallPage() {
             : unlocked
           const staticBright = slot.categoryId === 'musica' && hasUnlockedMusicByScore
           const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot)
-          const defeatedImageSrc = defeated
-            ? resolveDefeatedPortalImage(slot.categoryId, slotOutcome)
-            : null
           const slotCategory = getCategoryById(slot.categoryId)
+          const defeatedImageSrc = defeated
+            ? resolveDefeatedPortalImage(slotCategory, slotOutcome)
+            : null
           const revealCost = !unlocked ? slotCategory?.buyAccessCost ?? null : null
           const canOpenRevealModal =
             pendingBridge?.bridgeCompletedAt &&

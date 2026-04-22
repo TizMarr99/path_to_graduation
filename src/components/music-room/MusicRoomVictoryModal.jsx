@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { usePlayerState } from '../../hooks/usePlayerState'
 
 const VICTORY_AUDIO_SRC = '/audio/music-prize-won.mp3'
 const VICTORY_AUDIO_START_TIME = 10
@@ -14,11 +15,16 @@ export default function MusicRoomVictoryModal({ category, sessionCorrectCount, s
   const audioRef = useRef(null)
   const fadeIntervalRef = useRef(null)
   const [isClosing, setIsClosing] = useState(false)
+  const { isMusicEnabled } = usePlayerState()
 
   const guardian = category.characters?.guardian
   const inquisitor = category.characters?.inquisitor
 
   useEffect(() => {
+    if (!isMusicEnabled) {
+      return undefined
+    }
+
     const audio = new Audio(VICTORY_AUDIO_SRC)
     audio.preload = 'auto'
     audio.volume = VICTORY_AUDIO_VOLUME
@@ -53,7 +59,7 @@ export default function MusicRoomVictoryModal({ category, sessionCorrectCount, s
         audioRef.current = null
       }
     }
-  }, [])
+  }, [isMusicEnabled])
 
   function fadeOutVictoryAudio(onComplete) {
     const audio = audioRef.current

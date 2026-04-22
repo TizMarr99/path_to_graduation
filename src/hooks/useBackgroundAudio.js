@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * Plays a looping background audio track.
@@ -17,6 +17,9 @@ export function useBackgroundAudio(
   const startTimeRef = useRef(startTime)
   const endTimeRef = useRef(endTime)
   const audioRef = useRef(null)
+  const [isPageVisible, setIsPageVisible] = useState(
+    () => (typeof document === 'undefined' ? true : document.visibilityState === 'visible'),
+  )
 
   // Keep refs current so event handlers always read fresh values.
   useEffect(() => {
@@ -26,6 +29,22 @@ export function useBackgroundAudio(
   useEffect(() => {
     endTimeRef.current = endTime
   }, [endTime])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return undefined
+    }
+
+    function handleVisibilityChange() {
+      setIsPageVisible(document.visibilityState === 'visible')
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
 
   // Create / replace the Audio element whenever src changes.
   useEffect(() => {
@@ -63,13 +82,13 @@ export function useBackgroundAudio(
     const audio = audioRef.current
     if (!audio) return
 
-    if (isPlaying) {
+    if (isPlaying && isPageVisible) {
       audio.currentTime = startTimeRef.current
       void audio.play().catch(() => {})
     } else {
       audio.pause()
     }
-  }, [isPlaying, src])
+  }, [isPageVisible, isPlaying, src])
 
   // Keep volume in sync without recreating the element.
   useEffect(() => {

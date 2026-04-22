@@ -58,6 +58,29 @@ function findNextUnresolvedChallengeId(challenges, resolvedChallengeIds, current
   )
 }
 
+function resolveInitialDraftAnswer(challenge, persistedDraftAnswer = null) {
+  const initialDraft = createInitialDraftAnswerForChallenge(challenge)
+
+  if (!persistedDraftAnswer) {
+    return initialDraft
+  }
+
+  return {
+    ...initialDraft,
+    ...persistedDraftAnswer,
+    imageOptionSelections:
+      persistedDraftAnswer.imageOptionSelections ?? initialDraft.imageOptionSelections,
+    imageOptionItemOrderIds:
+      persistedDraftAnswer.imageOptionItemOrderIds?.length
+        ? persistedDraftAnswer.imageOptionItemOrderIds
+        : initialDraft.imageOptionItemOrderIds,
+    imageOptionSourceOrderIds:
+      persistedDraftAnswer.imageOptionSourceOrderIds?.length
+        ? persistedDraftAnswer.imageOptionSourceOrderIds
+        : initialDraft.imageOptionSourceOrderIds,
+  }
+}
+
 /**
  * @param {import('../types/challenge').Category | null} category
  * @param {string} [preferredChallengeId]
@@ -76,7 +99,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     () => persistedSession?.challengeResults ?? createChallengeResultMap(),
   )
   const [draftAnswer, setDraftAnswer] = useState(() =>
-    persistedSession?.draftAnswer ?? createInitialDraftAnswerForChallenge(initialChallenge),
+    resolveInitialDraftAnswer(initialChallenge, persistedSession?.draftAnswer),
   )
   const [challengeState, setChallengeState] = useState(() =>
     persistedSession?.challengeState ?? createInitialRuntimeStateForChallenge(initialChallenge),

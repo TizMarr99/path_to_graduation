@@ -6,7 +6,7 @@ const assetLabels = {
   video: 'Video',
 }
 
-function ChallengeAssetGallery({ assets = [], onAudioPlay }) {
+function ChallengeAssetGallery({ assets = [], onAudioPlay, imageClassName = '' }) {
   const [expandedAsset, setExpandedAsset] = useState(null)
   const isSingleAsset = assets.length === 1
 
@@ -44,7 +44,10 @@ function ChallengeAssetGallery({ assets = [], onAudioPlay }) {
                   >
                     <img
                       alt={asset.alt ?? ''}
-                      className="h-56 w-full rounded-xl object-cover transition hover:scale-[1.01]"
+                      className={[
+                        'w-full rounded-xl transition hover:scale-[1.01]',
+                        imageClassName || 'h-44 bg-slate-950 object-contain sm:h-52',
+                      ].join(' ')}
                       src={asset.src}
                     />
                     <span className="mt-3 block text-left text-xs uppercase tracking-[0.24em] text-cyan-300/80">

@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import TypewriterText from '../home/TypewriterText.jsx'
 import '../../components/home/vip-home.css'
 import { useBackgroundAudio } from '../../hooks/useBackgroundAudio'
+import { usePlayerState } from '../../hooks/usePlayerState'
 import { getRoomCharacterBySpeaker, getRoomNarrativeBySpeaker } from '../../lib/roomSpeakers'
 
 const HOLD_AFTER_TYPEWRITER_MS = 2200
 const CROSSFADE_DURATION_MS = 700
 
-function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role, tone = 'gold' }) {
+function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role, tone = 'gold', objectPosition = 'center top' }) {
   const [src, setSrc] = useState(imageSrc)
 
   useEffect(() => {
@@ -40,6 +41,7 @@ function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role,
             }
           }}
           src={src}
+          style={{ objectPosition }}
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_38%,rgba(0,0,0,0.42)_100%)]" />
       </div>
@@ -54,13 +56,21 @@ function NarrativePortrait({ compact = false, imageSrc, fallbackSrc, name, role,
 function MusicRoomNarrative({ category, onComplete }) {
   const timeoutIdsRef = useRef([])
   const [scene, setScene] = useState('guardian')
+  const { isMusicEnabled } = usePlayerState()
 
-  useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, true)
+  useBackgroundAudio(
+    { src: category.ambientAudioSrc || '/audio/bg_music_room.mp3', volume: 0.15 },
+    isMusicEnabled,
+  )
 
   const guardian = getRoomCharacterBySpeaker(category.characters, 'guardian')
   const inquisitor = getRoomCharacterBySpeaker(category.characters, 'inquisitor')
   const guardianMsg = getRoomNarrativeBySpeaker(category.introNarrative, 'guardian')?.message ?? ''
   const inquisitorMsg = getRoomNarrativeBySpeaker(category.introNarrative, 'inquisitor')?.message ?? ''
+  const introHeadline = category.introHeadline ?? 'Le frequenze ti accolgono.'
+  const introLead =
+    category.introLead ??
+    "In questa sala ti attendono due presenze: il guardiano custodisce il passaggio, l'inquisitore ne mette alla prova il coraggio."
 
   function scheduleTimeout(callback, delay) {
     const id = setTimeout(() => {
@@ -113,10 +123,10 @@ function MusicRoomNarrative({ category, onComplete }) {
               {category.title}
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight text-amber-50 sm:text-4xl lg:text-[2.7rem]">
-              Le frequenze ti accolgono.
+              {introHeadline}
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-amber-50/68">
-              In questa sala ti attendono due presenze: il guardiano custodisce il passaggio, l'inquisitore ne mette alla prova il coraggio.
+              {introLead}
             </p>
           </div>
         </div>
@@ -156,6 +166,7 @@ function MusicRoomNarrative({ category, onComplete }) {
                     imageSrc={guardian.imageSrc}
                     fallbackSrc={guardian.fallbackImageSrc}
                     name={guardian.name}
+                    objectPosition={guardian.portraitObjectPosition}
                     role={guardian.role}
                     tone={guardian.tone}
                   />
@@ -172,6 +183,7 @@ function MusicRoomNarrative({ category, onComplete }) {
                     imageSrc={inquisitor.imageSrc}
                     fallbackSrc={inquisitor.fallbackImageSrc}
                     name={inquisitor.name}
+                    objectPosition={inquisitor.portraitObjectPosition}
                     role={inquisitor.role}
                     tone={inquisitor.tone ?? 'silver'}
                   />
@@ -213,6 +225,7 @@ function MusicRoomNarrative({ category, onComplete }) {
                   imageSrc={guardian.imageSrc}
                   fallbackSrc={guardian.fallbackImageSrc}
                   name={guardian.name}
+                  objectPosition={guardian.portraitObjectPosition}
                   role={guardian.role}
                   tone={guardian.tone}
                 />
@@ -229,6 +242,7 @@ function MusicRoomNarrative({ category, onComplete }) {
                   imageSrc={inquisitor.imageSrc}
                   fallbackSrc={inquisitor.fallbackImageSrc}
                   name={inquisitor.name}
+                  objectPosition={inquisitor.portraitObjectPosition}
                   role={inquisitor.role}
                   tone={inquisitor.tone ?? 'silver'}
                 />

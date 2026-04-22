@@ -21,6 +21,7 @@ function HomePage() {
     hasVipAccess,
     isHydrating,
     isLoggingIn,
+    isMusicEnabled,
     login,
     shouldShowHomeIntro,
   } = usePlayerState()
@@ -31,7 +32,7 @@ function HomePage() {
   const [isLoginLeaving, setIsLoginLeaving] = useState(false)
   const [isVideoLeaving, setIsVideoLeaving] = useState(false)
 
-  useBackgroundAudio({ src: '/audio/bg_intro.mp3', volume: 0.15 }, stage === 'narrative')
+  useBackgroundAudio({ src: '/audio/bg_intro.mp3', volume: 0.15 }, stage === 'narrative' && isMusicEnabled)
 
   function scheduleTimeout(callback, delay) {
     const timeoutId = window.setTimeout(() => {
@@ -139,7 +140,7 @@ function HomePage() {
       ) : null}
 
       {stage === 'video' ? (
-        <VipIntroVideo isLeaving={isVideoLeaving} onEnded={handleVideoEnded} />
+          <VipIntroVideo isAudioEnabled={isMusicEnabled} isLeaving={isVideoLeaving} onEnded={handleVideoEnded} />
       ) : null}
 
       {stage === 'narrative' ? (

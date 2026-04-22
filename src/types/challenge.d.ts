@@ -34,7 +34,7 @@ export interface CategoryFear {
   name: string
   icon?: string
   description: string
-  sfxSrc?: string
+  sfxSrc?: string | string[]
 }
 
 export interface RewardArtifact {
@@ -146,11 +146,14 @@ export interface HitsterTrack {
 export interface ChallengeBase<T extends ChallengeType> {
   id: string
   zoneId?: string
+  quizSubType?: string
   difficulty: ChallengeDifficulty
   type: T
   title?: string
   prompt: string
+  subgameIntroText?: string
   infoText?: string
+  roundMusicSrc?: string
   assets: ChallengeAsset[]
   hint: string
   explanation: string
@@ -333,6 +336,8 @@ export interface ChallengeDraftAnswer {
   speedrunAnswers: Record<string, string>
   speedrunSkippedIds: string[]
   imageOptionSelections: Record<string, string>
+  imageOptionItemOrderIds: string[]
+  imageOptionSourceOrderIds: string[]
   columnOrders: string[][]
   columnBonusNames: Record<string, string>
   cardSelections: Record<string, { number: string; suit: string }>
@@ -366,10 +371,14 @@ export interface Category {
   title: string
   ghost: string
   description: string
+  introHeadline?: string
+  introLead?: string
   unlockCost: number
   buyAccessCost?: number
   backgroundImage?: string
+  ambientAudioSrc?: string
   mapImage?: string
+  wrongAnswerImageSrcs?: string[]
   mapHotspots?: CategoryMapHotspot[]
   fear?: CategoryFear | null
   rewardArtifact?: RewardArtifact | null
@@ -449,6 +458,7 @@ export interface CategoryCharacterInfo {
   role: string
   imageSrc: string
   fallbackImageSrc?: string
+  portraitObjectPosition?: string
   tone: 'gold' | 'silver'
 }
 
@@ -486,13 +496,16 @@ export interface CategoryCharacterComments {
 export interface RawChallengeBase {
   id: string
   zoneId?: string
+  quizSubType?: string
   difficulty: ChallengeDifficulty
   type?: ChallengeType
   mode?: 'multiple_choice' | 'free_text'
   title?: string
   prompt?: string
   introText?: string
+  subgameIntroText?: string
   infoText?: string
+  roundMusicSrc?: string
   assets?: Array<string | ChallengeAsset>
   hint?: string
   explanation?: string
@@ -756,10 +769,14 @@ export interface RawCategory {
   title: string
   ghost: string
   description: string
+  introHeadline?: string
+  introLead?: string
   unlockCost?: number
   buyAccessCost?: number
   backgroundImage?: string
+  ambientAudioSrc?: string
   mapImage?: string
+  wrongAnswerImageSrcs?: string[]
   mapHotspots?: CategoryMapHotspot[]
   fear?: CategoryFear | null
   rewardArtifact?: RewardArtifact | null

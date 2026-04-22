@@ -149,7 +149,10 @@ function SpeedrunCharactersChallenge({
 
         {currentCharacter && (
           <div className="space-y-3">
-            <ChallengeAssetGallery assets={currentCharacter.assets} />
+            <ChallengeAssetGallery
+              assets={currentCharacter.assets}
+              imageClassName="h-44 rounded-xl object-contain bg-slate-950 sm:h-52"
+            />
 
             <p className="text-center text-sm font-medium text-slate-400">
               {currentCharacter.showName}

@@ -5,8 +5,16 @@
     "title": "Sala delle Frequenze",
     "ghost": "Il Silenzio dei film horror",
     "description": "Una sala di risonanze, archivi sonori e tracce trattenute. Il Guardiano custodisce gli indizi; l'Inquisitore li piega in echi contraddittori.",
+    "introHeadline": "Le frequenze ti accolgono.",
+    "introLead": "In questa sala ti attendono due presenze: il guardiano custodisce il passaggio, l'inquisitore ne mette alla prova il coraggio.",
     "backgroundImage": "/images/rooms/musica-bg.png",
+    "ambientAudioSrc": "/audio/bg_music_room.mp3",
     "mapImage": "/images/rooms/musica-map.png",
+    "wrongAnswerImageSrcs": [
+      "/images/rooms/musica-error1.png",
+      "/images/rooms/musica-error2.png",
+      "/images/rooms/musica-error4.png"
+    ],
     "fear": {
       "id": "horror-musica",
       "name": "Ombra dell'Esorcismo",
@@ -354,7 +362,7 @@
         "answerSlots": 3,
         "minimumCorrectGroups": 2,
         "placeholder": "Inserisci un cantante",
-        "hint": "Uno dei tre è scozzese ed è noto per brani strappalacrime. Un altro e un rapper italiano. Il terzo e un cantautore dai capelli rossi.",
+          "hint": "Uno dei tre è scozzese ed è noto per brani strappalacrime. Un altro è un rapper italiano. Il terzo è un cantautore dai capelli rossi.",
         "explanation": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
         "speaker": "neutral",
         "creditReward": 10,
@@ -377,7 +385,7 @@
         "solutionText": "Anche se ti mancano, non ti mancano come ti manco io",
         "placeholder": "Completa qui il verso",
         "hint": "Il verso gioca su un doppio significato della parola 'mancano'. Pensa a qualcuno che sente la mancanza più di altri.",
-        "explanation": "Il verso completo e 'Anche se ti mancano, non ti mancano come ti manco io' — un gioco di parole tra assenza e desiderio.",
+        "explanation": "Il verso completo è 'Anche se ti mancano, non ti mancano come ti manco io' — un gioco di parole tra assenza e desiderio.",
         "speaker": "inquisitor",
         "creditReward": 10,
         "hintCost": 15,
@@ -444,7 +452,7 @@
         "difficulty": "easy",
         "type": "free_text",
         "title": "Canzone al contrario",
-        "prompt": "La canzone e riprodotta al contrario: indovina il titolo.",
+        "prompt": "La canzone è riprodotta al contrario: indovina il titolo.",
         "assets": [
           {
             "kind": "audio",
@@ -480,7 +488,7 @@
           "Ordinary"
         ],
         "placeholder": "Titolo del brano",
-        "hint": "Il titolo è una singola parola inglese. L'artista non e mainstream.",
+        "hint": "Il titolo è una singola parola inglese. L'artista non è mainstream.",
         "explanation": "'Ordinary' — un brano dal tono rilassato. Invertito, il ritmo della voce resta il miglior indizio per riconoscerlo.",
         "speaker": "guardian",
         "creditReward": 10,
@@ -719,7 +727,7 @@
           "hitster-track-4"
         ],
         "hint": "Metti i brani in ordine dal più vecchio al più recente. Il pezzo dei Coldplay è precedente al 2010.",
-        "explanation": "L'ordine corretto e: Viva La Vida (2008), Rolling in the Deep (2010), 7 Years (2015), That's What I Like (2016), Bad Guy (2019).",
+        "explanation": "L'ordine corretto è: Viva La Vida (2008), Rolling in the Deep (2010), 7 Years (2015), That's What I Like (2016), Bad Guy (2019).",
         "speaker": "neutral",
         "creditReward": 15,
         "hintCost": 15,
@@ -735,14 +743,22 @@
     "title": "Sala delle Serie e dei Film",
     "ghost": "Il Clown del Corridoio",
     "description": "Una sala di schermi spenti e poltrone vuote, dove le immagini di clown inquietanti e bambole assassine si confondono con i ricordi di jump scare inaspettati. Il Guardiano illumina le scene; l'Inquisitore le distorce in incubi vividi.",
+    "introHeadline": "Le immagini ti osservano.",
+    "introLead": "In questa sala gli schermi custodiscono memorie e inganni: il guardiano illumina la scena, l'inquisitore prova a confonderti.",
     "backgroundImage": "/images/rooms/serie-film-bg.png",
+    "ambientAudioSrc": "/audio/bg_serie_film_room.mp3",
     "mapImage": "/images/rooms/serie-film-map.png",
+    "wrongAnswerImageSrcs": [
+      "/images/rooms/serie-film-error1.jpg",
+      "/images/rooms/serie-film-error2.png",
+      "/images/rooms/serie-film-error3.png"
+    ],
     "fear": {
       "id": "horror-serie-film",
       "name": "La Bambola senza Occhi",
       "icon": "🎈",
       "description": "Risate distorte di clown, bambole che si muovono da sole, schermi che si accendono nel buio.",
-      "sfxSrc": "/audio/horror-clown-laugh.mp3"
+      "sfxSrc": "/audio/pennywise.mp3"
     },
     "rewardArtifact": {
       "type": "hint",
@@ -1011,6 +1027,7 @@
         "role": "Il Guardiano",
         "imageSrc": "/images/benedict-bridgerton.png",
         "fallbackImageSrc": "/images/benedict-bridgerton.png",
+        "portraitObjectPosition": "center 1.1rem",
         "tone": "purple"
       },
       "inquisitor": {
@@ -1352,6 +1369,7 @@
         "quizSubType": "face_morph",
         "difficulty": "hard",
         "title": "Face Morph Serie TV 1",
+        "subgameIntroText": "I volti si sovrappongono e cancellano i confini. Guarda il morph con attenzione e separa i personaggi nascosti nella stessa immagine.",
         "introText": "Tre personaggi sono stati fusi in un'unica immagine. Riconoscili tutti.",
         "assets": [
           {
@@ -1436,6 +1454,7 @@
         "quizSubType": "emoji_guess",
         "difficulty": "medium",
         "title": "Emoji Quiz 1",
+        "subgameIntroText": "Dietro una sequenza di emoji si nasconde un titolo preciso. Decifra il rebus visivo e trasformalo nel film o nella serie corretta.",
         "prompt": "Indovina il film dagli emoji: 🌀💤🌆🪀",
         "acceptedAnswers": [
           "Inception"
@@ -1484,6 +1503,7 @@
         "quizSubType": "puzzle",
         "difficulty": "hard",
         "title": "Puzzle Film 1",
+        "subgameIntroText": "Qui i titoli non si mostrano: si lasciano intuire da frasi, indizi e descrizioni oblique. Leggi bene il rebus e risali all'opera giusta.",
         "prompt": "\"Tutti hanno la stessa quantità. I ricchi la comprano, i poveri la vendono. Quando finisce, muori.\" Quale film è?",
         "acceptedAnswers": [
           "In Time"
@@ -1518,7 +1538,7 @@
         "acceptedAnswers": [
           "Iron Man"
         ],
-        "hint": "La frase e diventata iconica nell'MCU, ma il dettaglio decisivo resta la caverna.",
+        "hint": "La frase è diventata iconica nell'MCU, ma il dettaglio decisivo resta la caverna.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -1536,7 +1556,7 @@
           "3 Body Problem",
           "Three body problem"
         ],
-        "hint": "Il cuore del rebus non e 'stanno arrivando', ma il sistema cosmico impossibile descritto all'inizio.",
+        "hint": "Il cuore del rebus non è 'stanno arrivando', ma il sistema cosmico impossibile descritto all'inizio.",
         "hintCost": 12,
         "creditReward": 10
       },
@@ -1562,9 +1582,11 @@
         "type": "image_option_matching",
         "quizSubType": "got_matching",
         "difficulty": "medium",
-        "title": "GOT: Motti e Casate",
+        "title": "Game of Thrones",
         "introText": "Associa ogni motto di Game of Thrones alla sua casata.",
-        "minimumCorrectPairs": 4,
+        "roundMusicSrc": "/serie-film/associazioni/got/got.mp3",
+        "infoText": "Associa i motti alle casate selezionando un motto e assegnandolo all'immagine corretta.",
+        "minimumCorrectPairs": 6,
         "items": [
           {
             "id": "winter-is-coming",
@@ -1645,8 +1667,10 @@
         "type": "column_reorder_matching",
         "quizSubType": "dark_matching",
         "difficulty": "hard",
-        "title": "Dark: Versioni Temporali",
+        "title": "Dark",
         "introText": "Associa le versioni young, adult e old di ciascun personaggio di Dark.",
+        "roundMusicSrc": "/serie-film/associazioni/dark/dark.mp3",
+        "infoText": "Ricostruisci orizzontalmente i set temporali young, adult e old di ciascun personaggio, includendo anche gli slot non disponibili.",
         "columns": [
           "Young",
           "Adult",
@@ -1699,6 +1723,42 @@
             "bonusNameAcceptedAnswers": [
               "Helge Doppler",
               "Helge"
+            ]
+          },
+          {
+            "id": "egon",
+            "correctOrder": [
+              "egon_empty_young",
+              "egon_adult",
+              "egon_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Egon",
+              "Egon Tiedemann"
+            ]
+          },
+          {
+            "id": "elisabeth",
+            "correctOrder": [
+              "elisabeth_young",
+              "elisabeth_adult",
+              "elisabeth_empty_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Elisabeth",
+              "Elisabeth Doppler"
+            ]
+          },
+          {
+            "id": "hannah",
+            "correctOrder": [
+              "hannah_young",
+              "hannah_adult",
+              "hannah_empty_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Hannah",
+              "Hannah Kahnwald"
             ]
           }
         ],
@@ -1822,34 +1882,118 @@
                 "src": "/serie-film/associazioni/dark/helge_old.jpg"
               }
             ]
+          },
+          {
+            "id": "egon_empty_young",
+            "column": 0,
+            "assets": []
+          },
+          {
+            "id": "egon_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/egon_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "egon_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/egon_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "elisabeth_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/elisabeth_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "elisabeth_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/elisabeth_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "elisabeth_empty_old",
+            "column": 2,
+            "assets": []
+          },
+          {
+            "id": "hannah_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/hannah_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "hannah_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/hannah_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "hannah_empty_old",
+            "column": 2,
+            "assets": []
           }
         ],
         "shuffledColumnOrders": [
           [
             "helge_young",
+            "hannah_young",
+            "egon_empty_young",
             "claudia_young",
+            "elisabeth_young",
             "ines_young",
             "ulrich_young"
           ],
           [
             "ines_adult",
+            "egon_adult",
             "claudia_adult",
+            "hannah_adult",
             "ulrich_adult",
+            "elisabeth_adult",
             "helge_adult"
           ],
           [
             "claudia_old",
             "helge_old",
+            "elisabeth_empty_old",
+            "egon_old",
             "ulrich_old",
-            "ines_old"
+            "ines_old",
+            "hannah_empty_old"
           ]
         ],
         "lockedColumns": [
           1
         ],
-        "minimumCorrectRows": 3,
+        "minimumCorrectRows": 5,
         "bonusNameCredit": 3,
-        "hint": "Qui il trucco non e riconoscere tutti subito, ma inseguire i tratti che il tempo non riesce a cancellare del tutto.",
+        "hint": "Qui il trucco non è riconoscere tutti subito, ma inseguire i tratti che il tempo non riesce a cancellare del tutto.",
         "hintCost": 10,
         "creditReward": 15
       },
@@ -1861,6 +2005,7 @@
         "difficulty": "hard",
         "title": "Alice in Borderland: Giochi e Carte",
         "introText": "Associa ogni gioco di Alice in Borderland alla carta corrispondente (numero e seme).",
+        "roundMusicSrc": "/serie-film/associazioni/aib/aib.mp3",
         "items": [
           {
             "id": "jack-of-hearts",
@@ -1944,7 +2089,7 @@
           "clubs",
           "spades"
         ],
-        "minimumCorrect": 3,
+        "minimumCorrect": 4,
         "hint": "Inizia dal seme, non dal numero: in Alice in Borderland ogni seme racconta il tipo di gioco prima ancora del valore della carta.",
         "hintCost": 12,
         "creditReward": 12
@@ -1955,8 +2100,9 @@
         "type": "image_option_matching",
         "quizSubType": "st_matching",
         "difficulty": "medium",
-        "title": "Stranger Things: Scene e Canzoni",
+        "title": "Stranger Things",
         "introText": "Associa ogni scena iconica di Stranger Things alla canzone che accompagnava quel momento.",
+        "infoText": "Seleziona una traccia audio e assegnala alla scena corretta con un click sull'immagine.",
         "minimumCorrectPairs": 5,
         "items": [
           {
@@ -2109,7 +2255,7 @@
             ]
           }
         ],
-        "hint": "Una traccia esplode in energia rock — perfetta per una scena di sfogo e ribellione; un'altra è fragile e sospesa, scelta per i momenti più̀ cupi e introspettivi.",
+        "hint": "Una traccia esplode in energia rock — perfetta per una scena di sfogo e ribellione; un'altra è fragile e sospesa, scelta per i momenti più cupi e introspettivi.",
         "hintCost": 15,
         "creditReward": 10
       },
@@ -2119,8 +2265,11 @@
         "type": "column_reorder_matching",
         "quizSubType": "love_matching",
         "difficulty": "medium",
-        "title": "Grey's Anatomy: Coppie Iconiche",
+        "title": "Grey's Anatomy",
+        "subgameIntroText": "I legami qui contano quanto le immagini. Ricomponi le coppie iconiche seguendo chimica, storia e memoria delle relazioni.",
         "introText": "Riordina la colonna sinistra per ricomporre le coppie iconiche di Grey's Anatomy.",
+        "roundMusicSrc": "/serie-film/love/grey_s_anatomy/grey_s_anatomy.mp3",
+        "infoText": "Riordina orizzontalmente i personaggi per ricomporre le coppie iconiche della serie.",
         "columns": [
           "Personaggio",
           "Partner"
@@ -2283,7 +2432,7 @@
             "arizona"
           ]
         ],
-        "minimumCorrectRows": 4,
+        "minimumCorrectRows": 5,
         "bonusNameCredit": 0,
         "hint": "Non pensare ai flirt: qui contano le coppie che hanno segnato stagioni intere e lasciato una ferita netta nella serie.",
         "hintCost": 12,
@@ -2295,8 +2444,11 @@
         "type": "column_reorder_matching",
         "quizSubType": "love_matching",
         "difficulty": "medium",
-        "title": "Bridgerton: Coppie Iconiche",
+        "title": "Bridgerton",
+        "subgameIntroText": "I legami qui contano quanto le immagini. Ricomponi le coppie iconiche seguendo chimica, storia e memoria delle relazioni.",
         "introText": "Riordina la colonna sinistra per ricomporre le coppie iconiche di Bridgerton.",
+        "roundMusicSrc": "/serie-film/love/bridgerton/bridgerton.mp3",
+        "infoText": "Riordina orizzontalmente i personaggi per ricomporre le coppie iconiche della serie.",
         "columns": [
           "Personaggio",
           "Partner"
@@ -2459,7 +2611,7 @@
             "charlotte"
           ]
         ],
-        "minimumCorrectRows": 4,
+        "minimumCorrectRows": 5,
         "bonusNameCredit": 0,
         "hint": "Ragiona per stagioni e per centralità narrativa: le coppie principali di Bridgerton si riconoscono prima dal periodo che dai volti.",
         "hintCost": 12,
@@ -2672,7 +2824,7 @@
           "Guardiani della Galassia",
           "Guardians of the Galaxy"
         ],
-        "hint": "Qui il tono è avventuroso è spaziale, ma più scanzonato che epico.",
+        "hint": "Qui il tono è avventuroso e spaziale, ma più scanzonato che epico.",
         "hintCost": 12,
         "creditReward": 10
       },
@@ -2747,7 +2899,7 @@
         "quizSubType": "intruder",
         "difficulty": "medium",
         "title": "L'Intruso — Dynasty",
-        "prompt": "Trova l'intruso: chi di questi personaggi NON appartiene alla famiglia Carrington?",
+        "prompt": "Trova l'intruso: chi di questi personaggi di Dynasty NON appartiene alla famiglia Carrington?",
         "explanation": "Monica (e suo fratello Jeff) sono dei Colby. Fallon, Steven e Adam sono tutti figli di Blake Carrington.",
         "items": [
           {
@@ -2779,7 +2931,7 @@
         "quizSubType": "intruder",
         "difficulty": "hard",
         "title": "L'Intruso — Hunger Games",
-        "prompt": "Trova la coppia Nome–Distretto ERRATA:",
+        "prompt": "Trova la coppia Nome–Distretto di Hunger Games ERRATA:",
         "explanation": "Gloss appartiene al Distretto 1, non al 2. Il Distretto 2 ha personaggi come Cato e Clove.",
         "items": [
           {
@@ -2848,7 +3000,7 @@
           "Black Pearl",
           "Perla Nera"
         ],
-        "hint": "Non e una nave qualsiasi: il nome richiama il colore e qualcosa di prezioso.",
+        "hint": "Non è una nave qualsiasi: il nome richiama il colore e qualcosa di prezioso.",
         "hintCost": 18,
         "creditReward": 8
       },

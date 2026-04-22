@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom'
+import GlobalMusicToggle from './components/GlobalMusicToggle.jsx'
 import { usePlayerState } from './hooks/usePlayerState'
 import BridgePage from './pages/BridgePage.jsx'
 import DevPage from './pages/DevPage.jsx'
@@ -85,6 +86,7 @@ function ProtectedRoute({ children, requireAdmin = false }) {
 function App() {
   return (
     <BrowserRouter>
+      <GlobalMusicToggle />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route

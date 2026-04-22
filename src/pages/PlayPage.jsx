@@ -79,6 +79,40 @@ const HESITATION_TIME_THRESHOLDS_MS = {
   default: 50_000,
 }
 
+const subgameLabels = {
+  speedrun_characters: 'Speedrun',
+  face_morph: 'Face morph',
+  emoji_guess: 'Emoji',
+  puzzle: 'Puzzle',
+  got_matching: 'Game of Thrones',
+  dark_matching: 'Dark',
+  aib_matching: 'Alice in Borderland',
+  st_matching: 'Stranger Things',
+  love_matching: 'Love matching',
+  citazioni: 'Citazioni',
+  colonna_sonora: 'Colonne sonore',
+  intruder: 'Intrusi',
+  domande_aperte: 'Domande aperte',
+}
+
+function getChallengeSubgameId(challenge) {
+  return challenge?.quizSubType || challenge?.type || ''
+}
+
+function getChallengeSubgameKey(challenge) {
+  if (!challenge?.zoneId) {
+    return ''
+  }
+
+  return `${challenge.zoneId}::${getChallengeSubgameId(challenge)}`
+}
+
+function getChallengeSubgameLabel(challenge) {
+  const subgameId = getChallengeSubgameId(challenge)
+
+  return subgameLabels[subgameId] ?? challenge?.title ?? challengeTypeLabels[challenge?.type] ?? 'Sottogioco'
+}
+
 function DailyLimitOverlay() {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center rounded-[1.75rem] bg-slate-950/85 backdrop-blur-sm">
@@ -97,11 +131,6 @@ function DailyLimitOverlay() {
   )
 }
 
-const ERROR_IMAGES = [
-  '/images/rooms/musica-error1.png',
-  '/images/rooms/musica-error2.png',
-  '/images/rooms/musica-error4.png',
-]
 const ERROR_OPACITIES = [0.38, 0.52, 0.66]
 
 function ZoneChallengeNavigator({
@@ -109,6 +138,7 @@ function ZoneChallengeNavigator({
   challenges,
   onSelect,
   resolvedChallengeIds,
+  label = 'Prove della zona',
   vertical = false,
 }) {
   if (challenges.length <= 1) {
@@ -125,7 +155,7 @@ function ZoneChallengeNavigator({
         'text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-slate-300/75',
         vertical ? 'mb-1 text-center' : 'mr-2',
       ].join(' ')}>
-        Prove della zona
+        {label}
       </span>
       {challenges.map((challenge, index) => {
         const isActive = challenge.id === currentChallengeId
@@ -141,7 +171,7 @@ function ZoneChallengeNavigator({
               isActive
                 ? 'border-amber-200/70 bg-amber-300/18 text-amber-50'
                 : isResolved
-                  ? 'border-emerald-300/35 bg-emerald-400/10 text-emerald-100 hover:border-emerald-200/55'
+                  ? 'border-rose-300/35 bg-rose-400/10 text-rose-100 hover:border-rose-200/55'
                   : 'border-white/12 bg-white/5 text-slate-100 hover:border-cyan-300/45 hover:text-cyan-100',
             ].join(' ')}
             onClick={() => onSelect(challenge.id)}
@@ -152,6 +182,46 @@ function ZoneChallengeNavigator({
           </button>
         )
       })}
+    </div>
+  )
+}
+
+function SubgameNavigator({ currentSubgameId, onSelect, resolvedChallengeIds, subgames }) {
+  if (subgames.length <= 1) {
+    return null
+  }
+
+  return (
+    <div className="space-y-2 rounded-[1.4rem] border border-slate-800 bg-slate-900/60 px-4 py-4">
+      <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-slate-300/75">
+        Sottogiochi della zona
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {subgames.map((subgame) => {
+          const isActive = subgame.id === currentSubgameId
+          const completedCount = subgame.challengeIds.filter((challengeId) => resolvedChallengeIds.includes(challengeId)).length
+
+          return (
+            <button
+              key={subgame.id}
+              aria-pressed={isActive}
+              className={[
+                'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition',
+                isActive
+                  ? 'border-amber-200/70 bg-amber-300/18 text-amber-50'
+                  : 'border-white/12 bg-white/5 text-slate-100 hover:border-cyan-300/45 hover:text-cyan-100',
+              ].join(' ')}
+              onClick={() => onSelect(subgame.id)}
+              type="button"
+            >
+              <span>{subgame.label}</span>
+              <span className="rounded-full bg-black/20 px-2 py-0.5 text-[10px] tracking-[0.14em] text-slate-300/85">
+                {completedCount}/{subgame.challengeIds.length}
+              </span>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -171,11 +241,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     accessCode,
     clearActiveSession,
     applyChallengeFeedbackOutcome,
+    isMusicEnabled,
     playerState,
     registerRoomOutcome,
     spendCredits,
     registerQuizAttempt,
-    markMusicRoomIntroSeen,
+    markRoomIntroSeen,
     markVictoryModalSeen,
     canAttemptQuiz,
     getCredits,
@@ -187,7 +258,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     category.characterComments,
     category.characters,
   )
-  const { isFearActive, stopWrongAnswerEffect, triggerWrongAnswerEffect } = useFearEffects(category)
+  const { isFearActive, stopWrongAnswerEffect, triggerWrongAnswerEffect } = useFearEffects(category, isMusicEnabled)
   const persistedSession = playerState.activeSession?.categoryId === category.id
     ? playerState.activeSession
     : null
@@ -245,7 +316,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const isMusicRoom = category.id === 'musica'
   const isImmersiveRoom = Boolean(category.mapHotspots?.length)
   const hasWeightedScoring = Boolean(category.weightedScoring)
-  const currentRoomProgress = roomProgress?.[category.id] ?? null
+  const currentRoomProgress = roomProgress
   const archivedRoomReadOnly = Boolean(archivedSession)
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
   const victoryModalAlreadySeen = currentRoomProgress?.victoryModalSeen ?? false
@@ -285,6 +356,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     (!pendingBridge ||
       (pendingBridge.sourceCategoryId === category.id && !pendingBridge.bridgeCompletedAt))
   const currentZoneId = currentChallenge?.zoneId ?? ''
+  const currentSubgameId = getChallengeSubgameId(currentChallenge)
+  const currentSubgameKey = getChallengeSubgameKey(currentChallenge)
   const zoneChallengeMap = useMemo(
     () =>
       category.challenges.reduce((accumulator, challenge) => {
@@ -301,18 +374,66 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       }, {}),
     [category.challenges],
   )
+  const zoneSubgameMap = useMemo(
+    () =>
+      category.challenges.reduce((accumulator, challenge) => {
+        if (!challenge.zoneId) {
+          return accumulator
+        }
+
+        const zoneId = challenge.zoneId
+        const subgameId = getChallengeSubgameId(challenge)
+
+        if (!accumulator[zoneId]) {
+          accumulator[zoneId] = []
+        }
+
+        let existingSubgame = accumulator[zoneId].find((subgame) => subgame.id === subgameId)
+
+        if (!existingSubgame) {
+          existingSubgame = {
+            id: subgameId,
+            label: getChallengeSubgameLabel(challenge),
+            fallbackPrompt: challenge.prompt || challenge.infoText || 'La prova ti aspetta.',
+            introText: challenge.subgameIntroText || '',
+            challengeIds: [],
+          }
+          accumulator[zoneId].push(existingSubgame)
+        }
+
+        if (!existingSubgame.introText && challenge.subgameIntroText) {
+          existingSubgame.introText = challenge.subgameIntroText
+        }
+
+        existingSubgame.challengeIds.push(challenge.id)
+        return accumulator
+      }, {}),
+    [category.challenges],
+  )
   const currentZoneChallenges = useMemo(
     () => (zoneChallengeMap[currentZoneId] ?? [])
       .map((challengeId) => category.challenges.find((challenge) => challenge.id === challengeId) ?? null)
       .filter(Boolean),
     [category.challenges, currentZoneId, zoneChallengeMap],
   )
+  const currentZoneSubgames = useMemo(
+    () => zoneSubgameMap[currentZoneId] ?? [],
+    [currentZoneId, zoneSubgameMap],
+  )
+  const currentSubgameChallenges = useMemo(
+    () => currentZoneChallenges.filter((challenge) => getChallengeSubgameId(challenge) === currentSubgameId),
+    [currentSubgameId, currentZoneChallenges],
+  )
+  const currentSubgame = useMemo(
+    () => currentZoneSubgames.find((subgame) => subgame.id === currentSubgameId) ?? null,
+    [currentSubgameId, currentZoneSubgames],
+  )
   const currentZoneHotspot = useMemo(
     () => category.mapHotspots?.find((hotspot) => hotspot.id === currentZoneId) ?? null,
     [category.mapHotspots, currentZoneId],
   )
-  const [pendingIntroZoneId, setPendingIntroZoneId] = useState(
-    () => (persistedSession ? '' : currentChallenge?.zoneId ?? ''),
+  const [pendingIntroSubgameKey, setPendingIntroSubgameKey] = useState(
+    () => (persistedSession ? '' : getChallengeSubgameKey(currentChallenge)),
   )
 
   useEffect(() => {
@@ -568,8 +689,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   const isChallengeIntroVisible =
     isImmersiveRoom &&
-    pendingIntroZoneId === currentZoneId &&
+    pendingIntroSubgameKey === currentSubgameKey &&
     Boolean(currentZoneId) &&
+    Boolean(currentSubgameId) &&
     !challengeMapLocked &&
     !archivedRoomReadOnly
   const shouldPauseHesitationTimer =
@@ -579,9 +701,10 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     canAttemptQuiz() &&
     !isComplete
   const currentZoneIntroText =
+    currentSubgame?.introText ||
+    (currentSubgame?.challengeIds.length === 1 ? currentSubgame?.fallbackPrompt : '') ||
     currentZoneHotspot?.introPrompt ||
     currentZoneHotspot?.description ||
-    currentZoneChallenges[0]?.prompt ||
     currentChallenge?.prompt ||
     'La prova ti aspetta.'
 
@@ -602,14 +725,34 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     return () => clearTimeout(id)
   }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, shouldPauseHesitationTimer, showComment])
 
-  useBackgroundAudio({ src: '/audio/bg_music_room.mp3', volume: 0.15 }, isImmersiveRoom && isChallengeIntroVisible)
+  const ambientAudioSrc = category.ambientAudioSrc || '/audio/bg_music_room.mp3'
+  const shouldPlayAmbientAudio =
+    isImmersiveRoom &&
+    isMusicEnabled &&
+    (isChallengeIntroVisible || isRoomMapVisible) &&
+    !hasFeedback
+  const shouldPlayRoundMusic =
+    isImmersiveRoom &&
+    isMusicEnabled &&
+    Boolean(currentChallenge?.roundMusicSrc) &&
+    !shouldShowRoomIntro &&
+    !isChallengeIntroVisible &&
+    !isRoomMapVisible &&
+    !hasFeedback &&
+    !isComplete &&
+    !isCurrentChallengeResolved &&
+    !currentChallengeLocked &&
+    !archivedRoomReadOnly
+
+  useBackgroundAudio({ src: ambientAudioSrc, volume: 0.15 }, shouldPlayAmbientAudio)
+  useBackgroundAudio({ src: currentChallenge?.roundMusicSrc, volume: 0.18 }, shouldPlayRoundMusic)
 
   // Immersive room intro narrative gate (shown once)
   if (shouldShowRoomIntro) {
     return (
       <MusicRoomNarrative
         category={category}
-        onComplete={markMusicRoomIntroSeen}
+        onComplete={() => markRoomIntroSeen(category.id)}
       />
     )
   }
@@ -701,8 +844,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const awardedCredits = hasFeedback
     ? resolveChallengeCreditReward(feedbackChallenge, feedback)
     : 0
-  const errorVisualIndex = sessionWrongCount > 0
-    ? (sessionWrongCount - 1) % ERROR_IMAGES.length
+  const errorImageSources = category.wrongAnswerImageSrcs ?? []
+  const errorVisualIndex = sessionWrongCount > 0 && errorImageSources.length > 0
+    ? (sessionWrongCount - 1) % errorImageSources.length
     : 0
   const roomInteractionsDisabled = isSubmitting || hasFeedback || challengeMapLocked
   const hasInfo = Boolean(currentChallenge.infoText || currentChallenge.prompt)
@@ -772,14 +916,39 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     const nextChallengeId =
       zoneChallengeIds.find((challengeId) => !resolvedChallengeIds.includes(challengeId)) ??
       zoneChallengeIds[0]
+    const nextChallenge =
+      category.challenges.find((challenge) => challenge.id === nextChallengeId) ?? null
 
     clearResultComment()
     dismissFeedback()
     setInfoModalChallengeId('')
     setHintModalChallengeId('')
-    setPendingIntroZoneId(zoneId)
+    setPendingIntroSubgameKey(getChallengeSubgameKey(nextChallenge))
     selectChallenge(nextChallengeId, { openResolvedFeedback: false })
     setIsRoomMapVisible(false)
+  }
+
+  function handleSelectSubgame(subgameId) {
+    const targetSubgame = currentZoneSubgames.find((subgame) => subgame.id === subgameId)
+
+    if (!targetSubgame) {
+      return
+    }
+
+    const nextChallengeId =
+      targetSubgame.challengeIds.find((challengeId) => !resolvedChallengeIds.includes(challengeId)) ??
+      targetSubgame.challengeIds[0]
+    const nextChallenge =
+      category.challenges.find((challenge) => challenge.id === nextChallengeId) ?? null
+
+    clearResultComment()
+    dismissFeedback()
+    setInfoModalChallengeId('')
+    setHintModalChallengeId('')
+    if (getChallengeSubgameId(currentChallenge) !== subgameId) {
+      setPendingIntroSubgameKey(getChallengeSubgameKey(nextChallenge))
+    }
+    selectChallenge(nextChallengeId, { openResolvedFeedback: false })
   }
 
   const shouldShowDefaultFloatingPanel =
@@ -787,8 +956,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const isHesitationPanelVisible = activePanel?.eventType === 'onHesitation'
   const zoneNavigatorSide = (
     <ZoneChallengeNavigator
-      challenges={currentZoneChallenges}
+      challenges={currentSubgameChallenges}
       currentChallengeId={currentChallengeId}
+      label="Prove del sottogioco"
       onSelect={(challengeId) => {
         setHintModalChallengeId('')
         setInfoModalChallengeId('')
@@ -798,6 +968,14 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       }}
       resolvedChallengeIds={resolvedChallengeIds}
       vertical
+    />
+  )
+  const subgameNavigator = (
+    <SubgameNavigator
+      currentSubgameId={currentSubgameId}
+      onSelect={handleSelectSubgame}
+      resolvedChallengeIds={resolvedChallengeIds}
+      subgames={currentZoneSubgames}
     />
   )
 
@@ -828,11 +1006,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             {isChallengeIntroVisible ? (
               <div className="space-y-4">
                 <MusicChallengeIntro
-                  key={currentZoneId}
+                  key={currentSubgameKey}
                   character={getRoomCharacterBySpeaker(category.characters, 'guardian')}
                   introText={currentZoneIntroText}
                   onComplete={() => {
-                    setPendingIntroZoneId('')
+                    setPendingIntroSubgameKey('')
 
                     if (isCurrentChallengeResolved) {
                       selectChallenge(currentChallengeId)
@@ -843,6 +1021,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             ) : (
               <div className="space-y-4">
                 {currentChallengeLocked ? <DailyLimitOverlay /> : null}
+
+                {subgameNavigator}
 
                 {/* Achille brief panel for onHintUsed (above quiz card) */}
                 {activePanel?.eventType === 'onHintUsed' ? (
@@ -886,7 +1066,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                       </div>
                     </div>
 
-                    {currentZoneChallenges.length > 1 ? (
+                    {currentSubgameChallenges.length > 1 ? (
                       <div className="w-full lg:w-24 lg:shrink-0">
                         {zoneNavigatorSide}
                       </div>
@@ -942,12 +1122,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             characterComment={feedbackMode === 'fresh' ? resultComment : null}
             creditReward={feedbackCreditReward}
             errorImageSrc={
-              isMusicRoom && hasFeedback && !feedback.isCorrect
-                ? (ERROR_IMAGES[errorVisualIndex] ?? null)
+              errorImageSources.length > 0 && hasFeedback && !feedback.isCorrect
+                ? (errorImageSources[errorVisualIndex] ?? null)
                 : null
             }
             errorOpacity={
-              isMusicRoom && hasFeedback && !feedback.isCorrect
+              errorImageSources.length > 0 && hasFeedback && !feedback.isCorrect
                 ? (ERROR_OPACITIES[errorVisualIndex % ERROR_OPACITIES.length] ?? 0.38)
                 : 0
             }
@@ -970,8 +1150,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               clearResultComment()
               const nextChallenge = goToNextChallenge()
 
-              if (nextChallenge?.zoneId && nextChallenge.zoneId !== currentZoneId) {
-                setPendingIntroZoneId(nextChallenge.zoneId)
+              if (nextChallenge && getChallengeSubgameKey(nextChallenge) !== currentSubgameKey) {
+                setPendingIntroSubgameKey(getChallengeSubgameKey(nextChallenge))
               }
             }}
           />

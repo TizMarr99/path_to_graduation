@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 
-function VipIntroVideo({ isLeaving, onEnded }) {
+function VipIntroVideo({ isAudioEnabled = true, isLeaving, onEnded }) {
   const videoRef = useRef(null)
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
-    video.muted = false
+    video.muted = !isAudioEnabled
     const playPromise = video.play()
 
     if (playPromise !== undefined) {
@@ -17,7 +17,7 @@ function VipIntroVideo({ isLeaving, onEnded }) {
         void video.play().catch(() => {})
       })
     }
-  }, [])
+  }, [isAudioEnabled])
 
   return (
     <section

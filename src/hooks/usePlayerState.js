@@ -21,6 +21,7 @@ import {
 
 const PlayerStateContext = createContext(null)
 const ACCESS_CODE_STORAGE_KEY = 'path-to-graduation:access-code'
+const MUSIC_ENABLED_STORAGE_KEY = 'path-to-graduation:music-enabled'
 const VIP_ACCESS_STORAGE_KEY = 'path-to-graduation:vip-access'
 const SAVE_DEBOUNCE_MS = 900
 
@@ -63,6 +64,26 @@ function clearStoredVipAccess() {
 function clearPersistedAccessArtifacts() {
   clearStoredAccessCode()
   clearStoredVipAccess()
+}
+
+function loadStoredMusicEnabled() {
+  if (typeof window === 'undefined') {
+    return true
+  }
+
+  try {
+    return window.localStorage.getItem(MUSIC_ENABLED_STORAGE_KEY) !== 'false'
+  } catch {
+    return true
+  }
+}
+
+function persistStoredMusicEnabled(isEnabled) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.localStorage.setItem(MUSIC_ENABLED_STORAGE_KEY, isEnabled ? 'true' : 'false')
 }
 
 function areSerializableSnapshotsEqual(leftValue, rightValue) {
@@ -116,6 +137,7 @@ export function PlayerStateProvider({ children }) {
   const [isHydrating, setIsHydrating] = useState(true)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
+  const [isMusicEnabled, setIsMusicEnabledState] = useState(loadStoredMusicEnabled)
   const [authError, setAuthError] = useState('')
   const [syncError, setSyncError] = useState('')
   const playerStateRef = useRef(playerState)
@@ -129,6 +151,10 @@ export function PlayerStateProvider({ children }) {
   useEffect(() => {
     accessCodeRef.current = accessCode
   }, [accessCode])
+
+  useEffect(() => {
+    persistStoredMusicEnabled(isMusicEnabled)
+  }, [isMusicEnabled])
 
   useEffect(() => {
     return () => {
@@ -393,6 +419,14 @@ export function PlayerStateProvider({ children }) {
     setSyncError('')
   }
 
+  const setMusicEnabled = useCallback((nextValue) => {
+    setIsMusicEnabledState(Boolean(nextValue))
+  }, [])
+
+  const toggleMusicEnabled = useCallback(() => {
+    setIsMusicEnabledState((currentValue) => !currentValue)
+  }, [])
+
   function unlockCategories(categoryIds = []) {
     if (!categoryIds.length) {
       return
@@ -581,8 +615,12 @@ export function PlayerStateProvider({ children }) {
     )
   }
 
-  function markMusicRoomIntroSeen() {
-    markRoomStarted('musica')
+  function markRoomIntroSeen(categoryId) {
+    if (!categoryId) {
+      return
+    }
+
+    markRoomStarted(categoryId)
   }
 
   function queuePendingBridge({ sourceCategoryId, targetCategoryId }) {
@@ -869,6 +907,7 @@ export function PlayerStateProvider({ children }) {
     hasVipAccess: Boolean(accessCode && role),
     isHydrating,
     isLoggingIn,
+    isMusicEnabled,
     isSyncing,
     login,
     logout,
@@ -887,7 +926,9 @@ export function PlayerStateProvider({ children }) {
     resetPlayerState,
     resetPlayerStateForCode,
     resetMusicRoomIntro,
-    markMusicRoomIntroSeen,
+    markRoomIntroSeen,
+    setMusicEnabled,
+    toggleMusicEnabled,
     queuePendingBridge,
     markPendingBridgeSeen,
     clearPendingBridge,

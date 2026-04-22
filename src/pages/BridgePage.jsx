@@ -12,12 +12,12 @@ const AMANDA_BOX_EXIT_DURATION_MS = 380
 
 export default function BridgePage() {
   const navigate = useNavigate()
-  const { markPendingBridgeSeen, playerState } = usePlayerState()
+  const { isMusicEnabled, markPendingBridgeSeen, playerState } = usePlayerState()
   const timeoutIdsRef = useRef([])
   const [narrativeScene, setNarrativeScene] = useState('andrea')
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
 
-  useBackgroundAudio({ src: '/audio/bg_intro.mp3', volume: 0.15 }, true)
+  useBackgroundAudio({ src: '/audio/bg_intro.mp3', volume: 0.15 }, isMusicEnabled)
 
   useEffect(() => {
     if (!pendingBridge || pendingBridge.bridgeCompletedAt) {
