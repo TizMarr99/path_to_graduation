@@ -716,9 +716,11 @@ export interface RoomSessionSummary {
 
 export interface RoomCompletedSessionSnapshot {
   challengeResults: Record<string, ChallengeFeedback>
+  challengeStatesByChallengeId?: Record<string, ChallengeRuntimeState>
   completedAt: number
   currentChallengeId: string
   correctCount: number
+  draftAnswersByChallengeId?: Record<string, ChallengeDraftAnswer>
   totalChallenges: number
   wrongCount: number
   outcomeSummary?: RoomOutcomeSummary | null

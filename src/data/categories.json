@@ -1143,177 +1143,35 @@
         "quizSubType": "speedrun_characters",
         "difficulty": "medium",
         "title": "Speedrun Personaggi",
-        "introText": "Riconosci quanti più personaggi possibile in 30 secondi!",
-        "timerSeconds": 40,
+        "introText": "Riconosci quanti più personaggi possibile in 90 secondi!",
+        "timerSeconds": 90,
         "minimumCorrect": 10,
         "characters": [
           {
-            "id": "connor-walsh",
-            "showName": "How to Get Away with Murder",
+            "id": "alex-karev",
+            "showName": "Grey's Anatomy",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/connor.jpg"
+                "src": "/serie-film/speedrun/alex.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Connor",
-              "Connor Walsh"
+              "Alex",
+              "Alex Karev"
             ]
           },
           {
-            "id": "eddie-munson",
-            "showName": "Stranger Things",
+            "id": "amenadiel",
+            "showName": "Lucifer",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/eddie.jpg"
+                "src": "/serie-film/speedrun/amenadiel.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Eddie",
-              "Eddie Munson"
-            ]
-          },
-          {
-            "id": "tormund-giantsbane",
-            "showName": "Game of Thrones",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/tormund.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Tormund",
-              "Tormund Giantsbane"
-            ]
-          },
-          {
-            "id": "rhaenys-targaryen",
-            "showName": "House of the Dragon",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/rhaenys.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Rhaenys",
-              "Rhaenys Targaryen"
-            ]
-          },
-          {
-            "id": "mike-ehrmantraut",
-            "showName": "Breaking Bad",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/mike.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Mike",
-              "Mike Ehrmantraut"
-            ]
-          },
-          {
-            "id": "charlie-pace",
-            "showName": "Lost",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/charlie.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Charlie",
-              "Charlie Pace"
-            ]
-          },
-          {
-            "id": "desmond-hume",
-            "showName": "Lost",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/desmond.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Desmond",
-              "Desmond Hume"
-            ]
-          },
-          {
-            "id": "gale-hawthorne",
-            "showName": "The Hunger Games",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/gale.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Gale",
-              "Gale Hawthorne"
-            ]
-          },
-          {
-            "id": "jack-rooney",
-            "showName": "3 Body Problem",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/jack.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Jack",
-              "Jack Rooney"
-            ]
-          },
-          {
-            "id": "fallon-carrington",
-            "showName": "Dynasty",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/fallon.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Fallon",
-              "Fallon Carrington"
-            ]
-          },
-          {
-            "id": "jenny-humphrey",
-            "showName": "Gossip Girl",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/jenny.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Jenny",
-              "Jenny Humphrey"
-            ]
-          },
-          {
-            "id": "mary-watson",
-            "showName": "Sherlock",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/mary.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Mary",
-              "Mary Watson",
-              "Mary Morstan"
+              "Amenadiel"
             ]
           },
           {
@@ -1332,20 +1190,6 @@
             ]
           },
           {
-            "id": "amelia-shepherd",
-            "showName": "Grey's Anatomy",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/amelia.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Amelia",
-              "Amelia Shepherd"
-            ]
-          },
-          {
             "id": "cirilla",
             "showName": "The Witcher",
             "assets": [
@@ -1357,6 +1201,164 @@
             "acceptedAnswers": [
               "Cirilla",
               "Ciri"
+            ]
+          },
+          {
+            "id": "dolores-abernathy",
+            "showName": "Westworld",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/dolores.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Dolores",
+              "Dolores Abernathy"
+            ]
+          },
+          {
+            "id": "fallon-carrington",
+            "showName": "Dynasty",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/fallon.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Fallon",
+              "Fallon Carrington"
+            ]
+          },
+          {
+            "id": "wes-gibbins",
+            "showName": "How to Get Away with Murder",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/wes.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Wes",
+              "Wes Gibbins"
+            ]
+          },
+          {
+            "id": "jesse-pinkman",
+            "showName": "Breaking Bad",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/jesse.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Jesse",
+              "Jesse Pinkman"
+            ]
+          },
+          {
+            "id": "joel-miller",
+            "showName": "The Last of Us",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/joel.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Joel",
+              "Joel Miller"
+            ]
+          },
+          {
+            "id": "louis-litt",
+            "showName": "Suits",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/louis.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Louis",
+              "Louis Litt"
+            ]
+          },
+          {
+            "id": "lucas-sinclair",
+            "showName": "Stranger Things",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/lucas.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Lucas",
+              "Lucas Sinclair"
+            ]
+          },
+          {
+            "id": "sandor-clegane",
+            "showName": "Game of Thrones",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/mastino.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Mastino",
+              "Il Mastino",
+              "The Hound",
+              "Hound",
+              "Sandor",
+              "Sandor Clegane"
+            ]
+          },
+          {
+            "id": "peeta-mellark",
+            "showName": "The Hunger Games",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/peeta.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Peeta",
+              "Peeta Mellark"
+            ]
+          },
+          {
+            "id": "robb-stark",
+            "showName": "Game of Thrones",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/robb.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Robb",
+              "Robb Stark"
+            ]
+          },
+          {
+            "id": "tommy-shelby",
+            "showName": "Peaky Blinders",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/tommy.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Tommy",
+              "Tommy Shelby"
             ]
           }
         ],

@@ -244,7 +244,9 @@ export function PlayerStateProvider({ children }) {
   function buildRoomOutcomePlayerState(currentState, {
     categoryId,
     challengeResults = {},
+    challengeStatesByChallengeId = {},
     correctCount,
+    draftAnswersByChallengeId = {},
     wrongCount,
     totalChallenges,
     passedOverride,
@@ -282,9 +284,11 @@ export function PlayerStateProvider({ children }) {
             correctCount + wrongCount >= totalChallenges
               ? {
                   challengeResults,
+                  challengeStatesByChallengeId,
                   completedAt: Date.now(),
                   currentChallengeId: Object.keys(challengeResults)[0] ?? '',
                   correctCount,
+                  draftAnswersByChallengeId,
                   totalChallenges,
                   wrongCount,
                   outcomeSummary,
@@ -446,7 +450,9 @@ export function PlayerStateProvider({ children }) {
   const registerRoomOutcome = useCallback(async ({
     categoryId,
     challengeResults = {},
+    challengeStatesByChallengeId = {},
     correctCount,
+    draftAnswersByChallengeId = {},
     wrongCount,
     totalChallenges,
     passedOverride,
@@ -456,7 +462,9 @@ export function PlayerStateProvider({ children }) {
     const nextPlayerState = buildRoomOutcomePlayerState(playerStateRef.current, {
       categoryId,
       challengeResults,
+      challengeStatesByChallengeId,
       correctCount,
+      draftAnswersByChallengeId,
       wrongCount,
       totalChallenges,
       passedOverride,

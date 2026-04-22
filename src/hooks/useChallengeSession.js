@@ -26,6 +26,14 @@ function createChallengeResultMap() {
   return {}
 }
 
+function createChallengeDraftAnswerMap() {
+  return {}
+}
+
+function createChallengeStateMap() {
+  return {}
+}
+
 function findChallengeById(challenges, challengeId) {
   return challenges.find((challenge) => challenge.id === challengeId) ?? null
 }
@@ -81,6 +89,72 @@ function resolveInitialDraftAnswer(challenge, persistedDraftAnswer = null) {
   }
 }
 
+function resolveInitialChallengeState(challenge, persistedChallengeState = null) {
+  const initialState = createInitialRuntimeStateForChallenge(challenge)
+
+  if (!persistedChallengeState) {
+    return initialState
+  }
+
+  return {
+    ...initialState,
+    ...persistedChallengeState,
+  }
+}
+
+function resolvePersistedDraftAnswersByChallengeId(
+  persistedSession,
+  initialChallenge,
+  initialChallengeId,
+) {
+  const persistedDraftAnswers = persistedSession?.draftAnswersByChallengeId ??
+    createChallengeDraftAnswerMap()
+
+  if (!initialChallenge || !initialChallengeId) {
+    return persistedDraftAnswers
+  }
+
+  const initialPersistedDraft =
+    persistedDraftAnswers[initialChallengeId] ?? persistedSession?.draftAnswer ?? null
+
+  if (!initialPersistedDraft) {
+    return persistedDraftAnswers
+  }
+
+  return {
+    ...persistedDraftAnswers,
+    [initialChallengeId]: resolveInitialDraftAnswer(initialChallenge, initialPersistedDraft),
+  }
+}
+
+function resolvePersistedChallengeStatesByChallengeId(
+  persistedSession,
+  initialChallenge,
+  initialChallengeId,
+) {
+  const persistedChallengeStates = persistedSession?.challengeStatesByChallengeId ??
+    createChallengeStateMap()
+
+  if (!initialChallenge || !initialChallengeId) {
+    return persistedChallengeStates
+  }
+
+  const initialPersistedChallengeState =
+    persistedChallengeStates[initialChallengeId] ?? persistedSession?.challengeState ?? null
+
+  if (!initialPersistedChallengeState) {
+    return persistedChallengeStates
+  }
+
+  return {
+    ...persistedChallengeStates,
+    [initialChallengeId]: resolveInitialChallengeState(
+      initialChallenge,
+      initialPersistedChallengeState,
+    ),
+  }
+}
+
 /**
  * @param {import('../types/challenge').Category | null} category
  * @param {string} [preferredChallengeId]
@@ -94,15 +168,37 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     persistedSession?.currentChallengeId ?? '',
   )
   const initialChallenge = findChallengeById(challenges, initialChallengeId)
+  const initialDraftAnswersByChallengeId = resolvePersistedDraftAnswersByChallengeId(
+    persistedSession,
+    initialChallenge,
+    initialChallengeId,
+  )
+  const initialChallengeStatesByChallengeId = resolvePersistedChallengeStatesByChallengeId(
+    persistedSession,
+    initialChallenge,
+    initialChallengeId,
+  )
   const [currentChallengeId, setCurrentChallengeId] = useState(initialChallengeId)
   const [challengeResults, setChallengeResults] = useState(
     () => persistedSession?.challengeResults ?? createChallengeResultMap(),
   )
   const [draftAnswer, setDraftAnswer] = useState(() =>
-    resolveInitialDraftAnswer(initialChallenge, persistedSession?.draftAnswer),
+    resolveInitialDraftAnswer(
+      initialChallenge,
+      initialDraftAnswersByChallengeId[initialChallengeId] ?? null,
+    ),
   )
   const [challengeState, setChallengeState] = useState(() =>
-    persistedSession?.challengeState ?? createInitialRuntimeStateForChallenge(initialChallenge),
+    resolveInitialChallengeState(
+      initialChallenge,
+      initialChallengeStatesByChallengeId[initialChallengeId] ?? null,
+    ),
+  )
+  const [draftAnswersByChallengeId, setDraftAnswersByChallengeId] = useState(
+    initialDraftAnswersByChallengeId,
+  )
+  const [challengeStatesByChallengeId, setChallengeStatesByChallengeId] = useState(
+    initialChallengeStatesByChallengeId,
   )
   const [isHintVisible, setIsHintVisible] = useState(persistedSession?.isHintVisible ?? false)
   const [feedback, setFeedback] = useState(() => createFeedback(category))
@@ -136,11 +232,27 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
   function resetChallengeState() {
     const nextInitialChallenge = findChallengeById(challenges, initialChallengeId)
+    const nextInitialDraftAnswer = createInitialDraftAnswerForChallenge(nextInitialChallenge)
+    const nextInitialChallengeState = createInitialRuntimeStateForChallenge(nextInitialChallenge)
 
     setCurrentChallengeId(initialChallengeId)
     setChallengeResults(createChallengeResultMap())
-    setDraftAnswer(createInitialDraftAnswerForChallenge(nextInitialChallenge))
-    setChallengeState(createInitialRuntimeStateForChallenge(nextInitialChallenge))
+    setDraftAnswer(nextInitialDraftAnswer)
+    setChallengeState(nextInitialChallengeState)
+    setDraftAnswersByChallengeId(
+      initialChallengeId
+        ? {
+            [initialChallengeId]: nextInitialDraftAnswer,
+          }
+        : createChallengeDraftAnswerMap(),
+    )
+    setChallengeStatesByChallengeId(
+      initialChallengeId
+        ? {
+            [initialChallengeId]: nextInitialChallengeState,
+          }
+        : createChallengeStateMap(),
+    )
     setIsHintVisible(false)
     setFeedback(createFeedback(category))
     setFeedbackMode('closed')
@@ -150,17 +262,39 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   }
 
   function updateDraftAnswer(partialDraft) {
-    setDraftAnswer((currentDraft) => ({
-      ...currentDraft,
-      ...partialDraft,
-    }))
+    setDraftAnswer((currentDraft) => {
+      const nextDraft = {
+        ...currentDraft,
+        ...partialDraft,
+      }
+
+      if (currentChallengeId) {
+        setDraftAnswersByChallengeId((currentAnswersByChallengeId) => ({
+          ...currentAnswersByChallengeId,
+          [currentChallengeId]: nextDraft,
+        }))
+      }
+
+      return nextDraft
+    })
   }
 
   function updateChallengeState(partialState) {
-    setChallengeState((currentState) => ({
-      ...currentState,
-      ...partialState,
-    }))
+    setChallengeState((currentState) => {
+      const nextState = {
+        ...currentState,
+        ...partialState,
+      }
+
+      if (currentChallengeId) {
+        setChallengeStatesByChallengeId((currentStatesByChallengeId) => ({
+          ...currentStatesByChallengeId,
+          [currentChallengeId]: nextState,
+        }))
+      }
+
+      return nextState
+    })
   }
 
   function selectChallenge(challengeId, options = {}) {
@@ -172,9 +306,26 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
       return
     }
 
+    const nextDraftAnswer = resolveInitialDraftAnswer(
+      nextChallenge,
+      draftAnswersByChallengeId[nextChallenge.id] ?? null,
+    )
+    const nextChallengeState = resolveInitialChallengeState(
+      nextChallenge,
+      challengeStatesByChallengeId[nextChallenge.id] ?? null,
+    )
+
     setCurrentChallengeId(nextChallenge.id)
-    setDraftAnswer(createInitialDraftAnswerForChallenge(nextChallenge))
-    setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
+    setDraftAnswer(nextDraftAnswer)
+    setChallengeState(nextChallengeState)
+    setDraftAnswersByChallengeId((currentAnswersByChallengeId) => ({
+      ...currentAnswersByChallengeId,
+      [nextChallenge.id]: nextDraftAnswer,
+    }))
+    setChallengeStatesByChallengeId((currentStatesByChallengeId) => ({
+      ...currentStatesByChallengeId,
+      [nextChallenge.id]: nextChallengeState,
+    }))
     setIsHintVisible(false)
     setFeedback(openResolvedFeedback && nextFeedback ? nextFeedback : createFeedback(category))
     setFeedbackMode(openResolvedFeedback && nextFeedback ? 'history' : 'closed')
@@ -246,9 +397,26 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
       return null
     }
 
+    const nextDraftAnswer = resolveInitialDraftAnswer(
+      nextChallenge,
+      draftAnswersByChallengeId[nextChallenge.id] ?? null,
+    )
+    const nextChallengeState = resolveInitialChallengeState(
+      nextChallenge,
+      challengeStatesByChallengeId[nextChallenge.id] ?? null,
+    )
+
     setCurrentChallengeId(nextChallenge.id)
-    setDraftAnswer(createInitialDraftAnswerForChallenge(nextChallenge))
-    setChallengeState(createInitialRuntimeStateForChallenge(nextChallenge))
+    setDraftAnswer(nextDraftAnswer)
+    setChallengeState(nextChallengeState)
+    setDraftAnswersByChallengeId((currentAnswersByChallengeId) => ({
+      ...currentAnswersByChallengeId,
+      [nextChallenge.id]: nextDraftAnswer,
+    }))
+    setChallengeStatesByChallengeId((currentStatesByChallengeId) => ({
+      ...currentStatesByChallengeId,
+      [nextChallenge.id]: nextChallengeState,
+    }))
     setIsHintVisible(false)
     setFeedback(createFeedback(category))
     setFeedbackMode('closed')
@@ -263,6 +431,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
   return {
     allChallengesResolved,
+    challengeStatesByChallengeId,
     challengeNumber,
     challengeResults,
     currentChallenge,
@@ -271,6 +440,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     challengeState,
     dismissFeedback,
     draftAnswer,
+    draftAnswersByChallengeId,
     feedback,
     feedbackMode,
     hasFeedback,

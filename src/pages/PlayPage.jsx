@@ -277,6 +277,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       }
     : null
   const {
+    challengeStatesByChallengeId,
     challengeResults,
     challengeNumber,
     currentChallengeId,
@@ -284,6 +285,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     currentChallenge,
     dismissFeedback,
     draftAnswer,
+    draftAnswersByChallengeId,
     feedback,
     feedbackMode,
     goToNextChallenge,
@@ -462,7 +464,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       const result = await registerRoomOutcome({
         categoryId: category.id,
         challengeResults,
+        challengeStatesByChallengeId,
         correctCount: sessionCorrectCount,
+        draftAnswersByChallengeId,
         wrongCount: sessionWrongCount,
         totalChallenges,
         passedOverride: passedRoom,
@@ -515,6 +519,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     accessCode,
     category.id,
     challengeResults,
+    challengeStatesByChallengeId,
+    draftAnswersByChallengeId,
     earlyMusicVictory,
     immediateUnlockTargets,
     isComplete,
@@ -654,7 +660,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         categoryId: category.id,
         currentChallengeId,
         challengeResults,
+        challengeStatesByChallengeId,
         draftAnswer,
+        draftAnswersByChallengeId,
         challengeState,
         isHintVisible,
         resolvedChallengeIds,
@@ -666,11 +674,13 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }, [
     category.id,
     challengeResults,
+    challengeStatesByChallengeId,
     challengeState,
     clearActiveSession,
     currentChallenge,
     currentChallengeId,
     draftAnswer,
+    draftAnswersByChallengeId,
     isComplete,
     isHintVisible,
     resolvedChallengeIds,

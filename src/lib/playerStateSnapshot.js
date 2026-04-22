@@ -67,6 +67,21 @@ function normalizeJsonObject(value) {
   return value
 }
 
+function normalizeChallengeSnapshotMap(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {}
+  }
+
+  return Object.entries(value).reduce((accumulator, [challengeId, snapshot]) => {
+    if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) {
+      return accumulator
+    }
+
+    accumulator[challengeId] = snapshot
+    return accumulator
+  }, {})
+}
+
 export function normalizeRoomProgress(roomProgress = {}) {
   if (!roomProgress || typeof roomProgress !== 'object' || Array.isArray(roomProgress)) {
     return {}
@@ -89,6 +104,12 @@ export function normalizeRoomProgress(roomProgress = {}) {
                 !Array.isArray(rawProgress.lastCompletedSession.challengeResults)
                   ? rawProgress.lastCompletedSession.challengeResults
                   : {},
+              challengeStatesByChallengeId: normalizeChallengeSnapshotMap(
+                rawProgress.lastCompletedSession.challengeStatesByChallengeId,
+              ),
+              draftAnswersByChallengeId: normalizeChallengeSnapshotMap(
+                rawProgress.lastCompletedSession.draftAnswersByChallengeId,
+              ),
             }
           : null,
       startedAt: rawProgress?.startedAt ?? null,
@@ -130,6 +151,7 @@ export function normalizeTransitionState(transitionState) {
 export function normalizeSnapshot(snapshot) {
   const progress = snapshot?.progress ?? {}
   const dailyLimits = snapshot?.daily_limits ?? {}
+  const activeSession = normalizeJsonObject(progress?.active_session)
 
   return {
     accessCodeId: snapshot?.access_code_id ?? '',
@@ -153,10 +175,20 @@ export function normalizeSnapshot(snapshot) {
         Array.isArray(progress?.unlocked_category_ids) && progress.unlocked_category_ids.length
           ? progress.unlocked_category_ids
           : [...DEFAULT_UNLOCKED_CATEGORY_IDS],
-      currentRoom: progress?.current_room ?? progress?.active_session?.categoryId ?? null,
+      currentRoom: progress?.current_room ?? activeSession?.categoryId ?? null,
       currentChallengeId:
-        progress?.current_challenge_id ?? progress?.active_session?.currentChallengeId ?? '',
-      activeSession: progress?.active_session ?? null,
+        progress?.current_challenge_id ?? activeSession?.currentChallengeId ?? '',
+      activeSession: progress?.active_session
+        ? {
+            ...activeSession,
+            challengeStatesByChallengeId: normalizeChallengeSnapshotMap(
+              activeSession.challengeStatesByChallengeId,
+            ),
+            draftAnswersByChallengeId: normalizeChallengeSnapshotMap(
+              activeSession.draftAnswersByChallengeId,
+            ),
+          }
+        : null,
       lastPlayedAt: progress?.last_played_at ?? null,
       transitionState: normalizeTransitionState(progress?.transition_state),
       rewardState: normalizeJsonObject(snapshot?.reward_state),
