@@ -1144,9 +1144,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                         <ChallengeRenderer
                           challenge={currentChallenge}
                           challengeState={challengeState}
+                          credits={credits}
                           disabled={controlsDisabled}
                           draftAnswer={draftAnswer}
                           onAudioPlay={handleAudioPlay}
+                          onBuyTime={(seconds, cost) => spendCredits(cost)}
                           onChallengeStateChange={updateChallengeState}
                           onDraftAnswerChange={updateDraftAnswer}
                           onSubmit={handleSubmit}
@@ -1293,9 +1295,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               <ChallengeRenderer
                 challenge={currentChallenge}
                 challengeState={challengeState}
+                credits={credits}
                 disabled={controlsDisabled}
                 draftAnswer={draftAnswer}
                 onAudioPlay={handleAudioPlay}
+                onBuyTime={(seconds, cost) => spendCredits(cost)}
                 onChallengeStateChange={updateChallengeState}
                 onDraftAnswerChange={updateDraftAnswer}
                 onSubmit={handleSubmit}

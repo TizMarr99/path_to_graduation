@@ -327,7 +327,7 @@ function normalizeChallenge(rawChallenge) {
     return {
       ...baseChallenge,
       type: 'speedrun_characters',
-      timerSeconds: rawChallenge.timerSeconds ?? 30,
+      timerSeconds: rawChallenge.timerSeconds ?? 40,
       minimumCorrect: rawChallenge.minimumCorrect ?? 7,
       characters: (rawChallenge.characters ?? []).map((character) => ({
         id: character.id,

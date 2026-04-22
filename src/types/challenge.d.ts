@@ -349,6 +349,7 @@ export interface ChallengeRuntimeState {
   hitsterRevealedTrackCount: number
   speedrunCurrentIndex: number
   speedrunTimeRemaining: number
+  speedrunStarted: boolean
 }
 
 export interface ChallengeFeedback {
