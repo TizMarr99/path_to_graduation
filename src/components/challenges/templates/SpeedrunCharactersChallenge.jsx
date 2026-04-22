@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useBlocker } from 'react-router-dom'
 import { matchesAcceptedAnswer } from '../../../lib/answerNormalization'
 import ChallengeAssetGallery from '../common/ChallengeAssetGallery.jsx'
 import ChallengeSubmitButton from '../common/ChallengeSubmitButton.jsx'
@@ -34,8 +33,24 @@ function SpeedrunCharactersChallenge({
   const [confirmBuyTime, setConfirmBuyTime] = useState(false)
   const canAffordTime = typeof onBuyTime === 'function' && credits >= BUY_TIME_COST
 
-  // Block in-app navigation while the timer is running
-  const blocker = useBlocker(timerRunning)
+  // Block in-app navigation while the timer is running (popstate = tasto indietro del browser)
+  useEffect(() => {
+    if (!timerRunning) return
+
+    window.history.pushState(null, '', window.location.href)
+
+    function handlePopState() {
+      const leave = window.confirm(
+        'Il cronometro è ancora in corso. Se esci la challenge sarà considerata persa. Vuoi uscire?',
+      )
+      if (!leave) {
+        window.history.pushState(null, '', window.location.href)
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [timerRunning])
 
   // Block browser refresh / tab close while the timer is running
   useEffect(() => {
@@ -139,39 +154,6 @@ function SpeedrunCharactersChallenge({
 
   const progressPercent = Math.max(0, (timeLeft / timerSeconds) * 100)
   const currentCharacter = !isFinished ? challenge.characters[currentIndex] : null
-
-  // Navigation blocker confirmation overlay
-  if (blocker.state === 'blocked') {
-    return (
-      <div className="space-y-5">
-        <div className="rounded-2xl border border-rose-400/30 bg-rose-950/50 px-5 py-6 text-center space-y-4">
-          <p className="text-2xl">⚠️</p>
-          <p className="text-lg font-semibold text-rose-100">
-            Stai per abbandonare la challenge!
-          </p>
-          <p className="text-sm text-rose-200/80">
-            Se esci adesso il cronometro non si ferma e la challenge sarà considerata persa.
-          </p>
-          <div className="flex gap-3 justify-center">
-            <button
-              className="rounded-full border border-slate-600 bg-slate-900/80 px-6 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-cyan-300/55 hover:text-cyan-100"
-              onClick={() => blocker.reset()}
-              type="button"
-            >
-              Rimani
-            </button>
-            <button
-              className="rounded-full border border-rose-400/50 bg-rose-500/20 px-6 py-2.5 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/35"
-              onClick={() => blocker.proceed()}
-              type="button"
-            >
-              Esci lo stesso
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   // Start screen — shown before the timer has begun
   if (!started) {
