@@ -16,10 +16,10 @@ function ChallengeProgress({
           Stato sessione
         </p>
         <p className="mt-2 text-lg font-semibold text-white">
-          Quiz {challengeNumber} di {totalChallenges}
+          Sottogioco {challengeNumber} di {totalChallenges}
         </p>
         <p className="mt-2 text-sm leading-6 text-slate-300">
-          {title || challengeTypeLabels[type] || type} · superati {sessionCorrectCount} · falliti {sessionWrongCount} · risolti {completedChallenges}/{totalChallenges}
+          {title || challengeTypeLabels[type] || type} · superati {sessionCorrectCount} · falliti {sessionWrongCount} · giocati {completedChallenges}/{totalChallenges}
         </p>
       </div>
 

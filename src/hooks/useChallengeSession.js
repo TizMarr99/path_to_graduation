@@ -4,6 +4,7 @@ import {
   createInitialRuntimeStateForChallenge,
 } from '../lib/challengeDraftState'
 import { evaluateChallenge } from '../lib/challengeRegistry'
+import { computeSubgameStats } from '../lib/challengeRewards'
 
 /**
  * @param {import('../types/challenge').Category | null} category
@@ -218,6 +219,11 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   const resolvedChallengeIds = Object.keys(challengeResults)
   const resolvedChallengeCount = resolvedChallengeIds.length
   const allChallengesResolved = totalChallenges > 0 && resolvedChallengeCount >= totalChallenges
+
+  const subgameStats = useMemo(() => {
+    const feedbackMap = new Map(Object.entries(challengeResults))
+    return computeSubgameStats(category, feedbackMap, currentChallengeId)
+  }, [challengeResults, currentChallengeId, category])
   const hasFeedback = feedbackMode !== 'closed' && Boolean(feedback.attemptedChallengeId)
   const isCurrentChallengeResolved = Boolean(currentChallenge && challengeResults[currentChallenge.id])
   const isComplete = allChallengesResolved && !hasFeedback
@@ -454,6 +460,10 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     selectChallenge,
     sessionCorrectCount,
     sessionWrongCount,
+    subgameTotalCount: subgameStats.subgameTotalCount,
+    currentSubgameNumber: subgameStats.currentSubgameNumber,
+    subgamesPassedCount: subgameStats.subgamesPassedCount,
+    subgamesFailedCount: subgameStats.subgamesFailedCount,
     revealHint,
     goToNextChallenge,
     restartSession,
