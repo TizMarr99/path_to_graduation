@@ -265,11 +265,11 @@ export function evaluateColumnReorderMatching(columnOrders = [], rows = [], bonu
   let bonusNameMatches = 0
 
   rows.forEach((row) => {
-    const isRowCorrect = row.correctOrder.every((cellId, colIndex) => {
+    const positions = row.correctOrder.map((cellId, colIndex) => {
       const columnOrder = columnOrders[colIndex] ?? []
-      const expectedRowPosition = rows.findIndex((r) => r.id === row.id)
-      return columnOrder[expectedRowPosition] === cellId
+      return columnOrder.indexOf(cellId)
     })
+    const isRowCorrect = positions.every((pos, _i, arr) => pos >= 0 && pos === arr[0])
 
     if (isRowCorrect) {
       matchedRowIds.push(row.id)

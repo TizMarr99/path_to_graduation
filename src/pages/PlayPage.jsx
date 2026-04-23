@@ -821,17 +821,51 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       return
     }
 
+    const compactDraftAnswersByChallengeId = Object.fromEntries(
+      Object.entries(draftAnswersByChallengeId).flatMap(([id, draft]) => {
+        if (!draft) return []
+        const c = {}
+        if (draft.selectedChoiceId) c.selectedChoiceId = draft.selectedChoiceId
+        if (draft.selectedItemId) c.selectedItemId = draft.selectedItemId
+        if (draft.textAnswer) c.textAnswer = draft.textAnswer
+        if (draft.titleAnswer) c.titleAnswer = draft.titleAnswer
+        if (draft.authorAnswer) c.authorAnswer = draft.authorAnswer
+        if (draft.orderedItemIds?.length) c.orderedItemIds = draft.orderedItemIds
+        if (draft.sequenceOrderIds?.length) c.sequenceOrderIds = draft.sequenceOrderIds
+        if (draft.faceMorphAnswers?.some(Boolean)) c.faceMorphAnswers = draft.faceMorphAnswers
+        if (Object.keys(draft.speedrunAnswers ?? {}).length) c.speedrunAnswers = draft.speedrunAnswers
+        if (draft.speedrunSkippedIds?.length) c.speedrunSkippedIds = draft.speedrunSkippedIds
+        if (Object.keys(draft.imageOptionSelections ?? {}).length) c.imageOptionSelections = draft.imageOptionSelections
+        if (draft.imageOptionItemOrderIds?.length) c.imageOptionItemOrderIds = draft.imageOptionItemOrderIds
+        if (draft.imageOptionSourceOrderIds?.length) c.imageOptionSourceOrderIds = draft.imageOptionSourceOrderIds
+        if (draft.columnOrders?.some((col) => col?.length > 0)) c.columnOrders = draft.columnOrders
+        if (Object.keys(draft.columnBonusNames ?? {}).length) c.columnBonusNames = draft.columnBonusNames
+        if (Object.keys(draft.cardSelections ?? {}).length) c.cardSelections = draft.cardSelections
+        if (draft.hitsterTrackOrderIds?.some(Boolean)) c.hitsterTrackOrderIds = draft.hitsterTrackOrderIds
+        if (Object.keys(draft.hitsterTrackAnswers ?? {}).length) c.hitsterTrackAnswers = draft.hitsterTrackAnswers
+        return Object.keys(c).length ? [[id, c]] : []
+      }),
+    )
+
+    const compactChallengeStatesByChallengeId = Object.fromEntries(
+      Object.entries(challengeStatesByChallengeId).filter(([, s]) =>
+        s &&
+        (s.revealedStageCount !== 0 ||
+          s.musicalChainStageIndex !== 0 ||
+          s.hitsterRevealedTrackCount !== 0 ||
+          s.speedrunCurrentIndex !== 0 ||
+          s.speedrunTimeRemaining !== 0 ||
+          s.speedrunStarted),
+      ),
+    )
+
     syncActiveSessionSnapshot(
       {
         categoryId: category.id,
         currentChallengeId,
         challengeResults,
-        challengeStatesByChallengeId,
-        draftAnswer,
-        draftAnswersByChallengeId,
-        challengeState,
-        isHintVisible,
-        resolvedChallengeIds,
+        challengeStatesByChallengeId: compactChallengeStatesByChallengeId,
+        draftAnswersByChallengeId: compactDraftAnswersByChallengeId,
         sessionCorrectCount,
         sessionWrongCount,
       },
@@ -841,14 +875,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     category.id,
     challengeResults,
     challengeStatesByChallengeId,
-    challengeState,
     clearActiveSession,
     currentChallenge,
     currentChallengeId,
-    draftAnswer,
     draftAnswersByChallengeId,
     isComplete,
-    isHintVisible,
     resolvedChallengeIds,
     sessionCorrectCount,
     sessionWrongCount,

@@ -1,0 +1,337 @@
+
+      {
+        "id": "sf-dark-matching-01",
+        "zoneId": "associations",
+        "type": "column_reorder_matching",
+        "quizSubType": "dark_matching",
+        "difficulty": "hard",
+        "title": "Dark",
+        "introText": "Associa le versioni young, adult e old di ciascun personaggio di Dark.",
+        "roundMusicSrc": "/serie-film/associazioni/dark/dark.mp3",
+        "infoText": "Ricostruisci orizzontalmente i set temporali young, adult e old di ciascun personaggio, includendo anche gli slot non disponibili.",
+        "columns": [
+          "Young",
+          "Adult",
+          "Old"
+        ],
+        "rows": [
+          {
+            "id": "claudia",
+            "correctOrder": [
+              "claudia_young",
+              "claudia_adult",
+              "claudia_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Claudia",
+              "Claudia Tiedemann"
+            ]
+          },
+          {
+            "id": "ines",
+            "correctOrder": [
+              "ines_young",
+              "ines_adult",
+              "ines_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Ines",
+              "Ines Kahnwald"
+            ]
+          },
+          {
+            "id": "ulrich",
+            "correctOrder": [
+              "ulrich_young",
+              "ulrich_adult",
+              "ulrich_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Ulrich Nielsen",
+              "Ulrich"
+            ]
+          },
+          {
+            "id": "helge",
+            "correctOrder": [
+              "helge_young",
+              "helge_adult",
+              "helge_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Helge Doppler",
+              "Helge"
+            ]
+          },
+          {
+            "id": "egon",
+            "correctOrder": [
+              "egon_empty_young",
+              "egon_adult",
+              "egon_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Egon",
+              "Egon Tiedemann"
+            ]
+          },
+          {
+            "id": "elisabeth",
+            "correctOrder": [
+              "elisabeth_young",
+              "elisabeth_adult",
+              "elisabeth_empty_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Elisabeth",
+              "Elisabeth Doppler"
+            ]
+          },
+          {
+            "id": "hannah",
+            "correctOrder": [
+              "hannah_young",
+              "hannah_adult",
+              "hannah_empty_old"
+            ],
+            "bonusNameAcceptedAnswers": [
+              "Hannah",
+              "Hannah Kahnwald"
+            ]
+          }
+        ],
+        "cells": [
+          {
+            "id": "claudia_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/claudia_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "claudia_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/claudia_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "claudia_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/claudia_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ines_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ines_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ines_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ines_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ines_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ines_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ulrich_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ulrich_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ulrich_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ulrich_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "ulrich_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/ulrich_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "helge_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/helge_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "helge_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/helge_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "helge_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/helge_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "egon_empty_young",
+            "column": 0,
+            "assets": []
+          },
+          {
+            "id": "egon_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/egon_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "egon_old",
+            "column": 2,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/egon_old.jpg"
+              }
+            ]
+          },
+          {
+            "id": "elisabeth_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/elisabeth_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "elisabeth_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/elisabeth_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "elisabeth_empty_old",
+            "column": 2,
+            "assets": []
+          },
+          {
+            "id": "hannah_young",
+            "column": 0,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/hannah_young.jpg"
+              }
+            ]
+          },
+          {
+            "id": "hannah_adult",
+            "column": 1,
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/associazioni/dark/hannah_adult.jpg"
+              }
+            ]
+          },
+          {
+            "id": "hannah_empty_old",
+            "column": 2,
+            "assets": []
+          }
+        ],
+        "shuffledColumnOrders": [
+          [
+            "helge_young",
+            "hannah_young",
+            "egon_empty_young",
+            "claudia_young",
+            "elisabeth_young",
+            "ines_young",
+            "ulrich_young"
+          ],
+          [
+            "ines_adult",
+            "egon_adult",
+            "claudia_adult",
+            "hannah_adult",
+            "ulrich_adult",
+            "elisabeth_adult",
+            "helge_adult"
+          ],
+          [
+            "claudia_old",
+            "helge_old",
+            "elisabeth_empty_old",
+            "egon_old",
+            "ulrich_old",
+            "ines_old",
+            "hannah_empty_old"
+          ]
+        ],
+        "lockedColumns": [
+          1
+        ],
+        "minimumCorrectRows": 5,
+        "bonusNameCredit": 3,
+        "hint": "Qui il trucco non è riconoscere tutti subito, ma inseguire i tratti che il tempo non riesce a cancellare del tutto.",
+        "hintCost": 12,
+        "creditReward": 20
+      }

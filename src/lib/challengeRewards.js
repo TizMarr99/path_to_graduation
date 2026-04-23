@@ -120,7 +120,7 @@ function buildConfiguredGroupResults(category, feedbackMap, config) {
       groupChallenges,
       feedbackMap,
       groupConfig.weight ?? 1,
-      config.passingThreshold ?? 0.6,
+      config.groupPassingThreshold ?? config.passingThreshold ?? 0.7,
       groupConfig.passingThreshold,
     )
   }
@@ -134,7 +134,7 @@ function buildFallbackGroupResults(typeResults, config) {
 
   for (const [quizType, result] of Object.entries(typeResults)) {
     const normalizedScore = result.total > 0 ? result.passed / result.total : 0
-    const passingThreshold = config.passingThreshold ?? 0.6
+    const passingThreshold = config.groupPassingThreshold ?? config.passingThreshold ?? 0.7
     groupResults[quizType] = {
       ...result,
       score: result.passed,
@@ -303,7 +303,7 @@ export function computeSubgameStats(category, feedbackMap, currentChallengeId) {
         groupChallenges,
         feedbackMap,
         groupConfig.weight ?? 1,
-        config.passingThreshold ?? 0.6,
+        config.groupPassingThreshold ?? config.passingThreshold ?? 0.7,
         groupConfig.passingThreshold,
       )
       const challengeIds = groupChallenges.map((c) => c.id)
@@ -330,7 +330,7 @@ export function computeSubgameStats(category, feedbackMap, currentChallengeId) {
         groupChallenges,
         feedbackMap,
         1,
-        config.passingThreshold ?? 0.6,
+        config.groupPassingThreshold ?? config.passingThreshold ?? 0.7,
         undefined,
       )
       const isResolved = challengeIds.every((id) => feedbackMap.has(id))
