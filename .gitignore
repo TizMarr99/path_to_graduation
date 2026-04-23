@@ -49,3 +49,6 @@ dist-ssr/
 .copilot_history
 .vercel
 .env*.local
+progress_dev_progress_patch.json
+progress_dev.json
+prova.json

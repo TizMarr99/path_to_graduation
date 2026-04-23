@@ -237,8 +237,8 @@
         "hint": "Il brano ha un tono indie-pop malinconico. Il titolo parla di un ritorno.",
         "explanation": "'Back to Friends' di Sombr: un pezzo indie-pop uscito come singolo, riconoscibile dal synth sognante e dal ritornello sussurrato.",
         "speaker": "guardian",
-        "creditReward": 10,
-        "hintCost": 15,
+        "creditReward": 8,
+        "hintCost": 6,
         "scoring": {
           "passThreshold": 2,
           "fullMatchRatio": 1,
@@ -271,8 +271,8 @@
         "hint": "L'artista è britannico e il brano parla di guardare le stelle. Pensa al cielo notturno.",
         "explanation": "'Stargazing' di Myles Smith: un successo virale del 2024, con chitarra acustica e un ritornello che cita letteralmente le stelle.",
         "speaker": "guardian",
-        "creditReward": 10,
-        "hintCost": 15,
+        "creditReward": 7,
+        "hintCost": 5,
         "scoring": {
           "passThreshold": 2,
           "fullMatchRatio": 1,
@@ -320,8 +320,8 @@
         "hint": "Una delle tre è famosa per cantare con una parrucca bionda che le copre gli occhi. Un altro ha recitato in Stranger Things.",
         "explanation": "I tre volti fusi sono Adele (vincitrice di Grammy), Sia (nota per la parrucca) e Joe Keery (attore e musicista, Steve in Stranger Things).",
         "speaker": "neutral",
-        "creditReward": 10,
-        "hintCost": 15
+        "creditReward": 5,
+        "hintCost": 4
       },
       {
         "id": "musica-face-morph-02",
@@ -365,8 +365,8 @@
           "hint": "Uno dei tre è scozzese ed è noto per brani strappalacrime. Un altro è un rapper italiano. Il terzo è un cantautore dai capelli rossi.",
         "explanation": "Lewis Capaldi (scozzese, 'Someone You Loved'), Rkomi (rapper italiano) e Ed Sheeran (cantautore dai capelli rossi, 'Shape of You').",
         "speaker": "neutral",
-        "creditReward": 10,
-        "hintCost": 15
+        "creditReward": 5,
+        "hintCost": 3
       },
       {
         "id": "musica-fill-lyrics-01",
@@ -387,8 +387,8 @@
         "hint": "Il verso gioca su un doppio significato della parola 'mancano'. Pensa a qualcuno che sente la mancanza più di altri.",
         "explanation": "Il verso completo è 'Anche se ti mancano, non ti mancano come ti manco io' — un gioco di parole tra assenza e desiderio.",
         "speaker": "inquisitor",
-        "creditReward": 10,
-        "hintCost": 15,
+        "creditReward": 4,
+        "hintCost": 3,
         "scoring": {
           "minimumWordMatchRatio": 0.7,
           "maxScore": 11
@@ -413,8 +413,8 @@
         "hint": "È una frase breve, quasi una domanda retorica. Si parla di una mamma e di fare colpo.",
         "explanation": "'Che piacevo a tua mamma?' — un verso ironico e diretto, tipico del rap italiano contemporaneo.",
         "speaker": "inquisitor",
-        "creditReward": 10,
-        "hintCost": 15,
+        "creditReward": 4,
+        "hintCost": 3,
         "scoring": {
           "minimumWordMatchRatio": 0.7,
           "maxScore": 5
@@ -439,8 +439,8 @@
         "hint": "È una frase di cinque parole in inglese. Qualcuno chiede di non essere dimenticato.",
         "explanation": "'Please, don't forget about me' — un verso che esprime la paura dell'oblio, comune nel pop-rock emotivo.",
         "speaker": "inquisitor",
-        "creditReward": 15,
-        "hintCost": 15,
+        "creditReward": 4,
+        "hintCost": 3,
         "scoring": {
           "minimumWordMatchRatio": 0.7,
           "maxScore": 5
@@ -467,8 +467,8 @@
         "hint": "Il titolo ha a che fare con creature oscure interiori.",
         "explanation": "'Demons' degli Imagine Dragons (2012): il brano parla dei propri demoni interiori. Riconoscibile anche al contrario per il ritmo della batteria.",
         "speaker": "guardian",
-        "creditReward": 10,
-        "hintCost": 15
+        "creditReward": 6,
+        "hintCost": 4
       },
       {
         "id": "musica-reverse-song-02",
@@ -491,8 +491,8 @@
         "hint": "Il titolo è una singola parola inglese. L'artista non è mainstream.",
         "explanation": "'Ordinary' — un brano dal tono rilassato. Invertito, il ritmo della voce resta il miglior indizio per riconoscerlo.",
         "speaker": "guardian",
-        "creditReward": 10,
-        "hintCost": 15
+        "creditReward": 6,
+        "hintCost": 4
       },
       {
         "id": "musica-chain-01",
@@ -541,8 +541,8 @@
         "hint": "È un successo disco-pop di Dua Lipa.",
         "explanation": "'Don't Start Now' di Dua Lipa (2019): il bassline funky è inconfondibile già dal primo strumento isolato.",
         "speaker": "guardian",
-        "creditReward": 10,
-        "hintCost": 15,
+        "creditReward": 8,
+        "hintCost": 6,
         "scoring": {
           "maxScore": 3,
           "revealPenalty": 1,
@@ -598,8 +598,8 @@
         "hint": "Luca, Giuseppe e Tiziano.",
         "explanation": "'Faro di te un uomo' — un evergreen italiano sull'educazione e la crescita, spesso associato a momenti solenni.",
         "speaker": "guardian",
-        "creditReward": 10,
-        "hintCost": 15,
+        "creditReward": 7,
+        "hintCost": 5,
         "scoring": {
           "maxScore": 3,
           "revealPenalty": 1,
@@ -729,8 +729,8 @@
         "hint": "Metti i brani in ordine dal più vecchio al più recente. Il pezzo dei Coldplay è precedente al 2010.",
         "explanation": "L'ordine corretto è: Viva La Vida (2008), Rolling in the Deep (2010), 7 Years (2015), That's What I Like (2016), Bad Guy (2019).",
         "speaker": "neutral",
-        "creditReward": 15,
-        "hintCost": 15,
+        "creditReward": 20,
+        "hintCost": 14,
         "scoring": {
           "minimumCorrectPlacements": 3
         }
@@ -846,7 +846,7 @@
           "id": "emoji",
           "label": "Emoji quiz",
           "weight": 1,
-          "passingThreshold": 0.6666666667,
+          "passingThreshold": 0.66,
           "quizTypes": [
             "emoji_guess"
           ]
@@ -1024,7 +1024,7 @@
       }
     ],
     "unlockCost": 0,
-    "buyAccessCost": 60,
+    "buyAccessCost": 70,
     "characters": {
       "guardian": {
         "id": "benedict-bridgerton",
@@ -1302,6 +1302,20 @@
               "Chuck",
               "Chuck Bass"
             ]
+          },    
+          {
+            "id": "john-watson",
+            "showName": "Sherlock",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/john.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "John",
+              "John Watson"
+            ]
           },
           {
             "id": "joel-miller",
@@ -1360,7 +1374,7 @@
             ]
           }
         ],
-        "creditReward": 15
+        "creditReward": 20
       },
       {
         "id": "sf-face-morph-01",
@@ -1402,8 +1416,8 @@
         ],
         "minimumCorrectGroups": 2,
         "hint": "Uno dei tre porta addosso un Nord severo, uno vive di completi impeccabili, uno ha un'aria molto più ambigua che eroica.",
-        "hintCost": 18,
-        "creditReward": 12
+        "hintCost": 4,
+        "creditReward": 5
       },
       {
         "id": "sf-face-morph-02",
@@ -1444,8 +1458,8 @@
         ],
         "minimumCorrectGroups": 2,
         "hint": "Qui conta il contrasto: potere politico, istinto di sopravvivenza e autorità morale convivono nello stesso volto fuso.",
-        "hintCost": 12,
-        "creditReward": 12
+        "hintCost": 3,
+        "creditReward": 5
       },
       {
         "id": "sf-emoji-01",
@@ -1460,8 +1474,8 @@
           "Inception"
         ],
         "hint": "Non leggere gli emoji come oggetti: leggili come livelli di realtà che si piegano uno dentro l'altro.",
-        "hintCost": 15,
-        "creditReward": 8
+        "hintCost": 3,
+        "creditReward": 4
       },
       {
         "id": "sf-emoji-02",
@@ -1477,8 +1491,8 @@
           "The Devil Wears Prada"
         ],
         "hint": "Qui il tono vale più della trama: lusso, moda e un potere che entra in scena con i tacchi.",
-        "hintCost": 18,
-        "creditReward": 8
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-emoji-03",
@@ -1493,8 +1507,8 @@
           "Aladino"
         ],
         "hint": "Il titolo coincide con il protagonista, non con l'oggetto magico più famoso della storia.",
-        "hintCost": 18,
-        "creditReward": 8
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-puzzle-01",
@@ -1509,8 +1523,8 @@
           "In Time"
         ],
         "hint": "La chiave non è morale ma letterale: qui ciò che scade non è il denaro.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-puzzle-02",
@@ -1524,8 +1538,8 @@
           "Passengers"
         ],
         "hint": "Pensa a un viaggio spaziale che diventa soprattutto una storia di isolamento e compagnia forzata.",
-        "hintCost": 18,
-        "creditReward": 10
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-puzzle-03",
@@ -1539,8 +1553,8 @@
           "Iron Man"
         ],
         "hint": "La frase è diventata iconica nell'MCU, ma il dettaglio decisivo resta la caverna.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 3
       },
       {
         "id": "sf-puzzle-04",
@@ -1557,8 +1571,8 @@
           "Three body problem"
         ],
         "hint": "Il cuore del rebus non è 'stanno arrivando', ma il sistema cosmico impossibile descritto all'inizio.",
-        "hintCost": 12,
-        "creditReward": 10
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-puzzle-05",
@@ -1573,8 +1587,8 @@
           "Imitation Game"
         ],
         "hint": "La guerra è solo il contesto: il centro della storia è un uomo che nasconde quasi tutto di sé.",
-        "hintCost": 12,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 3
       },
       {
         "id": "sf-got-matching-01",
@@ -1658,8 +1672,8 @@
           }
         ],
         "hint": "Non partire dalle immagini delle casate: parti dai motti più celebri. Inverno, ruggito e fuoco ti danno già tre ancore solide.",
-        "hintCost": 12,
-        "creditReward": 12
+        "hintCost": 9,
+        "creditReward": 15
       },
       {
         "id": "sf-dark-matching-01",
@@ -1994,8 +2008,8 @@
         "minimumCorrectRows": 5,
         "bonusNameCredit": 3,
         "hint": "Qui il trucco non è riconoscere tutti subito, ma inseguire i tratti che il tempo non riesce a cancellare del tutto.",
-        "hintCost": 10,
-        "creditReward": 15
+        "hintCost": 12,
+        "creditReward": 20
       },
       {
         "id": "sf-aib-matching-01",
@@ -2091,8 +2105,8 @@
         ],
         "minimumCorrect": 4,
         "hint": "Inizia dal seme, non dal numero: in Alice in Borderland ogni seme racconta il tipo di gioco prima ancora del valore della carta.",
-        "hintCost": 12,
-        "creditReward": 12
+        "hintCost": 9,
+        "creditReward": 15
       },
       {
         "id": "sf-st-matching-01",
@@ -2256,8 +2270,8 @@
           }
         ],
         "hint": "Una traccia esplode in energia rock — perfetta per una scena di sfogo e ribellione; un'altra è fragile e sospesa, scelta per i momenti più cupi e introspettivi.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 11,
+        "creditReward": 15
       },
       {
         "id": "sf-love-grey-01",
@@ -2435,8 +2449,8 @@
         "minimumCorrectRows": 5,
         "bonusNameCredit": 0,
         "hint": "Non pensare ai flirt: qui contano le coppie che hanno segnato stagioni intere e lasciato una ferita netta nella serie.",
-        "hintCost": 12,
-        "creditReward": 8
+        "hintCost": 6,
+        "creditReward": 10
       },
       {
         "id": "sf-love-bridgerton-01",
@@ -2614,8 +2628,8 @@
         "minimumCorrectRows": 5,
         "bonusNameCredit": 0,
         "hint": "Ragiona per stagioni e per centralità narrativa: le coppie principali di Bridgerton si riconoscono prima dal periodo che dai volti.",
-        "hintCost": 12,
-        "creditReward": 8
+        "hintCost": 6,
+        "creditReward": 10
       },
       {
         "id": "sf-citazione-01",
@@ -2648,8 +2662,8 @@
           "partialMatchRatio": 1
         },
         "hint": "La voce è tagliente, ironica, più incline all'intelligenza che alla spada. Il personaggio si riconosce quasi prima del titolo.",
-        "hintCost": 15,
-        "creditReward": 12
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-citazione-02",
@@ -2681,8 +2695,8 @@
           "partialMatchRatio": 1
         },
         "hint": "Se il nome del personaggio non ti arriva subito, pensa a una serie in cui il tempo, il destino e un'isola contano quasi quanto i protagonisti.",
-        "hintCost": 15,
-        "creditReward": 12
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-citazione-03",
@@ -2714,8 +2728,8 @@
           "partialMatchRatio": 1
         },
         "hint": "La voce appartiene a qualcuno che ha trasformato sarcasmo e talento chirurgico in una firma precisa.",
-        "hintCost": 15,
-        "creditReward": 12
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-citazione-04",
@@ -2747,8 +2761,8 @@
           "partialMatchRatio": 1
         },
         "hint": "Qui il personaggio è spesso più facile del titolo: basta ascoltare il modo in cui piega le parole con sicurezza teatrale.",
-        "hintCost": 12,
-        "creditReward": 12
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-citazione-05",
@@ -2781,8 +2795,8 @@
           "partialMatchRatio": 1
         },
         "hint": "Non cercare un supereroe generico: la voce appartiene a qualcuno che porta addosso l'idea stessa di disciplina e sacrificio.",
-        "hintCost": 15,
-        "creditReward": 12
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-colonna-01",
@@ -2803,8 +2817,8 @@
           "Big Hero Six"
         ],
         "hint": "Il brano ha un'energia tenera e tecnologica: non viene da un classico antico ma da un'animazione molto più recente.",
-        "hintCost": 12,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-colonna-02",
@@ -2825,8 +2839,8 @@
           "Guardians of the Galaxy"
         ],
         "hint": "Qui il tono è avventuroso e spaziale, ma più scanzonato che epico.",
-        "hintCost": 12,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-colonna-03",
@@ -2847,8 +2861,8 @@
           "Ercole"
         ],
         "hint": "L'impronta è decisamente disneyana, ma con una teatralità quasi gospel.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-colonna-04",
@@ -2868,8 +2882,8 @@
           "Interstellar"
         ],
         "hint": "Qui il suono non accompagna soltanto lo spazio: sembra allungare il tempo stesso.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-colonna-05",
@@ -2889,8 +2903,8 @@
           "Sherlock"
         ],
         "hint": "La traccia ha un'eleganza nervosa e brillante, perfetta per qualcuno che corre più veloce di chiunque altro nel ragionamento.",
-        "hintCost": 18,
-        "creditReward": 10
+        "hintCost": 2,
+        "creditReward": 3
       },
       {
         "id": "sf-intruso-01",
@@ -2921,8 +2935,8 @@
         ],
         "intruderId": "monica",
         "hint": "Tre nomi condividono davvero il cognome che conta in quella dinastia. Uno no.",
-        "hintCost": 12,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-intruso-02",
@@ -2953,8 +2967,8 @@
         ],
         "intruderId": "gloss",
         "hint": "Controlla soprattutto i distretti dei tributi professionisti: l'errore si nasconde lì.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-intruso-03",
@@ -2985,8 +2999,8 @@
         ],
         "intruderId": "johnny",
         "hint": "L'intruso non è quello meno famoso: è quello meno distribuito tra le saghe citate.",
-        "hintCost": 15,
-        "creditReward": 12
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-01",
@@ -3001,8 +3015,8 @@
           "Perla Nera"
         ],
         "hint": "Non è una nave qualsiasi: il nome richiama il colore e qualcosa di prezioso.",
-        "hintCost": 18,
-        "creditReward": 8
+        "hintCost": 2,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-02",
@@ -3018,8 +3032,8 @@
           "Grey Sloan Memorial"
         ],
         "hint": "Non pensare alle primissime stagioni: il nome con cui è noto più avanti nella serie è quello che ti serve qui.",
-        "hintCost": 12,
-        "creditReward": 8
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-03",
@@ -3039,8 +3053,8 @@
           "Drogon, Viserion, Rhaegal"
         ],
         "hint": "Uno porta il nome del marito, uno del fratello e uno sembra il riflesso più diretto della sua rabbia.",
-        "hintCost": 15,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-04",
@@ -3058,8 +3072,8 @@
           "Winter Soldier"
         ],
         "hint": "Se ti viene in mente il suo nome più tardo, sei già molto vicina alla risposta.",
-        "hintCost": 12,
-        "creditReward": 8
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-05",
@@ -3075,8 +3089,8 @@
           "4-8-15-16-23-42"
         ],
         "hint": "Sono sei numeri, non pochi, e per chi ha visto la serie diventano quasi una formula ossessiva.",
-        "hintCost": 10,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-06",
@@ -3098,8 +3112,8 @@
           "Agente del destino"
         ],
         "hint": "Il titolo suggerisce più controllo invisibile che azione spettacolare.",
-        "hintCost": 10,
-        "creditReward": 8
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-07",
@@ -3122,8 +3136,8 @@
           "The Da Vinci Code"
         ],
         "hint": "Il centro non è il pittore in sé, ma il mistero che il suo nome lascia dietro di sé.",
-        "hintCost": 15,
-        "creditReward": 8
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-domanda-08",
@@ -3143,8 +3157,8 @@
           "Collateral Beauty"
         ],
         "hint": "Il titolo accosta due idee che di solito non stanno bene insieme: ferita e grazia.",
-        "hintCost": 12,
-        "creditReward": 8
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-intruso-04",
@@ -3175,8 +3189,8 @@
         ],
         "intruderId": "avatar",
         "hint": "Non fermarti al regista: anche la colonna sonora può eliminare quasi subito una delle opzioni.",
-        "hintCost": 12,
-        "creditReward": 10
+        "hintCost": 1,
+        "creditReward": 2
       },
       {
         "id": "sf-intruso-05",
@@ -3207,8 +3221,8 @@
         ],
         "intruderId": "quattro",
         "hint": "L'intruso sembra plausibile proprio perché richiama Conan Doyle, ma il numero è quello da osservare bene.",
-        "hintCost": 18,
-        "creditReward": 12
+        "hintCost": 2,
+        "creditReward": 2
       }
     ]
   }
