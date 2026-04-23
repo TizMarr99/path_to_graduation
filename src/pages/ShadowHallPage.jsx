@@ -38,7 +38,75 @@ const slotThemes = {
   },
 }
 
-function resolvePortalScoreLabel(progress, activeSession = null) {
+function resolveWeightedScoreGroupConfig(category, challenge) {
+  if (!category?.weightedScoring || !challenge) {
+    return null
+  }
+
+  const quizType = challenge.quizSubType ?? challenge.type
+
+  return category.weightedScoring.scoreGroups?.find((group) => {
+    const matchesById = group.challengeIds?.includes(challenge.id)
+    const matchesByType = group.quizTypes?.includes(quizType)
+
+    return Boolean(matchesById || matchesByType)
+  }) ?? null
+}
+
+function getCategoryChallengeSubgameId(category, challenge) {
+  return resolveWeightedScoreGroupConfig(category, challenge)?.id ?? (challenge?.quizSubType || challenge?.type || '')
+}
+
+function resolveSubgameOutcomeCounts(category, challengeResults) {
+  const challenges = category?.challenges ?? []
+
+  if (!challenges.length || !challengeResults || typeof challengeResults !== 'object') {
+    return null
+  }
+
+  const subgameChallengeIds = challenges.reduce((accumulator, challenge) => {
+    const subgameId = getCategoryChallengeSubgameId(category, challenge)
+
+    if (!accumulator[subgameId]) {
+      accumulator[subgameId] = []
+    }
+
+    accumulator[subgameId].push(challenge.id)
+    return accumulator
+  }, {})
+
+  let completedSubgames = 0
+  let passedSubgames = 0
+  let failedSubgames = 0
+
+  Object.values(subgameChallengeIds).forEach((challengeIds) => {
+    const feedbackList = challengeIds
+      .map((challengeId) => challengeResults[challengeId] ?? null)
+      .filter(Boolean)
+
+    if (feedbackList.length !== challengeIds.length) {
+      return
+    }
+
+    completedSubgames += 1
+
+    if (feedbackList.every((feedback) => feedback.isCorrect)) {
+      passedSubgames += 1
+      return
+    }
+
+    failedSubgames += 1
+  })
+
+  return {
+    completedSubgames,
+    failedSubgames,
+    passedSubgames,
+    totalSubgames: Object.keys(subgameChallengeIds).length,
+  }
+}
+
+function resolvePortalScoreLabel(progress, activeSession = null, category = null) {
   const hasStoredProgress = Boolean(progress?.lastCompletedSession) || (progress?.sessions?.length ?? 0) > 0
 
   if (!activeSession && !hasStoredProgress) {
@@ -56,22 +124,39 @@ function resolvePortalScoreLabel(progress, activeSession = null) {
     return null
   }
 
+  const subgameCounts = resolveSubgameOutcomeCounts(category, scoreSource.challengeResults)
+
+  if (subgameCounts) {
+    return `◈ ${subgameCounts.completedSubgames} · ✓ ${subgameCounts.passedSubgames} · ✗ ${subgameCounts.failedSubgames}`
+  }
+
   const correctCount = scoreSource.correctCount ?? scoreSource.sessionCorrectCount ?? 0
   const wrongCount = scoreSource.wrongCount ?? scoreSource.sessionWrongCount ?? 0
 
   return `✓ ${correctCount} · ✗ ${wrongCount}`
 }
 
-function resolvePortalOutcome(progress, activeSession = null) {
+function resolvePortalOutcome(progress, activeSession = null, category = null) {
   const scoreSource = activeSession
     ? {
         correctCount: activeSession.sessionCorrectCount ?? 0,
         wrongCount: activeSession.sessionWrongCount ?? 0,
+        challengeResults: activeSession.challengeResults ?? null,
       }
     : progress?.lastCompletedSession ?? progress?.sessions?.at(-1) ?? null
 
   if (!scoreSource) {
     return null
+  }
+
+  const subgameCounts = resolveSubgameOutcomeCounts(category, scoreSource.challengeResults)
+
+  if (subgameCounts) {
+    return {
+      correctCount: subgameCounts.passedSubgames,
+      wrongCount: subgameCounts.failedSubgames,
+      ...subgameCounts,
+    }
   }
 
   return {
@@ -572,7 +657,8 @@ export default function ShadowHallPage() {
           const activeSessionForSlot = playerState.activeSession?.categoryId === slot.categoryId
             ? playerState.activeSession
             : null
-          const slotOutcome = resolvePortalOutcome(slotProgress, activeSessionForSlot)
+          const slotCategory = getCategoryById(slot.categoryId)
+          const slotOutcome = resolvePortalOutcome(slotProgress, activeSessionForSlot, slotCategory)
           const defeated =
             unlocked &&
             !prizeWon &&
@@ -582,8 +668,7 @@ export default function ShadowHallPage() {
             ? unlocked || hasSeriesFilmReveal
             : unlocked
           const staticBright = slot.categoryId === 'musica' && hasUnlockedMusicByScore
-          const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot)
-          const slotCategory = getCategoryById(slot.categoryId)
+          const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot, slotCategory)
           const defeatedImageSrc = defeated
             ? resolveDefeatedPortalImage(slotCategory, slotOutcome)
             : null

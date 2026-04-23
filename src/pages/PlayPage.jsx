@@ -159,6 +159,65 @@ function getChallengeSubgameLabel(category, challenge) {
   return subgameLabels[subgameId] ?? challenge?.title ?? challengeTypeLabels[challenge?.type] ?? 'Sottogioco'
 }
 
+function computeSessionSubgameSummary(category, challengeResults = {}, weightedResult = null) {
+  const challenges = category?.challenges ?? []
+
+  if (!challenges.length) {
+    return {
+      totalSubgames: 0,
+      completedSubgames: 0,
+      passedSubgames: 0,
+      failedSubgames: 0,
+    }
+  }
+
+  const subgameChallengeIds = challenges.reduce((accumulator, challenge) => {
+    const subgameId = getCategoryChallengeSubgameId(category, challenge)
+
+    if (!accumulator[subgameId]) {
+      accumulator[subgameId] = []
+    }
+
+    accumulator[subgameId].push(challenge.id)
+    return accumulator
+  }, {})
+
+  let completedSubgames = 0
+  let passedSubgames = 0
+  let failedSubgames = 0
+
+  Object.entries(subgameChallengeIds).forEach(([subgameId, challengeIds]) => {
+    const feedbackList = challengeIds
+      .map((challengeId) => challengeResults[challengeId] ?? null)
+      .filter(Boolean)
+
+    if (feedbackList.length !== challengeIds.length) {
+      return
+    }
+
+    completedSubgames += 1
+
+    const weightedGroupOutcome = weightedResult?.groupResults?.[subgameId]
+    const isSubgamePassing = typeof weightedGroupOutcome?.isPassing === 'boolean'
+      ? weightedGroupOutcome.isPassing
+      : feedbackList.every((feedback) => feedback.isCorrect)
+
+    if (isSubgamePassing) {
+      passedSubgames += 1
+      return
+    }
+
+    failedSubgames += 1
+  })
+
+  return {
+    totalSubgames: Object.keys(subgameChallengeIds).length,
+    completedSubgames,
+    passedSubgames,
+    failedSubgames,
+  }
+}
+
 function DailyLimitOverlay() {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center rounded-[1.75rem] bg-slate-950/85 backdrop-blur-sm">
@@ -182,8 +241,8 @@ const ERROR_OPACITIES = [0.38, 0.52, 0.66]
 function ZoneChallengeNavigator({
   currentChallengeId,
   challenges,
+  challengeResults = {},
   onSelect,
-  resolvedChallengeIds,
   label = 'Prove della zona',
   vertical = false,
 }) {
@@ -205,7 +264,9 @@ function ZoneChallengeNavigator({
       </span>
       {challenges.map((challenge, index) => {
         const isActive = challenge.id === currentChallengeId
-        const isResolved = resolvedChallengeIds.includes(challenge.id)
+        const challengeFeedback = challengeResults[challenge.id] ?? null
+        const isPassed = Boolean(challengeFeedback?.isCorrect)
+        const isFailed = Boolean(challengeFeedback && !challengeFeedback.isCorrect)
 
         return (
           <button
@@ -216,8 +277,10 @@ function ZoneChallengeNavigator({
               vertical ? 'w-full min-h-10 px-0' : '',
               isActive
                 ? 'border-amber-200/70 bg-amber-300/18 text-amber-50'
-                : isResolved
-                  ? 'border-rose-300/35 bg-rose-400/10 text-rose-100 hover:border-rose-200/55'
+                : isPassed
+                  ? 'border-emerald-300/35 bg-emerald-400/10 text-emerald-100 hover:border-emerald-200/55'
+                  : isFailed
+                    ? 'border-rose-300/35 bg-rose-400/10 text-rose-100 hover:border-rose-200/55'
                   : 'border-white/12 bg-white/5 text-slate-100 hover:border-cyan-300/45 hover:text-cyan-100',
             ].join(' ')}
             onClick={() => onSelect(challenge.id)}
@@ -388,10 +451,25 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       groupResults: weightedResult.groupResults,
     }
   }, [weightedResult])
+  const sessionSubgameSummary = useMemo(
+    () => computeSessionSubgameSummary(category, challengeResults, weightedResult),
+    [category, challengeResults, weightedResult],
+  )
+  const displaySessionCorrectCount = sessionSubgameSummary.passedSubgames
+  const displaySessionWrongCount = sessionSubgameSummary.failedSubgames
+  const displayProgressLabel = sessionSubgameSummary.totalSubgames
+    ? `Sottogiochi completati ${sessionSubgameSummary.completedSubgames} di ${sessionSubgameSummary.totalSubgames}`
+    : progressLabel
   const earlyMusicVictory = isMusicRoom && sessionCorrectCount >= 8 && !isComplete && !victoryModalAlreadySeen
+  const nonWeightedSubgamePass =
+    sessionSubgameSummary.totalSubgames > 0 &&
+    sessionSubgameSummary.completedSubgames === sessionSubgameSummary.totalSubgames &&
+    sessionSubgameSummary.failedSubgames === 0
   const passedRoom = hasWeightedScoring
     ? (weightedResult?.isPassing ?? false)
-    : sessionCorrectCount >= 8
+    : isMusicRoom
+      ? sessionCorrectCount >= 8
+      : nonWeightedSubgamePass
   const shouldShowRoomVictoryModal =
     earlyMusicVictory ||
     (isComplete && passedRoom && !victoryModalAlreadySeen)
@@ -458,7 +536,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         existingSubgame.challengeIds.push(challenge.id)
         return accumulator
       }, {}),
-    [category, category.challenges],
+    [category],
   )
   const currentZoneChallenges = useMemo(
     () => (zoneChallengeMap[currentZoneId] ?? [])
@@ -1082,7 +1160,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         dismissFeedback()
         selectChallenge(challengeId)
       }}
-      resolvedChallengeIds={resolvedChallengeIds}
+      challengeResults={challengeResults}
       vertical
     />
   )
@@ -1122,9 +1200,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             onHintClick={openHintModal}
             onInfoClick={openInfoModal}
             onMapClick={() => setIsRoomMapVisible(true)}
-            progressLabel={progressLabel}
-            sessionCorrectCount={sessionCorrectCount}
-            sessionWrongCount={sessionWrongCount}
+            progressLabel={displayProgressLabel}
+            sessionCorrectCount={displaySessionCorrectCount}
+            sessionWrongCount={displaySessionWrongCount}
           >
             {isChallengeIntroVisible ? (
               <div className="space-y-4">
@@ -1317,8 +1395,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             <ChallengeProgress
               challengeNumber={challengeNumber}
               completedChallenges={resolvedChallengeCount}
-              sessionCorrectCount={sessionCorrectCount}
-              sessionWrongCount={sessionWrongCount}
+              sessionCorrectCount={displaySessionCorrectCount}
+              sessionWrongCount={displaySessionWrongCount}
               totalChallenges={totalChallenges}
               title={currentChallenge.title}
               type={currentChallenge.type}
