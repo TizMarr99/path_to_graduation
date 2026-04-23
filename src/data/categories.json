@@ -1148,148 +1148,66 @@
         "quizSubType": "speedrun_characters",
         "difficulty": "medium",
         "title": "Speedrun Personaggi",
-        "introText": "Riconosci quanti più personaggi possibile in 60 secondi!",
-        "timerSeconds": 60,
+        "introText": "Riconosci quanti più personaggi possibile in 2 minuti!",
+        "timerSeconds": 120,
         "minimumCorrect": 10,
         "characters": [
-          {
-            "id": "alex-karev",
+                    {
+            "id": "cristina-yang",
             "showName": "Grey's Anatomy",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/alex.jpg"
+                "src": "/serie-film/speedrun/cristina.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Alex",
-              "Alex Karev"
+              "Cristina",
+              "Cristina Yang",
+              "Christina",
+              "Christina Yang"
             ]
           },
           {
-            "id": "amenadiel",
-            "showName": "Lucifer",
+            "id": "daemon-targaryen",
+            "showName": "House of the Dragon",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/amenadiel.jpg"
+                "src": "/serie-film/speedrun/daemon.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Amenadiel"
+              "Daemon",
+              "Daemon Targaryen"
             ]
           },
           {
-            "id": "shuntaro-chishiya",
-            "showName": "Alice in Borderland",
+            "id": "peeta-mellark",
+            "showName": "The Hunger Games",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/chishiya.jpg"
+                "src": "/serie-film/speedrun/peeta.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Chishiya",
-              "Shuntaro",
-              "Shuntaro Chishiya"
+              "Peeta",
+              "Peeta Mellark"
             ]
           },
           {
-            "id": "cirilla",
-            "showName": "The Witcher",
+            "id": "robb-stark",
+            "showName": "Game of Thrones",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/cirilla.jpg"
+                "src": "/serie-film/speedrun/robb.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Cirilla",
-              "Ciri"
-            ]
-          },
-          {
-            "id": "dolores-abernathy",
-            "showName": "Westworld",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/dolores.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Dolores",
-              "Dolores Abernathy"
-            ]
-          },
-          {
-            "id": "fallon-carrington",
-            "showName": "Dynasty",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/fallon.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Fallon",
-              "Fallon Carrington"
-            ]
-          },
-          {
-            "id": "wes-gibbins",
-            "showName": "How to Get Away with Murder",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/wes.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Wes",
-              "Wes Gibbins"
-            ]
-          },
-          {
-            "id": "jesse-pinkman",
-            "showName": "Breaking Bad",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/jesse.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Jesse",
-              "Jesse Pinkman"
-            ]
-          },
-          {
-            "id": "joel-miller",
-            "showName": "The Last of Us",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/joel.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Joel",
-              "Joel Miller"
-            ]
-          },
-          {
-            "id": "louis-litt",
-            "showName": "Suits",
-            "assets": [
-              {
-                "kind": "image",
-                "src": "/serie-film/speedrun/louis.jpg"
-              }
-            ],
-            "acceptedAnswers": [
-              "Louis",
-              "Louis Litt"
+              "Robb",
+              "Robb Stark"
             ]
           },
           {
@@ -1325,45 +1243,120 @@
             ]
           },
           {
-            "id": "peeta-mellark",
-            "showName": "The Hunger Games",
+            "id": "geralt-of-rivia",
+            "showName": "The Witcher",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/peeta.jpg"
+                "src": "/serie-film/speedrun/geralt.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Peeta",
-              "Peeta Mellark"
+              "Geralt",
+              "Geralt di Rivia",
+              "Geralt of Rivia"
             ]
           },
           {
-            "id": "robb-stark",
-            "showName": "Game of Thrones",
+            "id": "filippo-edinburgo",
+            "showName": "The Crown",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/robb.jpg"
+                "src": "/serie-film/speedrun/filippo.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Robb",
-              "Robb Stark"
+              "Filippo",
+              "Principe Filippo",
+              "Prince Philip",
+              "Philip",
+              "Duca di Edimburgo"
+            ]
+          },
+                    {
+            "id": "sawyer",
+            "showName": "Lost",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/sawyer.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Sawyer",
+              "James Ford",
+              "James"
             ]
           },
           {
-            "id": "tommy-shelby",
-            "showName": "Peaky Blinders",
+            "id": "chuck-bass",
+            "showName": "Gossip Girl",
             "assets": [
               {
                 "kind": "image",
-                "src": "/serie-film/speedrun/tommy.jpg"
+                "src": "/serie-film/speedrun/chuck.jpg"
               }
             ],
             "acceptedAnswers": [
-              "Tommy",
-              "Tommy Shelby"
+              "Chuck",
+              "Chuck Bass"
+            ]
+          },
+          {
+            "id": "joel-miller",
+            "showName": "The Last of Us",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/joel.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Joel",
+              "Joel Miller"
+            ]
+          },
+          {
+            "id": "louis-litt",
+            "showName": "Suits",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/louis.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Louis",
+              "Louis Litt"
+            ]
+          },
+          {
+            "id": "eloise-bridgerton",
+            "showName": "Bridgerton",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/eloise.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Eloise",
+              "Eloise Bridgerton"
+            ]
+          },
+          {
+            "id": "denver",
+            "showName": "La Casa di Carta",
+            "assets": [
+              {
+                "kind": "image",
+                "src": "/serie-film/speedrun/denver.jpg"
+              }
+            ],
+            "acceptedAnswers": [
+              "Denver",
+              "Daniel Ramos"
             ]
           }
         ],

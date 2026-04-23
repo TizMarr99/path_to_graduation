@@ -343,6 +343,10 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isHintVisible,
     isSubmitting,
     progressLabel,
+    subgameTotalCount,
+    currentSubgameNumber,
+    subgamesPassedCount,
+    subgamesFailedCount,
     resolvedChallengeCount,
     resolvedChallengeIds,
     selectChallenge,
@@ -1315,11 +1319,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
             {archivedBanner}
 
             <ChallengeProgress
-              challengeNumber={challengeNumber}
-              completedChallenges={resolvedChallengeCount}
-              sessionCorrectCount={sessionCorrectCount}
-              sessionWrongCount={sessionWrongCount}
-              totalChallenges={totalChallenges}
+              challengeNumber={currentSubgameNumber}
+              completedChallenges={subgamesPassedCount + subgamesFailedCount}
+              sessionCorrectCount={subgamesPassedCount}
+              sessionWrongCount={subgamesFailedCount}
+              totalChallenges={subgameTotalCount}
               title={currentChallenge.title}
               type={currentChallenge.type}
             />

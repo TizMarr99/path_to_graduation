@@ -276,3 +276,75 @@ export function computeWeightedRoomScore(category, feedbackMap) {
 
   return { typeResults, groupResults, weightedScore, isPassing, subPrizesWon }
 }
+
+/**
+ * Compute subgame-level progress stats for display in the UI.
+ *
+ * @param {import('../types/challenge').Category | null} category
+ * @param {Map<string, import('../types/challenge').ChallengeFeedback>} feedbackMap
+ * @param {string} currentChallengeId
+ * @returns {{
+ *   subgameTotalCount: number,
+ *   currentSubgameNumber: number,
+ *   subgamesPassedCount: number,
+ *   subgamesFailedCount: number,
+ * }}
+ */
+export function computeSubgameStats(category, feedbackMap, currentChallengeId) {
+  const allChallenges = category?.challenges ?? []
+  const config = category?.weightedScoring ?? {}
+
+  let groups
+
+  if (config.scoreGroups?.length) {
+    groups = config.scoreGroups.map((groupConfig) => {
+      const groupChallenges = selectChallengesForScoreGroup(groupConfig, allChallenges)
+      const result = buildScoreGroupResult(
+        groupChallenges,
+        feedbackMap,
+        groupConfig.weight ?? 1,
+        config.passingThreshold ?? 0.6,
+        groupConfig.passingThreshold,
+      )
+      const challengeIds = groupChallenges.map((c) => c.id)
+      const isResolved = challengeIds.length > 0 && challengeIds.every((id) => feedbackMap.has(id))
+      return { id: groupConfig.id, challengeIds, isResolved, ...result }
+    })
+  } else {
+    const typeOrder = []
+    const typeMap = {}
+    for (const challenge of allChallenges) {
+      const qType = challenge.quizSubType ?? challenge.type
+      if (!typeMap[qType]) {
+        typeMap[qType] = []
+        typeOrder.push(qType)
+      }
+      typeMap[qType].push(challenge.id)
+    }
+    groups = typeOrder.map((qType) => {
+      const challengeIds = typeMap[qType]
+      const groupChallenges = challengeIds
+        .map((id) => allChallenges.find((c) => c.id === id))
+        .filter(Boolean)
+      const result = buildScoreGroupResult(
+        groupChallenges,
+        feedbackMap,
+        1,
+        config.passingThreshold ?? 0.6,
+        undefined,
+      )
+      const isResolved = challengeIds.every((id) => feedbackMap.has(id))
+      return { id: qType, challengeIds, isResolved, ...result }
+    })
+  }
+
+  const currentGroupIndex = groups.findIndex((g) => g.challengeIds.includes(currentChallengeId))
+  const resolvedGroups = groups.filter((g) => g.isResolved)
+
+  return {
+    subgameTotalCount: groups.length,
+    currentSubgameNumber: currentGroupIndex >= 0 ? currentGroupIndex + 1 : 0,
+    subgamesPassedCount: resolvedGroups.filter((g) => g.isPassing).length,
+    subgamesFailedCount: resolvedGroups.filter((g) => !g.isPassing).length,
+  }
+}
