@@ -8,8 +8,8 @@ import { getRoomTransition } from '../lib/roomTransitions'
 const shadowSlots = [
   { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',    y: '25%', w: '14%', h: '55%', accent: 'amber' },
   { id: 'serie-film',          categoryId: 'serie-film',            label: 'Sala delle Serie TV & Film', x: '24%', y: '18%', w: '14%', h: '55%', accent: 'cyan' },
-  { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Sala dell\'Arte e del Mito', x: '43%', y: '15%', w: '14%', h: '62%', accent: 'amber' },
-  { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '62%',   y: '18%', w: '14%', h: '60%', accent: 'amber' },
+  { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala del Corpo, della Moda e della Fotografia', x: '43%', y: '15%', w: '14%', h: '62%', accent: 'amber' },
+  { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Sala dell\'Arte e del Mito', x: '62%', y: '18%', w: '14%', h: '60%', accent: 'amber' },
   { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%',  y: '25%', w: '14%', h: '55%', accent: 'amber' },
 ]
 
@@ -415,6 +415,7 @@ function ShadowSlot({
               width: 'clamp(32px, 5vw, 48px)',
               height: 'clamp(32px, 5vw, 48px)',
               objectFit: 'contain',
+              borderRadius: '10px',
               filter: slot.categoryId === 'musica'
                 ? 'drop-shadow(0 0 12px rgba(212,175,55,0.9))'
                 : 'drop-shadow(0 0 12px rgba(103,232,249,0.9))',
@@ -594,7 +595,7 @@ export default function ShadowHallPage() {
   // Serie-film card appears when music room is passed (8+ correct) or fully completed
   const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
   const hasSerieFilmCompletion = Boolean(serieFilmProgress?.lastCompletedSession)
-  const hasArteMitoComingSoonReveal = hasSerieFilmCompletion
+  const hasCuraCorpoComingSoonReveal = hasSerieFilmCompletion
   const activeBridgeKey = pendingBridge?.bridgeCompletedAt
     ? `${pendingBridge.sourceCategoryId}:${pendingBridge.targetCategoryId}:${pendingBridge.bridgeCompletedAt}`
     : null
@@ -728,10 +729,10 @@ export default function ShadowHallPage() {
             !prizeWon &&
             !activeSessionForSlot &&
             Boolean(slotProgress?.buyAccessAvailable || slotProgress?.lastCompletedSession)
-          const comingSoon = slot.categoryId === 'arte-mito-letteratura' && hasArteMitoComingSoonReveal
+          const comingSoon = slot.categoryId === 'cura-corpo' && hasCuraCorpoComingSoonReveal
           const visible = slot.categoryId === 'serie-film'
             ? unlocked || hasSeriesFilmReveal
-            : slot.categoryId === 'arte-mito-letteratura'
+            : slot.categoryId === 'cura-corpo'
               ? comingSoon || unlocked
               : unlocked
           const staticBright = prizeWon || (slot.categoryId === 'musica' && hasUnlockedMusicByScore)

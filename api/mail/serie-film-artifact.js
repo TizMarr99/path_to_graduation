@@ -141,6 +141,8 @@ export default async function handler(req, res) {
     }
 
     const baseUrl = process.env.VITE_BASE_URL || 'https://la-mostra-delle-ombre.vercel.app';
+    const artifactImageUrl = `${baseUrl}/images/rooms/serie-film-artifact.png`;
+    const artifactImageAlt = 'Proiettore di Ombre - Artefatto della Sala Serie & Film';
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -175,8 +177,8 @@ export default async function handler(req, res) {
                   immagini, voci e ricordi senza lasciarti piegare dal buio della sala.
                 </p>
                 <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#9f9fb8;">
-                  Ogni volto riconosciuto, ogni collegamento ricomposto, ogni citazione restituita al suo autore:
-                  il percorso è ormai tuo.
+                  Con la soglia superata hai sbloccato sia l'artefatto della sala sia il premio di stanza:
+                  <strong>Candlelight: I grandi successi di Bridgerton</strong>.
                 </p>
               </td>
             </tr>
@@ -187,7 +189,7 @@ export default async function handler(req, res) {
                   <tr>
                     <td style="padding:16px 18px 14px 18px;">
                       <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#b3b3ff;">
-                        Premio stanza ottenuto
+                        Artefatto ottenuto
                       </p>
                       <h2 style="margin:0 0 8px 0;font-size:18px;line-height:1.4;color:#ffffff;">
                         Proiettore di Ombre
@@ -202,9 +204,39 @@ export default async function handler(req, res) {
                       </p>
                     </td>
                     <td style="padding:16px 18px 14px 0;width:120px;" align="right" valign="middle">
-                      <div style="width:96px;height:96px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);box-shadow:0 0 18px rgba(167,139,250,0.35);display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,rgba(44,44,72,0.9),rgba(20,20,34,0.95));font-size:40px;">
-                        🎞️
-                      </div>
+                      <table role="presentation" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td>
+                            <img
+                              src="${artifactImageUrl}"
+                              alt="${artifactImageAlt}"
+                              width="96"
+                              height="96"
+                              style="display:block;border-radius:12px;border:1px solid rgba(255,255,255,0.18);box-shadow:0 0 18px rgba(167,139,250,0.35);background:linear-gradient(145deg,rgba(44,44,72,0.9),rgba(20,20,34,0.95));object-fit:contain;padding:8px;"
+                            />
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:8px 24px 8px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-radius:10px;border:1px solid #2c2c3b;background:radial-gradient(circle at 0% 0%,#2a2033,#17131f);">
+                  <tr>
+                    <td style="padding:16px 18px 14px 18px;">
+                      <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#f0abfc;">
+                        Premio stanza sbloccato
+                      </p>
+                      <h2 style="margin:0 0 8px 0;font-size:18px;line-height:1.4;color:#ffffff;">
+                        Candlelight: I grandi successi di Bridgerton
+                      </h2>
+                      <p style="margin:0;font-size:13px;line-height:1.7;color:#d8d4f2;">
+                        Questa è la ricompensa reale legata al superamento della soglia della sala, ottenuta insieme al Proiettore di Ombre.
+                      </p>
                     </td>
                   </tr>
                 </table>
@@ -218,7 +250,7 @@ export default async function handler(req, res) {
                   come prova del fatto che hai saputo guardare oltre la superficie.
                 </p>
                 <p style="margin:0 0 10px 0;font-size:13px;line-height:1.7;color:#9f9fb8;">
-                  Se hai sbloccato anche premi extra, troverai un'altra mail dedicata con il riepilogo di ciò che hai conquistato.
+                  Se hai sbloccato anche premi extra, troverai un'altra mail dedicata con il riepilogo della cena fissa e dell'eventuale esperienza MIRO raggiunta.
                 </p>
               </td>
             </tr>
@@ -253,7 +285,7 @@ export default async function handler(req, res) {
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'La Mostra <noreply@la-mostra-delle-ombre.vercel.app>',
       to: [playerEmail],
-      subject: 'Il tuo premio stanza dalla Sala Serie & Film - Path to Graduation',
+      subject: 'Il tuo artefatto e il premio stanza dalla Sala Serie & Film - Path to Graduation',
       html: emailHtml,
     });
 

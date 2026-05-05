@@ -9,24 +9,24 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const PRIZE_COPY = {
   'fixed-association-prize': {
     eyebrow: 'Premio fisso',
-    title: 'Premio fisso della sala',
+    title: 'Cena a casa con serata cinema',
     description:
-      'Hai superato almeno quattro prove su cinque tra associazioni principali e love matching. Questo riconoscimento premia la parte piu tecnica e relazionale dell’intera sala.',
+      'Hai superato almeno quattro prove su cinque tra associazioni principali e love matching. Questo sblocca il premio fisso della sala: una cena a casa con serata cinema.',
   },
   'cinema-ticket-base': {
-    eyebrow: 'Premio incrementale',
-    title: 'Cinema Base',
-    description: 'Hai conquistato il livello base: un biglietto cinema.',
+    eyebrow: 'Premio variabile',
+    title: 'MIRO - Osteria del Cinema · Base',
+    description: 'Hai conquistato il livello base: esperienza film in Sala Nobel all\'Anteo, firmata MIRO - Osteria del Cinema.',
   },
   'cinema-ticket-premium': {
-    eyebrow: 'Premio incrementale',
-    title: 'Cinema Premium',
-    description: 'Hai conquistato il livello premium: biglietto cinema con aperitivo in sala.',
+    eyebrow: 'Premio variabile',
+    title: 'MIRO - Osteria del Cinema · Premium',
+    description: 'Hai conquistato il livello premium: esperienza film in Sala Nobel all\'Anteo con aperitivo incluso.',
   },
   'cinema-ticket-diamond': {
-    eyebrow: 'Premio incrementale',
-    title: 'Cinema Diamond',
-    description: 'Hai conquistato il livello diamond: biglietto cinema con pranzo o cena in sala.',
+    eyebrow: 'Premio variabile',
+    title: 'MIRO - Osteria del Cinema · Diamond',
+    description: 'Hai conquistato il livello diamond: esperienza film in Sala Nobel all\'Anteo con pranzo o cena inclusi.',
   },
 };
 
@@ -280,11 +280,12 @@ export default async function handler(req, res) {
           </p>
           <p style="margin:0 0 12px 0;font-size:14px;line-height:1.6;color:#c5c5dd;">
             hai portato a termine la <strong>Sala delle Serie &amp; Film</strong> e il percorso
-            ha convertito ciò che hai sbloccato in premi reali. Le immagini ora hanno lasciato
-            qualcosa anche fuori dallo schermo.
+            ha convertito ciò che hai sbloccato in premi reali. In questa mail trovi i premi aggiuntivi
+            collegati ai sottogiochi superati.
           </p>
           <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#9f9fb8;">
-            Qui sotto trovi solo ciò che hai davvero conquistato in questa corsa.
+            Il premio di stanza <strong>Candlelight: I grandi successi di Bridgerton</strong> è già compreso
+            nella mail principale insieme al Proiettore di Ombre. Qui sotto trovi solo i premi extra davvero conquistati.
           </p>
           </td>
         </tr>
@@ -294,8 +295,8 @@ export default async function handler(req, res) {
         <tr>
           <td style="padding:8px 24px 20px 24px;">
             <p style="margin:0;font-size:13px;line-height:1.7;color:#9f9fb8;">
-              Se vorrai, potrai usare questo riepilogo come traccia per ricordare esattamente
-              quale livello del premio incrementale hai raggiunto.
+              Se vorrai, potrai usare questo riepilogo per ricordare esattamente quale combinazione di premio fisso
+              e livello MIRO hai raggiunto in questa sala.
             </p>
           </td>
         </tr>

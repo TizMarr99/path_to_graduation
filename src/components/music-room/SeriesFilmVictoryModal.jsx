@@ -336,8 +336,8 @@ export default function SeriesFilmVictoryModal({
             }}
           >
             {hasExtraPrizeMail
-              ? '📧 Andrea ti ha inviato la mail con il premio di stanza. Se hai sbloccato premi extra, riceverai anche una seconda mail dedicata.'
-              : '📧 Andrea ti ha inviato la mail con il premio di stanza: il Proiettore di Ombre.'}
+              ? '📧 Andrea ti ha inviato la mail con il Proiettore di Ombre e il premio di stanza Candlelight: I grandi successi di Bridgerton. Se hai sbloccato premi extra, riceverai anche una seconda mail dedicata.'
+              : '📧 Andrea ti ha inviato la mail con il Proiettore di Ombre e il premio di stanza Candlelight: I grandi successi di Bridgerton.'}
           </p>
         </div>
 
