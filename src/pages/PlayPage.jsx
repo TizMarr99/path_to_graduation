@@ -339,6 +339,7 @@ function SubgameNavigator({ currentSubgameId, lockedSubgameIds = [], onSelect, r
 
 function PlayCategorySession({ category, preferredChallengeId }) {
   const navigate = useNavigate()
+  const [emailDispatchError, setEmailDispatchError] = useState('')
   const [infoModalChallengeId, setInfoModalChallengeId] = useState('')
   const [isRoomMapVisible, setIsRoomMapVisible] = useState(false)
   const [hintModalChallengeId, setHintModalChallengeId] = useState('')
@@ -433,6 +434,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const archivedRoomReadOnly = Boolean(archivedSession)
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
   const victoryModalAlreadySeen = currentRoomProgress?.victoryModalSeen ?? false
+  const normalizePrizeEmailError = useCallback((error) => {
+    const rawMessage = error?.userMessage ?? error?.message ?? ''
+    const normalizedMessage = rawMessage.trim().toLowerCase()
+
+    if (!normalizedMessage) {
+      return 'Non sono riuscito a confermare l\'invio delle mail premio. Riprova piu tardi o controlla la configurazione email.'
+    }
+
+    if (normalizedMessage.includes('database non configurato') || normalizedMessage.includes('supabase')) {
+      return 'Le mail premio non sono disponibili in questa configurazione locale. Nel deploy funzioneranno solo con il database collegato.'
+    }
+
+    return rawMessage
+  }, [])
   const weightedResult = useMemo(() => {
     if (!hasWeightedScoring) return null
     const feedbackMap = new Map(Object.entries(challengeResults))
@@ -595,6 +610,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     isPersistingOutcomeRef.current = true
 
     async function persistOutcomeAndSendPrizeEmails() {
+      setEmailDispatchError('')
+
       const result = await registerRoomOutcome({
         categoryId: category.id,
         challengeResults,
@@ -628,8 +645,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         !hasTriggeredPrizeEmailsRef.current
       ) {
         hasTriggeredPrizeEmailsRef.current = true
-        void sendMusicPrizeMail1(accessCode).catch(() => {})
-        void sendMusicPrizeMail2(accessCode).catch(() => {})
+        void sendMusicPrizeMail1(accessCode).catch((error) => {
+          console.error('Music room artifact mail failed', error)
+        })
+        void sendMusicPrizeMail2(accessCode).catch((error) => {
+          console.error('Music room extra mail failed', error)
+        })
       }
 
       if (
@@ -639,8 +660,34 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         !hasTriggeredPrizeEmailsRef.current
       ) {
         hasTriggeredPrizeEmailsRef.current = true
-        void sendSerieFilmArtifactMail(accessCode).catch(() => {})
-        void sendSerieFilmPrizeMail(accessCode).catch(() => {})
+
+        const artifactMailResult = await sendSerieFilmArtifactMail(accessCode)
+          .then(() => ({ ok: true }))
+          .catch((error) => {
+            if (error?.statusCode === 409) {
+              return { ok: true, ignored: true }
+            }
+
+            console.error('Serie-film artifact mail failed', error)
+            return { ok: false, error }
+          })
+
+        const extraMailResult = await sendSerieFilmPrizeMail(accessCode)
+          .then(() => ({ ok: true }))
+          .catch((error) => {
+            if (error?.statusCode === 403 || error?.statusCode === 409) {
+              return { ok: true, ignored: true }
+            }
+
+            console.error('Serie-film extra prize mail failed', error)
+            return { ok: false, error }
+          })
+
+        const firstFailure = artifactMailResult.ok ? extraMailResult.error : artifactMailResult.error
+
+        if (!artifactMailResult.ok || !extraMailResult.ok) {
+          setEmailDispatchError(normalizePrizeEmailError(firstFailure))
+        }
       }
     }
 
@@ -658,6 +705,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     earlyMusicVictory,
     immediateUnlockTargets,
     isComplete,
+    normalizePrizeEmailError,
     passedRoom,
     registerRoomOutcome,
     roomOutcomeSummary,
@@ -972,6 +1020,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       return (
         <SeriesFilmVictoryModal
           category={category}
+          emailDispatchError={emailDispatchError}
           onClose={() => markVictoryModalSeen(category.id)}
           sessionCorrectCount={sessionCorrectCount}
           sessionWrongCount={sessionWrongCount}

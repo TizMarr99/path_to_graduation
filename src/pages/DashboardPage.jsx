@@ -12,7 +12,7 @@ const galleryFrameStyles = {
 }
 
 function RoomFrame({ category, isUnlocked, roomProgress }) {
-  const lastSession = roomProgress?.sessions?.at(-1) ?? null
+  const lastSession = roomProgress?.lastSessionSummary ?? roomProgress?.sessions?.at(-1) ?? null
 
   return (
     <article
@@ -154,7 +154,9 @@ function DashboardPage() {
   const bundleCost = categories
     .filter((category) => lockedBundleIds.includes(category.id))
     .reduce((sum, category) => sum + (category.buyAccessCost ?? 0), 0)
-  const hasCompletedMusicRoom = Boolean(musicProgress?.sessions?.length)
+  const hasCompletedMusicRoom = Boolean(
+    musicProgress?.completionCount || musicProgress?.lastSessionSummary || musicProgress?.sessions?.length,
+  )
   const canBuyBundle = Boolean(musicProgress?.buyAccessAvailable && lockedBundleIds.length)
 
   function handleBundleUnlock() {

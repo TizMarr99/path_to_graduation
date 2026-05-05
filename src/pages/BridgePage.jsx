@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import VipNarrative from '../components/home/VipNarrative.jsx'
 import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { usePlayerState } from '../hooks/usePlayerState'
-import { getCategoryById } from '../lib/challengeData'
 import { getRoomTransition } from '../lib/roomTransitions'
 
 const CHARACTER_HOLD_AFTER_TYPEWRITER_MS = 2200
@@ -62,8 +61,11 @@ export default function BridgePage() {
   }
 
   function handleGoToMap() {
+    const transition = pendingBridge ? getRoomTransition(pendingBridge.sourceCategoryId) : null
+    const destinationPath = transition?.destinationPath ?? '/shadows'
+
     markPendingBridgeSeen()
-    navigate('/shadows', { replace: true })
+    navigate(destinationPath, { replace: true })
   }
 
   if (!pendingBridge || pendingBridge.bridgeCompletedAt) {
@@ -71,9 +73,8 @@ export default function BridgePage() {
   }
 
   const transition = getRoomTransition(pendingBridge.sourceCategoryId)
-  const targetCategory = getCategoryById(pendingBridge.targetCategoryId)
 
-  if (!transition || !targetCategory) {
+  if (!transition) {
     return null
   }
 

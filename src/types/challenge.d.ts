@@ -731,6 +731,9 @@ export interface RoomProgress {
   categoryId: string
   startedAt: number | string | null
   sessions: RoomSessionSummary[]
+  completionCount?: number
+  totalResolvedChallenges?: number
+  lastSessionSummary?: RoomSessionSummary | null
   lastCompletedSession: RoomCompletedSessionSnapshot | null
   unlockedByScore: boolean
   prizeWon: boolean

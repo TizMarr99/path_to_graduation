@@ -1,14 +1,3 @@
-function resolveWonPrizeLabels(category, wonSubPrizeIds = []) {
-  if (!Array.isArray(wonSubPrizeIds) || !wonSubPrizeIds.length) {
-    return []
-  }
-
-  const prizeMap = new Map((category.subPrizes ?? []).map((prize) => [prize.id, prize.label]))
-  return wonSubPrizeIds
-    .map((prizeId) => prizeMap.get(prizeId) ?? prizeId)
-    .filter(Boolean)
-}
-
 export default function SeriesFilmVictoryModal({
   category,
   onClose,
@@ -16,10 +5,11 @@ export default function SeriesFilmVictoryModal({
   sessionWrongCount,
   totalChallenges,
   wonSubPrizeIds = [],
+  emailDispatchError = '',
 }) {
   const guardian = category.characters?.guardian
   const inquisitor = category.characters?.inquisitor
-  const wonPrizeLabels = resolveWonPrizeLabels(category, wonSubPrizeIds)
+  const hasExtraPrizeMail = Array.isArray(wonSubPrizeIds) && wonSubPrizeIds.length > 0
 
   return (
     <div
@@ -215,7 +205,7 @@ export default function SeriesFilmVictoryModal({
                 fontStyle: 'italic',
               }}
             >
-              "Hai rimesso ordine dove c'erano solo frammenti. Questo fotogramma è la prova che sai vedere una storia intera anche quando prova a spezzarsi."
+              "Hai rimesso insieme scene, legami e battute senza lasciare che il buio decidesse per te. Il Proiettore di Ombre è tuo: da ora in poi anche ciò che sembrava confuso dovrà mostrarti qualcosa in più."
             </p>
           </div>
         ) : null}
@@ -275,7 +265,7 @@ export default function SeriesFilmVictoryModal({
                 fontStyle: 'italic',
               }}
             >
-              "Fastidioso, davvero. Sei riuscita a ricordare abbastanza da rovinare il mio spettacolo. Tieniti pure il tuo trofeo: non renderà meno irritante il fatto che tu abbia avuto ragione."
+              "Fastidioso, davvero. Hai ricucito una storia anche quando l'avevo lasciata a brandelli. Tieniti pure il tuo trofeo: resta insopportabile vedere qualcuno trasformare il caos in memoria."
             </p>
           </div>
         ) : null}
@@ -301,83 +291,79 @@ export default function SeriesFilmVictoryModal({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '2.8rem',
               boxShadow: '0 0 20px rgba(167, 139, 250, 0.25)',
+              overflow: 'hidden',
             }}
           >
-            🎞️
+            <img
+              src="/images/rooms/serie-film-artifact.png"
+              alt={category.rewardArtifact?.label || 'Proiettore di Ombre'}
+              style={{
+                width: '78px',
+                height: '78px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 0 12px rgba(167, 139, 250, 0.55))',
+              }}
+              onError={(event) => {
+                event.currentTarget.style.display = 'none'
+              }}
+            />
           </div>
           <p style={{ fontSize: '1.1rem', fontWeight: '600', color: '#ddd6fe', marginBottom: '8px' }}>
-            {category.rewardArtifact?.label || 'Fotogramma Maledetto'}
+            {category.rewardArtifact?.label || 'Proiettore di Ombre'}
           </p>
           <p style={{ fontSize: '0.85rem', lineHeight: '1.6', color: 'rgba(226, 232, 240, 0.84)' }}>
             {category.rewardArtifact?.description || 'Un frammento ottenuto completando la sala.'}
           </p>
         </div>
 
-        {wonPrizeLabels.length ? (
+        <div
+          style={{
+            marginBottom: '24px',
+            padding: '16px',
+            background: 'rgba(103, 232, 249, 0.08)',
+            border: '1px solid rgba(103, 232, 249, 0.2)',
+            borderRadius: '12px',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '0.8rem',
+              lineHeight: '1.6',
+              color: 'rgba(224, 242, 254, 0.9)',
+              textAlign: 'center',
+              margin: 0,
+            }}
+          >
+            {hasExtraPrizeMail
+              ? '📧 Andrea ti ha inviato la mail con il premio di stanza. Se hai sbloccato premi extra, riceverai anche una seconda mail dedicata.'
+              : '📧 Andrea ti ha inviato la mail con il premio di stanza: il Proiettore di Ombre.'}
+          </p>
+        </div>
+
+        {emailDispatchError ? (
           <div
             style={{
               marginBottom: '24px',
-              padding: '16px',
-              background: 'rgba(103, 232, 249, 0.08)',
-              border: '1px solid rgba(103, 232, 249, 0.2)',
+              padding: '14px 16px',
+              background: 'rgba(248, 113, 113, 0.08)',
+              border: '1px solid rgba(248, 113, 113, 0.22)',
               borderRadius: '12px',
             }}
           >
             <p
               style={{
-                margin: '0 0 10px 0',
-                fontSize: '0.8rem',
-                lineHeight: '1.6',
-                color: 'rgba(224, 242, 254, 0.92)',
-                textAlign: 'center',
-              }}
-            >
-              📧 Andrea ti ha inviato una mail con il premio di stanza e una seconda mail con i premi extra sbloccati.
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-              {wonPrizeLabels.map((label) => (
-                <span
-                  key={label}
-                  style={{
-                    borderRadius: '999px',
-                    padding: '6px 10px',
-                    background: 'rgba(125, 211, 252, 0.08)',
-                    border: '1px solid rgba(125, 211, 252, 0.2)',
-                    color: '#e0f2fe',
-                    fontSize: '0.75rem',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div
-            style={{
-              marginBottom: '24px',
-              padding: '16px',
-              background: 'rgba(103, 232, 249, 0.08)',
-              border: '1px solid rgba(103, 232, 249, 0.2)',
-              borderRadius: '12px',
-            }}
-          >
-            <p
-              style={{
-                fontSize: '0.8rem',
-                lineHeight: '1.6',
-                color: 'rgba(224, 242, 254, 0.9)',
-                textAlign: 'center',
                 margin: 0,
+                fontSize: '0.78rem',
+                lineHeight: '1.6',
+                color: '#fee2e2',
+                textAlign: 'center',
               }}
             >
-              📧 Andrea ti ha inviato la mail con il premio di stanza: il Fotogramma Maledetto.
+              ⚠️ {emailDispatchError}
             </p>
           </div>
-        )}
+        ) : null}
 
         <button
           onClick={onClose}
@@ -395,7 +381,7 @@ export default function SeriesFilmVictoryModal({
           }}
           type="button"
         >
-          Continua il Quiz
+          Continua
         </button>
       </div>
     </div>

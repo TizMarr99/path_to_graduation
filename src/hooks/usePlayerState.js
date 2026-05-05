@@ -257,6 +257,18 @@ export function PlayerStateProvider({ children }) {
     const previousProgress =
       currentState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
     const startedAt = previousProgress.startedAt ?? Date.now()
+    const nextSessionSummary = {
+      categoryId,
+      startedAt,
+      completedAt: Date.now(),
+      correctCount,
+      wrongCount,
+      totalChallenges,
+      passed,
+      unlockedCategoryIds: passed ? unlockedCategoryIds : [],
+      prizeAwarded: passed,
+      outcomeSummary,
+    }
 
     return {
       ...currentState,
@@ -265,21 +277,11 @@ export function PlayerStateProvider({ children }) {
         [categoryId]: {
           ...previousProgress,
           startedAt,
-          sessions: [
-            ...previousProgress.sessions,
-            {
-              categoryId,
-              startedAt,
-              completedAt: Date.now(),
-              correctCount,
-              wrongCount,
-              totalChallenges,
-              passed,
-              unlockedCategoryIds: passed ? unlockedCategoryIds : [],
-              prizeAwarded: passed,
-              outcomeSummary,
-            },
-          ],
+          sessions: [],
+          completionCount: (previousProgress.completionCount ?? previousProgress.sessions?.length ?? 0) + 1,
+          totalResolvedChallenges:
+            (previousProgress.totalResolvedChallenges ?? 0) + correctCount + wrongCount,
+          lastSessionSummary: nextSessionSummary,
           lastCompletedSession:
             correctCount + wrongCount >= totalChallenges
               ? {

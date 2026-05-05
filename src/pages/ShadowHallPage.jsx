@@ -8,8 +8,8 @@ import { getRoomTransition } from '../lib/roomTransitions'
 const shadowSlots = [
   { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',    y: '25%', w: '14%', h: '55%', accent: 'amber' },
   { id: 'serie-film',          categoryId: 'serie-film',            label: 'Sala delle Serie TV & Film', x: '24%', y: '18%', w: '14%', h: '55%', accent: 'cyan' },
-  { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '43%',   y: '15%', w: '14%', h: '62%', accent: 'amber' },
-  { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Arte / Mito / Lett.',  x: '62%',   y: '18%', w: '14%', h: '60%', accent: 'amber' },
+  { id: 'arte-mito',           categoryId: 'arte-mito-letteratura', label: 'Sala dell\'Arte e del Mito', x: '43%', y: '15%', w: '14%', h: '62%', accent: 'amber' },
+  { id: 'cura-corpo',          categoryId: 'cura-corpo',            label: 'Sala Cura del Corpo',  x: '62%',   y: '18%', w: '14%', h: '60%', accent: 'amber' },
   { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%',  y: '25%', w: '14%', h: '55%', accent: 'amber' },
 ]
 
@@ -107,7 +107,7 @@ function resolveSubgameOutcomeCounts(category, challengeResults) {
 }
 
 function resolvePortalScoreLabel(progress, activeSession = null, category = null) {
-  const hasStoredProgress = Boolean(progress?.lastCompletedSession) || (progress?.sessions?.length ?? 0) > 0
+  const hasStoredProgress = Boolean(progress?.lastCompletedSession) || Boolean(progress?.lastSessionSummary) || (progress?.sessions?.length ?? 0) > 0
 
   if (!activeSession && !hasStoredProgress) {
     return null
@@ -116,9 +116,10 @@ function resolvePortalScoreLabel(progress, activeSession = null, category = null
   const scoreSource = activeSession
     ? {
         correctCount: activeSession.sessionCorrectCount ?? 0,
+        challengeResults: activeSession.challengeResults ?? null,
         wrongCount: activeSession.sessionWrongCount ?? 0,
       }
-    : progress?.lastCompletedSession ?? progress?.sessions?.at(-1) ?? null
+    : progress?.lastCompletedSession ?? progress?.lastSessionSummary ?? progress?.sessions?.at(-1) ?? null
 
   if (!scoreSource) {
     return null
@@ -127,7 +128,7 @@ function resolvePortalScoreLabel(progress, activeSession = null, category = null
   const subgameCounts = resolveSubgameOutcomeCounts(category, scoreSource.challengeResults)
 
   if (subgameCounts) {
-    return `◈ ${subgameCounts.completedSubgames} · ✓ ${subgameCounts.passedSubgames} · ✗ ${subgameCounts.failedSubgames}`
+    return `✓ ${subgameCounts.passedSubgames} · ✗ ${subgameCounts.failedSubgames}`
   }
 
   const correctCount = scoreSource.correctCount ?? scoreSource.sessionCorrectCount ?? 0
@@ -143,7 +144,7 @@ function resolvePortalOutcome(progress, activeSession = null, category = null) {
         wrongCount: activeSession.sessionWrongCount ?? 0,
         challengeResults: activeSession.challengeResults ?? null,
       }
-    : progress?.lastCompletedSession ?? progress?.sessions?.at(-1) ?? null
+    : progress?.lastCompletedSession ?? progress?.lastSessionSummary ?? progress?.sessions?.at(-1) ?? null
 
   if (!scoreSource) {
     return null
@@ -181,6 +182,8 @@ function ShadowSlot({
   visible,
   unlocked,
   prizeWon,
+  completed,
+  comingSoon = false,
   defeated,
   defeatedImageSrc = null,
   dailyBlocked,
@@ -190,11 +193,12 @@ function ShadowSlot({
   revealCost = null,
   scoreLabel = null,
 }) {
-  const isClickable = unlocked && !dailyBlocked
-  const isRevealOnly = visible && !unlocked
+  const isClickable = unlocked && (!dailyBlocked || completed)
+  const isRevealOnly = visible && !unlocked && !comingSoon
   const canReveal = isRevealOnly && typeof onRevealRequest === 'function'
-  const isInteractive = isClickable || canReveal
+  const isInteractive = (isClickable || canReveal) && !comingSoon
   const theme = slotThemes[slot.accent] ?? slotThemes.amber
+  const hasPermanentGlow = staticBright || prizeWon
 
   function handleClick() {
     if (isClickable) {
@@ -228,22 +232,24 @@ function ShadowSlot({
     : defeated
       ? '1px solid rgba(71, 85, 105, 0.78)'
       : `1px solid ${isRevealOnly ? theme.borderStrong : theme.border}`
-  const frameAnimation = staticBright || isRevealOnly || defeated
+  const frameAnimation = hasPermanentGlow || isRevealOnly || defeated || comingSoon
     ? undefined
-    : prizeWon
-      ? 'shadowGlowPulseCompleted 2.8s ease-in-out infinite'
-      : 'shadowGlowPulse 2.8s ease-in-out infinite'
-  const frameShadow = staticBright
-    ? `0 0 24px 6px ${theme.glow}`
+    : 'shadowGlowPulse 2.8s ease-in-out infinite'
+  const frameShadow = hasPermanentGlow
+    ? `0 0 24px 6px ${theme.glowStrong}`
     : defeated
       ? '0 0 18px rgba(0, 0, 0, 0.62), 0 0 34px rgba(0, 0, 0, 0.42), inset 0 0 26px rgba(0, 0, 0, 0.68)'
+    : comingSoon
+      ? '0 0 16px rgba(148, 163, 184, 0.28)'
     : isRevealOnly
       ? `0 0 28px 6px ${theme.glow}`
       : undefined
-  const brightOverlayBackground = staticBright
+  const brightOverlayBackground = hasPermanentGlow
     ? theme.revealOverlay
     : defeated
       ? 'linear-gradient(180deg, rgba(2,6,23,0.28), rgba(2,6,23,0.58))'
+    : comingSoon
+      ? 'linear-gradient(180deg, rgba(2,6,23,0.32), rgba(2,6,23,0.62))'
     : isRevealOnly
       ? theme.lockedOverlay
       : 'rgba(255,255,255,0)'
@@ -288,7 +294,7 @@ function ShadowSlot({
           transition: 'background 0.25s ease',
           pointerEvents: 'none',
         }}
-        className={!staticBright && isInteractive ? 'group-hover:!bg-white/[0.07]' : undefined}
+        className={!hasPermanentGlow && isInteractive ? 'group-hover:!bg-white/[0.07]' : undefined}
       />
 
       {defeated && defeatedImageSrc ? (
@@ -318,6 +324,35 @@ function ShadowSlot({
               e.target.style.display = 'none'
             }}
           />
+        </div>
+      ) : null}
+
+      {comingSoon ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: '12%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none',
+            zIndex: 2,
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 'clamp(0.62rem, 0.95vw, 0.76rem)',
+              padding: '6px 12px',
+              borderRadius: '999px',
+              border: '1px solid rgba(226, 232, 240, 0.28)',
+              background: 'rgba(15, 23, 42, 0.72)',
+              color: 'rgba(226, 232, 240, 0.92)',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Coming Soon
+          </div>
         </div>
       ) : null}
 
@@ -361,8 +396,8 @@ function ShadowSlot({
         </div>
       )}
 
-      {/* Artifact icon for music room */}
-      {prizeWon && slot.categoryId === 'musica' && (
+      {/* Artifact icon for completed rooms */}
+      {prizeWon && (slot.categoryId === 'musica' || slot.categoryId === 'serie-film') && (
         <div
           style={{
             position: 'absolute',
@@ -374,12 +409,15 @@ function ShadowSlot({
           }}
         >
           <img
-            src="/images/rooms/music-artifact-no-bg.png"
-            alt="Accordatore di Ombre"
+            src={slot.categoryId === 'musica' ? '/images/rooms/music-artifact-no-bg.png' : '/images/rooms/serie-film-artifact.png'}
+            alt={slot.categoryId === 'musica' ? 'Accordatore di Ombre' : 'Proiettore di Ombre'}
             style={{
               width: 'clamp(32px, 5vw, 48px)',
               height: 'clamp(32px, 5vw, 48px)',
-              filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.9))',
+              objectFit: 'contain',
+              filter: slot.categoryId === 'musica'
+                ? 'drop-shadow(0 0 12px rgba(212,175,55,0.9))'
+                : 'drop-shadow(0 0 12px rgba(103,232,249,0.9))',
               animation: 'artifactFloat 3s ease-in-out infinite',
             }}
             onError={(e) => {
@@ -432,7 +470,18 @@ function ShadowSlot({
           </p>
         )}
 
-        {isRevealOnly ? (
+        {comingSoon ? (
+          <p
+            style={{
+              fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
+              color: 'rgba(226, 232, 240, 0.82)',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Bloccata
+          </p>
+        ) : isRevealOnly ? (
           <p
             style={{
               fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
@@ -441,6 +490,16 @@ function ShadowSlot({
             }}
           >
             {dailyBlocked ? 'Sblocca oggi · entra domani' : 'Sblocco disponibile'}
+          </p>
+        ) : completed ? (
+          <p
+            style={{
+              fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
+              color: defeated ? 'rgba(148, 163, 184, 0.78)' : theme.labelSoft,
+              letterSpacing: '0.05em',
+            }}
+          >
+            👁 Consulta
           </p>
         ) : defeated ? null : dailyBlocked ? (
           <p
@@ -514,6 +573,7 @@ export default function ShadowHallPage() {
   useBackgroundAudio({ src: '/audio/shadow-hall-ambient.mp3', volume: 0.28 }, isMusicEnabled)
 
   const musicProgress = roomProgress['musica']
+  const serieFilmProgress = roomProgress['serie-film']
   const activeMusicSession = playerState.activeSession?.categoryId === 'musica'
     ? playerState.activeSession
     : null
@@ -524,14 +584,17 @@ export default function ShadowHallPage() {
 
   // Count music challenges completed across all sessions
   const musicChallengesCompleted =
-    musicProgress?.sessions?.reduce(
-      (total, session) => total + (session.correctCount || 0) + (session.wrongCount || 0),
-      0
-    ) || 0
+    (musicProgress?.totalResolvedChallenges ??
+      musicProgress?.sessions?.reduce(
+        (total, session) => total + (session.correctCount || 0) + (session.wrongCount || 0),
+        0
+      )) || 0
   const isMusicRoomFullyCompleted = musicChallengesCompleted >= 12
 
   // Serie-film card appears when music room is passed (8+ correct) or fully completed
   const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
+  const hasSerieFilmCompletion = Boolean(serieFilmProgress?.lastCompletedSession)
+  const hasArteMitoComingSoonReveal = hasSerieFilmCompletion
   const activeBridgeKey = pendingBridge?.bridgeCompletedAt
     ? `${pendingBridge.sourceCategoryId}:${pendingBridge.targetCategoryId}:${pendingBridge.bridgeCompletedAt}`
     : null
@@ -654,6 +717,7 @@ export default function ShadowHallPage() {
           const unlocked = unlockedCategoryIds.includes(slot.categoryId)
           const slotProgress = roomProgress[slot.categoryId] ?? null
           const prizeWon = slotProgress?.prizeWon === true
+          const completed = Boolean(slotProgress?.lastCompletedSession)
           const activeSessionForSlot = playerState.activeSession?.categoryId === slot.categoryId
             ? playerState.activeSession
             : null
@@ -664,24 +728,30 @@ export default function ShadowHallPage() {
             !prizeWon &&
             !activeSessionForSlot &&
             Boolean(slotProgress?.buyAccessAvailable || slotProgress?.lastCompletedSession)
+          const comingSoon = slot.categoryId === 'arte-mito-letteratura' && hasArteMitoComingSoonReveal
           const visible = slot.categoryId === 'serie-film'
             ? unlocked || hasSeriesFilmReveal
-            : unlocked
-          const staticBright = slot.categoryId === 'musica' && hasUnlockedMusicByScore
+            : slot.categoryId === 'arte-mito-letteratura'
+              ? comingSoon || unlocked
+              : unlocked
+          const staticBright = prizeWon || (slot.categoryId === 'musica' && hasUnlockedMusicByScore)
           const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot, slotCategory)
           const defeatedImageSrc = defeated
             ? resolveDefeatedPortalImage(slotCategory, slotOutcome)
             : null
-          const revealCost = !unlocked ? slotCategory?.buyAccessCost ?? null : null
+          const revealCost = !unlocked && !comingSoon ? slotCategory?.buyAccessCost ?? null : null
           const canOpenRevealModal =
             pendingBridge?.bridgeCompletedAt &&
             pendingTargetCategory?.id === slot.categoryId &&
             !unlocked &&
+            !comingSoon &&
             hasCreditsForPendingRoom
 
           return (
             <ShadowSlot
               key={slot.id}
+              comingSoon={comingSoon}
+              completed={completed}
               slot={slot}
               visible={visible}
               unlocked={unlocked}

@@ -29,6 +29,29 @@ export const roomTransitionRegistry = {
       actionLabel: 'Sblocca l’accesso',
     },
   },
+  'serie-film': {
+    targetCategoryId: 'shadow-hall',
+    destinationPath: '/shadows',
+    bridgeNarrative: {
+      eyebrow: 'Ritorno alla Grotta',
+      title: 'Gli schermi si spengono.',
+      description:
+        'La sala ha lasciato andare il suo ultimo riflesso. Il Proiettore di Ombre ora e tuo, e la Grotta delle Ombre ne conservera la traccia.',
+      ctaLabel: 'Torna alla Sala delle Ombre',
+      andrea: {
+        name: 'Andrea Sachs',
+        role: 'Il Curatore',
+        message:
+          'Hai rimesso insieme battute, volti e legami senza lasciare che il buio decidesse il montaggio. Il Proiettore di Ombre adesso ti appartiene. Torna nella Grotta: la sala si e illuminata e l\'artefatto ti aspetta tra le ombre che hai gia attraversato.',
+      },
+      miranda: {
+        name: 'Amanda Priestly',
+        role: 'La Critica',
+        message:
+          'Non confondere memoria e talento. Hai solo dimostrato di saper riconoscere una storia anche quando la faccio a pezzi. Tieniti il tuo proiettore, torna pure nella Grotta e prova a goderti il raro privilegio di avermi contraddetta con successo.',
+      },
+    },
+  },
 }
 
 export function getRoomTransition(sourceCategoryId) {

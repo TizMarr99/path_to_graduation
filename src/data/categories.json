@@ -762,7 +762,7 @@
     },
     "rewardArtifact": {
       "type": "hint",
-      "label": "Fotogramma maledetto",
+      "label": "Proiettore di Ombre",
       "description": "Ti concede un indizio extra basato sulle immagini che hai visto."
     },
     "mapHotspots": [
@@ -2659,6 +2659,70 @@
         "creditReward": 2
       },
       {
+        "id": "sf-intruso-04",
+        "zoneId": "knowledge",
+        "type": "intruder",
+        "quizSubType": "intruder",
+        "difficulty": "medium",
+        "title": "L'Intruso — Nolan / Zimmer",
+        "prompt": "Quale di questi film non è stato diretto da Nolan né ha le musiche di Hans Zimmer?",
+        "explanation": "Avatar non è di Nolan (è di James Cameron) né ha musiche di Zimmer (colonna sonora di James Horner). Madagascar è DreamWorks/Powell&Barrett. Il Gladiatore ha musiche di Hans Zimmer! Memento è di Nolan.",
+        "items": [
+          {
+            "id": "memento",
+            "text": "Memento"
+          },
+          {
+            "id": "madagascar",
+            "text": "Madagascar"
+          },
+          {
+            "id": "gladiatore",
+            "text": "Il Gladiatore"
+          },
+          {
+            "id": "avatar",
+            "text": "Avatar"
+          }
+        ],
+        "intruderId": "avatar",
+        "hint": "Non fermarti al regista: anche la colonna sonora può eliminare quasi subito una delle opzioni.",
+        "hintCost": 1,
+        "creditReward": 2
+      },
+      {
+        "id": "sf-intruso-05",
+        "zoneId": "knowledge",
+        "type": "intruder",
+        "quizSubType": "intruder",
+        "difficulty": "hard",
+        "title": "L'Intruso — Sherlock",
+        "prompt": "Quale di questi NON è un titolo di un episodio della serie TV \"Sherlock\" (con Benedict Cumberbatch)?",
+        "explanation": "\"Il segno dei quattro\" è un romanzo originale di Conan Doyle, ma l'episodio della serie si intitola \"Il segno dei tre\" (The Sign of Three).",
+        "items": [
+          {
+            "id": "belgravia",
+            "text": "Lo scandalo di Belgravia"
+          },
+          {
+            "id": "cieco",
+            "text": "Il banchiere cieco"
+          },
+          {
+            "id": "baskerville",
+            "text": "I mastini di Baskerville"
+          },
+          {
+            "id": "quattro",
+            "text": "Il segno dei quattro"
+          }
+        ],
+        "intruderId": "quattro",
+        "hint": "L'intruso sembra plausibile proprio perché richiama Conan Doyle, ma il numero è quello da osservare bene.",
+        "hintCost": 2,
+        "creditReward": 2
+      },
+      {
         "id": "sf-domanda-01",
         "zoneId": "knowledge",
         "type": "free_text",
@@ -2765,7 +2829,7 @@
         "acceptedAnswers": [
           "Adjustment Bureau",
           "The Adjustment Bureau",
-          "Agente del destino"
+          "I guardiani del destino"
         ],
         "hint": "Il titolo suggerisce più controllo invisibile che azione spettacolare.",
         "hintCost": 1,
@@ -2814,70 +2878,6 @@
         ],
         "hint": "Il titolo accosta due idee che di solito non stanno bene insieme: ferita e grazia.",
         "hintCost": 1,
-        "creditReward": 2
-      },
-      {
-        "id": "sf-intruso-04",
-        "zoneId": "knowledge",
-        "type": "intruder",
-        "quizSubType": "intruder",
-        "difficulty": "medium",
-        "title": "L'Intruso — Nolan / Zimmer",
-        "prompt": "Quale di questi film non è stato diretto da Nolan né ha le musiche di Hans Zimmer?",
-        "explanation": "Avatar non è di Nolan (è di James Cameron) né ha musiche di Zimmer (colonna sonora di James Horner). Madagascar è DreamWorks/Powell&Barrett. Il Gladiatore ha musiche di Hans Zimmer! Memento è di Nolan.",
-        "items": [
-          {
-            "id": "memento",
-            "text": "Memento"
-          },
-          {
-            "id": "madagascar",
-            "text": "Madagascar"
-          },
-          {
-            "id": "gladiatore",
-            "text": "Il Gladiatore"
-          },
-          {
-            "id": "avatar",
-            "text": "Avatar"
-          }
-        ],
-        "intruderId": "avatar",
-        "hint": "Non fermarti al regista: anche la colonna sonora può eliminare quasi subito una delle opzioni.",
-        "hintCost": 1,
-        "creditReward": 2
-      },
-      {
-        "id": "sf-intruso-05",
-        "zoneId": "knowledge",
-        "type": "intruder",
-        "quizSubType": "intruder",
-        "difficulty": "hard",
-        "title": "L'Intruso — Sherlock",
-        "prompt": "Quale di questi NON è un titolo di un episodio della serie TV \"Sherlock\" (con Benedict Cumberbatch)?",
-        "explanation": "\"Il segno dei quattro\" è un romanzo originale di Conan Doyle, ma l'episodio della serie si intitola \"Il segno dei tre\" (The Sign of Three).",
-        "items": [
-          {
-            "id": "belgravia",
-            "text": "Lo scandalo di Belgravia"
-          },
-          {
-            "id": "cieco",
-            "text": "Il banchiere cieco"
-          },
-          {
-            "id": "baskerville",
-            "text": "I mastini di Baskerville"
-          },
-          {
-            "id": "quattro",
-            "text": "Il segno dei quattro"
-          }
-        ],
-        "intruderId": "quattro",
-        "hint": "L'intruso sembra plausibile proprio perché richiama Conan Doyle, ma il numero è quello da osservare bene.",
-        "hintCost": 2,
         "creditReward": 2
       }
     ]

@@ -147,7 +147,7 @@ export default async function handler(req, res) {
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <title>Fotogramma Maledetto</title>
+    <title>Proiettore di Ombre</title>
   </head>
   <body style="margin:0;padding:0;background-color:#0b0b10;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#0b0b10;padding:24px 0;">
@@ -190,14 +190,14 @@ export default async function handler(req, res) {
                         Premio stanza ottenuto
                       </p>
                       <h2 style="margin:0 0 8px 0;font-size:18px;line-height:1.4;color:#ffffff;">
-                        Fotogramma Maledetto
+                        Proiettore di Ombre
                       </h2>
                       <p style="margin:0 0 8px 0;font-size:13px;line-height:1.7;color:#d0d0ea;">
                         È il frammento che resta quando una scena smette di spaventare e comincia a rivelarsi.
                         La sala lo consegna solo a chi sa riconoscere cosa c'è davvero dentro le immagini.
                       </p>
                       <p style="margin:0;font-size:12px;line-height:1.7;color:#9f9fb8;">
-                        Nel gioco, il Fotogramma Maledetto ti concede <strong>un indizio extra basato sulle immagini</strong>
+                        Nel gioco, il Proiettore di Ombre ti concede <strong>un indizio extra basato sulle immagini</strong>
                         che hai raccolto durante il percorso finale.
                       </p>
                     </td>

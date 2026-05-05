@@ -32,6 +32,9 @@ export function createDefaultRoomProgress(categoryId) {
     categoryId,
     startedAt: null,
     sessions: [],
+    completionCount: 0,
+    totalResolvedChallenges: 0,
+    lastSessionSummary: null,
     lastCompletedSession: null,
     lastOutcomeSummary: null,
     unlockedByScore: false,
@@ -82,6 +85,25 @@ function normalizeChallengeSnapshotMap(value) {
   }, {})
 }
 
+function normalizeSessionSummary(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  return {
+    categoryId: value.categoryId ?? '',
+    startedAt: value.startedAt ?? Date.now(),
+    completedAt: value.completedAt ?? Date.now(),
+    correctCount: value.correctCount ?? 0,
+    wrongCount: value.wrongCount ?? 0,
+    totalChallenges: value.totalChallenges ?? 0,
+    passed: Boolean(value.passed),
+    unlockedCategoryIds: Array.isArray(value.unlockedCategoryIds) ? value.unlockedCategoryIds : [],
+    prizeAwarded: Boolean(value.prizeAwarded),
+    outcomeSummary: value.outcomeSummary ?? null,
+  }
+}
+
 export function normalizeRoomProgress(roomProgress = {}) {
   if (!roomProgress || typeof roomProgress !== 'object' || Array.isArray(roomProgress)) {
     return {}
@@ -89,11 +111,29 @@ export function normalizeRoomProgress(roomProgress = {}) {
 
   return Object.entries(roomProgress).reduce((accumulator, [categoryId, rawProgress]) => {
     const baseProgress = createDefaultRoomProgress(categoryId)
+    const normalizedSessions = Array.isArray(rawProgress?.sessions) ? rawProgress.sessions : []
+    const normalizedLastSessionSummary = normalizeSessionSummary(
+      rawProgress?.lastSessionSummary ?? normalizedSessions.at(-1) ?? null,
+    )
+    const normalizedCompletionCount =
+      typeof rawProgress?.completionCount === 'number'
+        ? rawProgress.completionCount
+        : normalizedSessions.length
+    const normalizedResolvedChallenges =
+      typeof rawProgress?.totalResolvedChallenges === 'number'
+        ? rawProgress.totalResolvedChallenges
+        : normalizedSessions.reduce(
+            (total, session) => total + (session?.correctCount ?? 0) + (session?.wrongCount ?? 0),
+            0,
+          )
 
     accumulator[categoryId] = {
       ...baseProgress,
       ...rawProgress,
-      sessions: Array.isArray(rawProgress?.sessions) ? rawProgress.sessions : [],
+      sessions: normalizedSessions,
+      completionCount: normalizedCompletionCount,
+      totalResolvedChallenges: normalizedResolvedChallenges,
+      lastSessionSummary: normalizedLastSessionSummary,
       lastCompletedSession:
         rawProgress?.lastCompletedSession && typeof rawProgress.lastCompletedSession === 'object'
           ? {
@@ -198,12 +238,28 @@ export function normalizeSnapshot(snapshot) {
 }
 
 export function buildProgressPayload(playerState) {
+  const compactRoomProgress = Object.entries(playerState.roomProgress ?? {}).reduce(
+    (accumulator, [categoryId, roomProgress]) => {
+      if (!roomProgress || typeof roomProgress !== 'object' || Array.isArray(roomProgress)) {
+        return accumulator
+      }
+
+      accumulator[categoryId] = {
+        ...roomProgress,
+        sessions: [],
+      }
+
+      return accumulator
+    },
+    {},
+  )
+
   return {
     credits: playerState.credits,
     unlocked_category_ids: playerState.unlockedCategoryIds,
     current_room: playerState.currentRoom,
     current_challenge_id: playerState.currentChallengeId || null,
-    room_progress: playerState.roomProgress,
+    room_progress: compactRoomProgress,
     active_session: playerState.activeSession ?? null,
     transition_state: playerState.transitionState,
   }

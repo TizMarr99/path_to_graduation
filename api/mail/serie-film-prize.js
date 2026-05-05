@@ -11,7 +11,7 @@ const PRIZE_COPY = {
     eyebrow: 'Premio fisso',
     title: 'Premio fisso della sala',
     description:
-      'Hai superato almeno cinque prove su sei tra associazioni principali e love matching. Questo riconoscimento premia la parte piu tecnica e relazionale dell’intera sala.',
+      'Hai superato almeno quattro prove su cinque tra associazioni principali e love matching. Questo riconoscimento premia la parte piu tecnica e relazionale dell’intera sala.',
   },
   'cinema-ticket-base': {
     eyebrow: 'Premio incrementale',
