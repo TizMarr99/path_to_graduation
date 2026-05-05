@@ -177,8 +177,9 @@ export default async function handler(req, res) {
                   immagini, voci e ricordi senza lasciarti piegare dal buio della sala.
                 </p>
                 <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#9f9fb8;">
-                  Con la soglia superata hai sbloccato sia l'artefatto della sala sia il premio di stanza:
-                  <strong>Candlelight: I grandi successi di Bridgerton</strong>.
+                  La sala ha registrato ogni dettaglio del tuo passaggio e ha lasciato dietro di te
+                  un frammento da portare nel corridoio finale: qualcosa che sapr\u00e0 mostrarti un'immagine
+                  in pi\u00f9 quando il percorso prover\u00e0 a confonderti.
                 </p>
               </td>
             </tr>
@@ -224,33 +225,14 @@ export default async function handler(req, res) {
             </tr>
 
             <tr>
-              <td style="padding:8px 24px 8px 24px;">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-radius:10px;border:1px solid #2c2c3b;background:radial-gradient(circle at 0% 0%,#2a2033,#17131f);">
-                  <tr>
-                    <td style="padding:16px 18px 14px 18px;">
-                      <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#f0abfc;">
-                        Premio stanza sbloccato
-                      </p>
-                      <h2 style="margin:0 0 8px 0;font-size:18px;line-height:1.4;color:#ffffff;">
-                        Candlelight: I grandi successi di Bridgerton
-                      </h2>
-                      <p style="margin:0;font-size:13px;line-height:1.7;color:#d8d4f2;">
-                        Questa è la ricompensa reale legata al superamento della soglia della sala, ottenuta insieme al Proiettore di Ombre.
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <tr>
               <td style="padding:8px 24px 16px 24px;">
                 <p style="margin:0 0 10px 0;font-size:13px;line-height:1.7;color:#c5c5dd;">
                   Nella <strong>Sala delle Ombre</strong> vedrai la traccia di questo artefatto affiancarsi alla sala superata,
                   come prova del fatto che hai saputo guardare oltre la superficie.
                 </p>
                 <p style="margin:0 0 10px 0;font-size:13px;line-height:1.7;color:#9f9fb8;">
-                  Se hai sbloccato anche premi extra, troverai un'altra mail dedicata con il riepilogo della cena fissa e dell'eventuale esperienza MIRO raggiunta.
+                  Potrai sempre tornare in questa sala, ma da questo momento non attraverserai pi\u00f9 le immagini a mani vuote:
+                  il Proiettore di Ombre continuer\u00e0 a seguirti.
                 </p>
               </td>
             </tr>
@@ -285,7 +267,7 @@ export default async function handler(req, res) {
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'La Mostra <noreply@la-mostra-delle-ombre.vercel.app>',
       to: [playerEmail],
-      subject: 'Il tuo artefatto e il premio stanza dalla Sala Serie & Film - Path to Graduation',
+      subject: 'Il tuo artefatto dalla Sala Serie & Film - Path to Graduation',
       html: emailHtml,
     });
 
@@ -314,7 +296,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       emailId: emailData?.id,
-      userMessage: 'Email premio stanza Serie & Film inviata!',
+      userMessage: 'Email artefatto Serie & Film inviata!',
       sentAt: nowIso,
     });
   } catch (error) {

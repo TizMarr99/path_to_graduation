@@ -4,12 +4,10 @@ export default function SeriesFilmVictoryModal({
   sessionCorrectCount,
   sessionWrongCount,
   totalChallenges,
-  wonSubPrizeIds = [],
   emailDispatchError = '',
 }) {
   const guardian = category.characters?.guardian
   const inquisitor = category.characters?.inquisitor
-  const hasExtraPrizeMail = Array.isArray(wonSubPrizeIds) && wonSubPrizeIds.length > 0
 
   return (
     <div
@@ -100,7 +98,7 @@ export default function SeriesFilmVictoryModal({
                 color: 'rgba(196, 181, 253, 0.72)',
               }}
             >
-              Premio stanza ottenuto
+              Premio ottenuto
             </span>
             <div
               style={{
@@ -335,9 +333,7 @@ export default function SeriesFilmVictoryModal({
               margin: 0,
             }}
           >
-            {hasExtraPrizeMail
-              ? '📧 Andrea ti ha inviato la mail con il Proiettore di Ombre e il premio di stanza Candlelight: I grandi successi di Bridgerton. Se hai sbloccato premi extra, riceverai anche una seconda mail dedicata.'
-              : '📧 Andrea ti ha inviato la mail con il Proiettore di Ombre e il premio di stanza Candlelight: I grandi successi di Bridgerton.'}
+            {'📧 Andrea ti ha inviato la mail con il Proiettore di Ombre.'}
           </p>
         </div>
 

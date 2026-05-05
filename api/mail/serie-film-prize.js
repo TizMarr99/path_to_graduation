@@ -6,25 +6,32 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+const ROOM_PRIZE_COPY = {
+  eyebrow: 'Premio stanza',
+  title: 'Candlelight: I grandi successi di Bridgerton',
+  description:
+    'Questa e la ricompensa reale legata al completamento della Sala delle Serie & Film, assegnata come premio principale della stanza.',
+};
+
 const PRIZE_COPY = {
   'fixed-association-prize': {
-    eyebrow: 'Premio fisso',
+    eyebrow: 'Premio extra',
     title: 'Cena a casa con serata cinema',
     description:
       'Hai superato almeno quattro prove su cinque tra associazioni principali e love matching. Questo sblocca il premio fisso della sala: una cena a casa con serata cinema.',
   },
   'cinema-ticket-base': {
-    eyebrow: 'Premio variabile',
+    eyebrow: 'Premio extra',
     title: 'MIRO - Osteria del Cinema · Base',
     description: 'Hai conquistato il livello base: esperienza film in Sala Nobel all\'Anteo, firmata MIRO - Osteria del Cinema.',
   },
   'cinema-ticket-premium': {
-    eyebrow: 'Premio variabile',
+    eyebrow: 'Premio extra',
     title: 'MIRO - Osteria del Cinema · Premium',
     description: 'Hai conquistato il livello premium: esperienza film in Sala Nobel all\'Anteo con aperitivo incluso.',
   },
   'cinema-ticket-diamond': {
-    eyebrow: 'Premio variabile',
+    eyebrow: 'Premio extra',
     title: 'MIRO - Osteria del Cinema · Diamond',
     description: 'Hai conquistato il livello diamond: esperienza film in Sala Nobel all\'Anteo con pranzo o cena inclusi.',
   },
@@ -86,16 +93,16 @@ function buildPrizeBlocks(prizeIds) {
       return `
         <tr>
           <td style="padding:0 24px 14px 24px;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#1a1a2e;border-radius:8px;border:1px solid #2a2a44;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#181827;border-radius:8px;border:1px solid #2a2a44;">
               <tr>
-                <td style="padding:16px 20px;">
+                <td style="padding:14px 18px;">
                   <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a78bfa;">
                     ${prizeCopy.eyebrow}
                   </p>
-                  <p style="margin:0;font-size:16px;font-weight:600;color:#ffffff;">
+                  <p style="margin:0;font-size:15px;font-weight:600;color:#ffffff;">
                     ${prizeCopy.title}
                   </p>
-                  <p style="margin:8px 0 0 0;font-size:13px;line-height:1.6;color:#c5c5dd;">
+                  <p style="margin:8px 0 0 0;font-size:12px;line-height:1.6;color:#c5c5dd;">
                     ${prizeCopy.description}
                   </p>
                 </td>
@@ -105,6 +112,29 @@ function buildPrizeBlocks(prizeIds) {
         </tr>`;
     })
     .join('');
+}
+
+function buildRoomPrizeBlock() {
+  return `
+    <tr>
+      <td style="padding:8px 24px 18px 24px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-radius:10px;border:1px solid #3b3454;background:radial-gradient(circle at 0% 0%,#2a2033,#17131f);">
+          <tr>
+            <td style="padding:18px 20px 16px 20px;">
+              <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#f0abfc;">
+                ${ROOM_PRIZE_COPY.eyebrow}
+              </p>
+              <h2 style="margin:0 0 8px 0;font-size:20px;line-height:1.4;color:#ffffff;">
+                ${ROOM_PRIZE_COPY.title}
+              </h2>
+              <p style="margin:0;font-size:13px;line-height:1.7;color:#d8d4f2;">
+                ${ROOM_PRIZE_COPY.description}
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
 }
 
 /**
@@ -238,15 +268,10 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!wonPrizeIds.length) {
-      return res.status(403).json({
-        error: 'No real prize won',
-        userMessage: 'Nessun premio reale sbloccato per questa sala.',
-      });
-    }
-
     const baseUrl = process.env.VITE_BASE_URL || 'https://la-mostra-delle-ombre.vercel.app';
+    const roomPrizeBlockHtml = buildRoomPrizeBlock();
     const prizeBlocksHtml = buildPrizeBlocks(wonPrizeIds);
+    const hasExtraPrizes = wonPrizeIds.length > 0;
 
     const emailHtml = `
   <!DOCTYPE html>
@@ -279,24 +304,44 @@ export default async function handler(req, res) {
             Ciao Francesca,
           </p>
           <p style="margin:0 0 12px 0;font-size:14px;line-height:1.6;color:#c5c5dd;">
-            hai portato a termine la <strong>Sala delle Serie &amp; Film</strong> e il percorso
-            ha convertito ciò che hai sbloccato in premi reali. In questa mail trovi i premi aggiuntivi
-            collegati ai sottogiochi superati.
+            hai portato a termine la <strong>Sala delle Serie &amp; Film</strong> e questa mail raccoglie
+            il premio reale principale della stanza insieme agli eventuali premi extra ottenuti lungo il percorso.
           </p>
           <p style="margin:0 0 4px 0;font-size:13px;line-height:1.6;color:#9f9fb8;">
-            Il premio di stanza <strong>Candlelight: I grandi successi di Bridgerton</strong> è già compreso
-            nella mail principale insieme al Proiettore di Ombre. Qui sotto trovi solo i premi extra davvero conquistati.
+            Qui sotto trovi prima il premio di stanza in evidenza e, subito dopo, il riepilogo dei premi extra sbloccati nei sottogiochi.
           </p>
           </td>
         </tr>
 
+        ${roomPrizeBlockHtml}
+
+        ${hasExtraPrizes ? `
+        <tr>
+          <td style="padding:0 24px 12px 24px;">
+            <p style="margin:0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#9f9fb8;">
+              Premi extra sbloccati
+            </p>
+          </td>
+        </tr>
+        ` : ''}
+
         ${prizeBlocksHtml}
+
+        ${!hasExtraPrizes ? `
+        <tr>
+          <td style="padding:0 24px 18px 24px;">
+            <p style="margin:0;font-size:12px;line-height:1.7;color:#9f9fb8;">
+              In questa sala non hai sbloccato premi extra aggiuntivi oltre al premio principale della stanza.
+            </p>
+          </td>
+        </tr>
+        ` : ''}
 
         <tr>
           <td style="padding:8px 24px 20px 24px;">
             <p style="margin:0;font-size:13px;line-height:1.7;color:#9f9fb8;">
-              Se vorrai, potrai usare questo riepilogo per ricordare esattamente quale combinazione di premio fisso
-              e livello MIRO hai raggiunto in questa sala.
+              Se vorrai, potrai usare questo riepilogo per ricordare quale combinazione di premio di stanza
+              e premi extra hai raggiunto in questa sala.
             </p>
           </td>
         </tr>
@@ -332,7 +377,7 @@ export default async function handler(req, res) {
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'La Mostra <noreply@la-mostra-delle-ombre.vercel.app>',
       to: [playerEmail],
-      subject: 'Premi reali sbloccati - Sala Serie & Film',
+      subject: 'Riepilogo premi reali - Sala Serie & Film',
       html: emailHtml,
     });
 
@@ -361,7 +406,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       emailId: emailData?.id,
-      userMessage: 'Email premio Serie & Film inviata!',
+      userMessage: 'Email riepilogo premi Serie & Film inviata!',
       sentAt: nowIso,
     });
   } catch (error) {
