@@ -107,7 +107,7 @@ function resolveSubgameOutcomeCounts(category, challengeResults) {
 }
 
 function resolvePortalScoreLabel(progress, activeSession = null, category = null) {
-  const hasStoredProgress = Boolean(progress?.lastCompletedSession) || Boolean(progress?.lastSessionSummary) || (progress?.sessions?.length ?? 0) > 0
+  const hasStoredProgress = hasStoredRoomCompletion(progress)
 
   if (!activeSession && !hasStoredProgress) {
     return null
@@ -135,6 +135,15 @@ function resolvePortalScoreLabel(progress, activeSession = null, category = null
   const wrongCount = scoreSource.wrongCount ?? scoreSource.sessionWrongCount ?? 0
 
   return `✓ ${correctCount} · ✗ ${wrongCount}`
+}
+
+function hasStoredRoomCompletion(progress) {
+  return Boolean(
+    progress?.lastCompletedSession ||
+    progress?.archiveAvailable ||
+    progress?.lastSessionSummary ||
+    (progress?.sessions?.length ?? 0) > 0
+  )
 }
 
 function resolvePortalOutcome(progress, activeSession = null, category = null) {
@@ -594,7 +603,7 @@ export default function ShadowHallPage() {
 
   // Serie-film card appears when music room is passed (8+ correct) or fully completed
   const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
-  const hasSerieFilmCompletion = Boolean(serieFilmProgress?.lastCompletedSession)
+  const hasSerieFilmCompletion = hasStoredRoomCompletion(serieFilmProgress)
   const hasCuraCorpoComingSoonReveal = hasSerieFilmCompletion
   const activeBridgeKey = pendingBridge?.bridgeCompletedAt
     ? `${pendingBridge.sourceCategoryId}:${pendingBridge.targetCategoryId}:${pendingBridge.bridgeCompletedAt}`
@@ -718,7 +727,7 @@ export default function ShadowHallPage() {
           const unlocked = unlockedCategoryIds.includes(slot.categoryId)
           const slotProgress = roomProgress[slot.categoryId] ?? null
           const prizeWon = slotProgress?.prizeWon === true
-          const completed = Boolean(slotProgress?.lastCompletedSession)
+          const completed = hasStoredRoomCompletion(slotProgress)
           const activeSessionForSlot = playerState.activeSession?.categoryId === slot.categoryId
             ? playerState.activeSession
             : null
@@ -728,7 +737,7 @@ export default function ShadowHallPage() {
             unlocked &&
             !prizeWon &&
             !activeSessionForSlot &&
-            Boolean(slotProgress?.buyAccessAvailable || slotProgress?.lastCompletedSession)
+            Boolean(slotProgress?.buyAccessAvailable || completed)
           const comingSoon = slot.categoryId === 'cura-corpo' && hasCuraCorpoComingSoonReveal
           const visible = slot.categoryId === 'serie-film'
             ? unlocked || hasSeriesFilmReveal

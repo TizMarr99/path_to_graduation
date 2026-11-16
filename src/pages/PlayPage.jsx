@@ -1560,16 +1560,120 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 function PlayPage() {
   const { categoryId } = useParams()
   const [searchParams] = useSearchParams()
+  const { loadRoomArchive, playerState } = usePlayerState()
   const category = getCategoryById(categoryId)
   const preferredChallengeId = searchParams.get('challenge') ?? ''
+  const archiveLoadRequestRef = useRef('')
+  const [archiveLoadError, setArchiveLoadError] = useState({
+    categoryId: '',
+    message: '',
+  })
+
+  const categoryKey = category?.id ?? ''
+  const roomProgress = category ? playerState.roomProgress[category.id] ?? null : null
+  const hasActiveSession = category ? playerState.activeSession?.categoryId === category.id : false
+  const needsArchiveLoad = Boolean(
+    category &&
+    !hasActiveSession &&
+    roomProgress?.archiveAvailable &&
+    !roomProgress?.lastCompletedSession,
+  )
+
+  useEffect(() => {
+    let isCancelled = false
+
+    if (!categoryKey || !needsArchiveLoad) {
+      return () => {
+        isCancelled = true
+      }
+    }
+
+    if (
+      archiveLoadRequestRef.current === categoryKey ||
+      archiveLoadError.categoryId === categoryKey
+    ) {
+      return () => {
+        isCancelled = true
+      }
+    }
+
+    archiveLoadRequestRef.current = categoryKey
+
+    loadRoomArchive(categoryKey).then((result) => {
+      if (isCancelled) {
+        return
+      }
+
+      if (result.ok) {
+        setArchiveLoadError({ categoryId: '', message: '' })
+        return
+      }
+
+      setArchiveLoadError({
+        categoryId: categoryKey,
+        message: result.error?.userMessage ?? result.error?.message ?? "Archivio della stanza non disponibile.",
+      })
+    })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [archiveLoadError.categoryId, categoryKey, loadRoomArchive, needsArchiveLoad])
 
   if (!category) {
     return <NotFoundState categoryId={categoryId ?? 'sconosciuta'} />
   }
 
+  if (needsArchiveLoad) {
+    if (archiveLoadError.categoryId === category.id) {
+      return (
+        <section className="rounded-[2rem] border border-rose-300/20 bg-slate-950/70 p-8 shadow-[0_0_80px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-rose-200/80">
+            Archivio non disponibile
+          </p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            Non riesco a ricaricare questa stanza.
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+            {archiveLoadError.message}
+          </p>
+          <div className="mt-6">
+            <Link
+              className="inline-flex items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/12 px-5 py-3 text-sm font-semibold text-cyan-50 transition hover:border-cyan-200/60 hover:bg-cyan-400/20"
+              to="/shadows"
+            >
+              Torna alla mappa
+            </Link>
+          </div>
+        </section>
+      )
+    }
+
+    return (
+      <section className="rounded-[2rem] border border-cyan-300/20 bg-slate-950/70 p-8 shadow-[0_0_80px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200/80">
+          Archivio stanza
+        </p>
+        <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          Ricarico la stanza completata...
+        </h2>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+          Sto recuperando il dettaglio delle risposte salvate in archivio.
+        </p>
+      </section>
+    )
+  }
+
+  const sessionKey = [
+    category.id,
+    playerState.activeSession?.categoryId === category.id
+      ? 'active'
+      : roomProgress?.lastCompletedSession?.completedAt ?? 'new',
+  ].join(':')
+
   return (
     <PlayCategorySession
-      key={category.id}
+      key={sessionKey}
       category={category}
       preferredChallengeId={preferredChallengeId}
     />

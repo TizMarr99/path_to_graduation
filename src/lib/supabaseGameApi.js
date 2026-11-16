@@ -19,6 +19,10 @@ function mapRpcError(error, fallbackMessage) {
     return 'Non hai i permessi necessari per questa operazione.'
   }
 
+  if (error.message === 'ROOM_ARCHIVE_NOT_FOUND') {
+    return 'Archivio della stanza non trovato.'
+  }
+
   return fallbackMessage
 }
 
@@ -54,6 +58,37 @@ export async function appSaveSnapshot(code, progress, daily) {
       p_daily: daily,
     },
     'Impossibile salvare il progresso.',
+  )
+}
+
+export async function appSaveRoomArchive(code, categoryId, archive) {
+  return callRpc(
+    'app_save_room_archive',
+    {
+      p_code: code,
+      p_category_id: categoryId,
+      p_archive: archive,
+    },
+    "Impossibile archiviare il dettaglio della stanza.",
+  )
+}
+
+export async function appGetRoomArchive(code, categoryId) {
+  return callRpc(
+    'app_get_room_archive',
+    {
+      p_code: code,
+      p_category_id: categoryId,
+    },
+    "Impossibile recuperare l'archivio della stanza.",
+  )
+}
+
+export async function appClearRoomArchives(code) {
+  return callRpc(
+    'app_clear_room_archives',
+    { p_code: code },
+    'Impossibile eliminare gli archivi delle stanze.',
   )
 }
 

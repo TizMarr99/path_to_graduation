@@ -41,6 +41,7 @@ export function createDefaultRoomProgress(categoryId) {
     prizeWon: false,
     buyAccessAvailable: false,
     victoryModalSeen: false,
+    archiveAvailable: false,
   }
 }
 
@@ -244,9 +245,15 @@ export function buildProgressPayload(playerState) {
         return accumulator
       }
 
+      const shouldExternalizeCompletedSession =
+        roomProgress.archiveAvailable === true && roomProgress.lastCompletedSession
+
       accumulator[categoryId] = {
         ...roomProgress,
         sessions: [],
+        lastCompletedSession: shouldExternalizeCompletedSession
+          ? null
+          : roomProgress.lastCompletedSession ?? null,
       }
 
       return accumulator
@@ -262,6 +269,30 @@ export function buildProgressPayload(playerState) {
     room_progress: compactRoomProgress,
     active_session: playerState.activeSession ?? null,
     transition_state: playerState.transitionState,
+  }
+}
+
+export function buildRoomArchivePayload(playerState, categoryId) {
+  const roomProgress = playerState.roomProgress?.[categoryId] ?? null
+  const completedSnapshot = roomProgress?.lastCompletedSession ?? null
+
+  if (!roomProgress || !completedSnapshot) {
+    return null
+  }
+
+  return {
+    archive_version: 1,
+    summary: {
+      categoryId,
+      lastSessionSummary: roomProgress.lastSessionSummary ?? null,
+      lastOutcomeSummary: roomProgress.lastOutcomeSummary ?? null,
+      completionCount: roomProgress.completionCount ?? 0,
+      totalResolvedChallenges: roomProgress.totalResolvedChallenges ?? 0,
+      unlockedByScore: Boolean(roomProgress.unlockedByScore),
+      prizeWon: Boolean(roomProgress.prizeWon),
+      buyAccessAvailable: Boolean(roomProgress.buyAccessAvailable),
+    },
+    completed_snapshot: completedSnapshot,
   }
 }
 

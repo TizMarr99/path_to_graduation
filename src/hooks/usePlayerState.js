@@ -1,15 +1,19 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
+  appClearRoomArchives,
+  appGetRoomArchive,
   adminResetDailyLimits,
   adminResetPlayer,
   appGetSnapshot,
   appLogin,
+  appSaveRoomArchive,
   appSaveSnapshot,
 } from '../lib/supabaseGameApi'
 import {
   applyAdminStateOverrides,
   buildDailyPayload,
   buildProgressPayload,
+  buildRoomArchivePayload,
   createDefaultPlayerState,
   createDefaultRoomProgress,
   MAX_DAILY_LIVES,
@@ -100,6 +104,68 @@ function getFallbackErrorMessage(error, fallbackMessage) {
   }
 
   return error.userMessage ?? error.message ?? fallbackMessage
+}
+
+function isMissingArchiveRpcError(error) {
+  const message = `${error?.message ?? ''} ${error?.details ?? ''} ${error?.hint ?? ''}`.toLowerCase()
+
+  return (
+    message.includes('app_save_room_archive') ||
+    message.includes('app_get_room_archive') ||
+    message.includes('app_clear_room_archives') ||
+    message.includes('could not find the function') ||
+    (message.includes('function') && message.includes('does not exist'))
+  )
+}
+
+function markRoomArchiveAvailableInState(playerState, categoryId) {
+  const previousProgress =
+    playerState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
+
+  return {
+    ...playerState,
+    roomProgress: {
+      ...playerState.roomProgress,
+      [categoryId]: {
+        ...previousProgress,
+        archiveAvailable: true,
+      },
+    },
+  }
+}
+
+function mergeRoomArchiveIntoState(playerState, categoryId, archive) {
+  const completedSnapshot = archive?.completed_snapshot ?? archive?.completedSnapshot ?? null
+
+  if (!completedSnapshot || typeof completedSnapshot !== 'object' || Array.isArray(completedSnapshot)) {
+    return playerState
+  }
+
+  const summary = archive?.summary && typeof archive.summary === 'object' && !Array.isArray(archive.summary)
+    ? archive.summary
+    : {}
+  const previousProgress =
+    playerState.roomProgress[categoryId] ?? createDefaultRoomProgress(categoryId)
+
+  return {
+    ...playerState,
+    roomProgress: {
+      ...playerState.roomProgress,
+      [categoryId]: {
+        ...previousProgress,
+        completionCount: summary.completionCount ?? previousProgress.completionCount,
+        totalResolvedChallenges:
+          summary.totalResolvedChallenges ?? previousProgress.totalResolvedChallenges,
+        lastSessionSummary: summary.lastSessionSummary ?? previousProgress.lastSessionSummary,
+        lastCompletedSession: completedSnapshot,
+        lastOutcomeSummary: summary.lastOutcomeSummary ?? previousProgress.lastOutcomeSummary,
+        unlockedByScore: summary.unlockedByScore ?? previousProgress.unlockedByScore,
+        prizeWon: summary.prizeWon ?? previousProgress.prizeWon,
+        buyAccessAvailable: summary.buyAccessAvailable ?? previousProgress.buyAccessAvailable,
+        archiveAvailable: true,
+      },
+    },
+  }
 }
 
 function getResumePathForState(playerState) {
@@ -461,7 +527,7 @@ export function PlayerStateProvider({ children }) {
     outcomeSummary = null,
     unlockedCategoryIds = [],
   }) => {
-    const nextPlayerState = buildRoomOutcomePlayerState(playerStateRef.current, {
+    let nextPlayerState = buildRoomOutcomePlayerState(playerStateRef.current, {
       categoryId,
       challengeResults,
       challengeStatesByChallengeId,
@@ -473,6 +539,22 @@ export function PlayerStateProvider({ children }) {
       outcomeSummary,
       unlockedCategoryIds,
     })
+
+    if (accessCodeRef.current) {
+      const archivePayload = buildRoomArchivePayload(nextPlayerState, categoryId)
+
+      if (archivePayload) {
+        try {
+          await appSaveRoomArchive(accessCodeRef.current, categoryId, archivePayload)
+          nextPlayerState = markRoomArchiveAvailableInState(nextPlayerState, categoryId)
+        } catch (error) {
+          if (!isMissingArchiveRpcError(error)) {
+            console.warn('Room archive save failed; falling back to full progress snapshot.', error)
+          }
+        }
+      }
+    }
+
     playerStateRef.current = nextPlayerState
     setPlayerState(nextPlayerState)
     if (!accessCodeRef.current) return { ok: true }
@@ -587,6 +669,16 @@ export function PlayerStateProvider({ children }) {
 
     clearScheduledSave()
 
+    if (accessCodeRef.current) {
+      try {
+        await appClearRoomArchives(accessCodeRef.current)
+      } catch (error) {
+        if (!isMissingArchiveRpcError(error)) {
+          console.warn('Room archive cleanup failed during reset.', error)
+        }
+      }
+    }
+
     const result = await persistPlayerState(nextPlayerState)
 
     if (!result.ok) {
@@ -596,6 +688,40 @@ export function PlayerStateProvider({ children }) {
     resetLocalSession()
     return { ok: true }
   }
+
+  const loadRoomArchive = useCallback(async (categoryId) => {
+    if (!accessCodeRef.current || !categoryId) {
+      return { ok: false }
+    }
+
+    const currentProgress = playerStateRef.current.roomProgress[categoryId]
+
+    if (currentProgress?.lastCompletedSession) {
+      return { ok: true, fromCache: true }
+    }
+
+    setSyncError('')
+
+    try {
+      const archive = await appGetRoomArchive(accessCodeRef.current, categoryId)
+      const nextPlayerState = mergeRoomArchiveIntoState(
+        playerStateRef.current,
+        categoryId,
+        archive,
+      )
+
+      playerStateRef.current = nextPlayerState
+      setPlayerState(nextPlayerState)
+
+      return { ok: true, archive }
+    } catch (error) {
+      if (!isMissingArchiveRpcError(error) && error?.message !== 'ROOM_ARCHIVE_NOT_FOUND') {
+        setSyncError(getFallbackErrorMessage(error, "Impossibile recuperare l'archivio della stanza."))
+      }
+
+      return { ok: false, error }
+    }
+  }, [])
 
   function resetMusicRoomIntro() {
     updatePlayerState((currentState) => resetMusicRoomIntroInPlayerState(currentState))
@@ -919,6 +1045,7 @@ export function PlayerStateProvider({ children }) {
     isLoggingIn,
     isMusicEnabled,
     isSyncing,
+    loadRoomArchive,
     login,
     logout,
     playerState,
