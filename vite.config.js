@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import fs from 'fs'
 import { pathToFileURL } from 'url'
+import process from 'node:process'
+import { Buffer } from 'node:buffer'
 
 // Load ALL env vars (including non-VITE_ ones like RESEND_API_KEY)
 // so serverless handlers can read them via process.env during local dev.

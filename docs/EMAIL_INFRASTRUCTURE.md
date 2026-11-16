@@ -1,3 +1,5 @@
+> Documento storico/design: per stato e configurazione correnti consultare [indice](README.md), [stato progetto](STATO_PROGETTO.md) e [configurazione](CONFIGURAZIONE.md). Le affermazioni di implementazione qui sotto possono essere superate.
+
 /**
  * Music Room Email Infrastructure - Implementation Guide
  *
