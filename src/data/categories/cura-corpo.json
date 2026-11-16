@@ -1,0 +1,2246 @@
+{
+  "id": "cura-corpo",
+  "kind": "room",
+  "title": "Sala del Corpo, della Moda e della Fotografia",
+  "ghost": "Il Riflesso del Flash",
+  "description": "Un atelier sospeso tra specchi, flash e profumi. Ogni dettaglio sembra innocuo finche non cambia colore, posa o nome.",
+  "introHeadline": "Il gusto è tuo. L'ultima parola è di Miranda.",
+  "introLead": "Dodici prove tra moda, beauty e fotografia. Andrea ti copre le spalle; Miranda aspetta una risposta di cui pentirti. Guarda bene, poi prenditi la scena.",
+  "backgroundImage": "/images/rooms/corpo-moda-fotografia-bg.png",
+  "ambientAudioSrc": "/audio/bg_corpo_moda_fotografia_room.mp3",
+  "mapImage": "/images/rooms/corpo-moda-fotografia-map.png",
+  "wrongAnswerImageSrcs": [],
+  "fear": {
+    "id": "horror-cura-corpo",
+    "name": "Il Flash alle Spalle",
+    "icon": "camera",
+    "description": "Scatti improvvisi, specchi appannati, passi sul parquet dell'atelier.",
+    "sfxSrc": "/audio/corpo-moda-fotografia-fear.mp3"
+  },
+  "rewardArtifact": {
+    "type": "hint",
+    "label": "Specchio Prismatico",
+    "description": "Un frammento che riflette dettagli nascosti e palette dimenticate."
+  },
+  "mapHotspots": [
+    {
+      "id": "specchio-cromatico",
+      "label": "Specchio dei dettagli",
+      "description": "Memory Palette e Attenzione al dettaglio.",
+      "introPrompt": "Memory Palette e Attenzione al dettaglio.",
+      "icon": "palette",
+      "x": 9,
+      "y": 18,
+      "width": 16,
+      "height": 42
+    },
+    {
+      "id": "passerella-tempo",
+      "label": "Passerella delle icone",
+      "description": "Hitster moda e Outfit iconici.",
+      "introPrompt": "Hitster moda e Outfit iconici.",
+      "icon": "calendar",
+      "x": 50,
+      "y": 12,
+      "width": 16,
+      "height": 34
+    },
+    {
+      "id": "camera-oscura",
+      "label": "Camera oscura",
+      "description": "Filtri e supporti fotografici.",
+      "introPrompt": "Filtri e supporti fotografici.",
+      "icon": "camera",
+      "x": 70,
+      "y": 18,
+      "width": 16,
+      "height": 42
+    },
+    {
+      "id": "beauty-lab",
+      "label": "Beauty e profumi",
+      "description": "Prodotti, dupe e profumi.",
+      "introPrompt": "Prodotti, dupe e profumi.",
+      "icon": "sparkle",
+      "x": 20,
+      "y": 62,
+      "width": 28,
+      "height": 20
+    },
+    {
+      "id": "vetrina-segreta",
+      "label": "Vetrina degli enigmi",
+      "description": "Rebus, indizi progressivi e cultura generale.",
+      "introPrompt": "Rebus, indizi progressivi e cultura generale.",
+      "icon": "tag",
+      "x": 54,
+      "y": 62,
+      "width": 30,
+      "height": 20
+    }
+  ],
+  "weightedScoring": {
+    "passingThreshold": 0.6,
+    "groupPassingThreshold": 1,
+    "scoreGroups": [
+      {
+        "id": "memory_palette",
+        "label": "Memory Palette",
+        "weight": 1,
+        "challengeIds": [
+          "cc-memory-palette-01"
+        ]
+      },
+      {
+        "id": "timed_detail",
+        "label": "Attenzione al Dettaglio",
+        "weight": 1,
+        "challengeIds": [
+          "cc-timed-detail-01"
+        ]
+      },
+      {
+        "id": "hitster_style",
+        "label": "Hitster With Style",
+        "weight": 1,
+        "challengeIds": [
+          "cc-hitster-style-01"
+        ]
+      },
+      {
+        "id": "iconic_outfits",
+        "label": "Outfit Iconico Nascosto",
+        "weight": 1,
+        "challengeIds": [
+          "cc-iconic-outfits-01"
+        ]
+      },
+      {
+        "id": "photo_filters",
+        "label": "Filtri & Effetti",
+        "weight": 1,
+        "challengeIds": [
+          "cc-photo-filters-01"
+        ]
+      },
+      {
+        "id": "photo_supports",
+        "label": "Supporto Fotografico",
+        "weight": 1,
+        "challengeIds": [
+          "cc-photo-supports-01"
+        ]
+      },
+      {
+        "id": "product_names",
+        "label": "Nome Prodotto da Immagine",
+        "weight": 1,
+        "challengeIds": [
+          "cc-product-names-01"
+        ]
+      },
+      {
+        "id": "dupe_original",
+        "label": "Dupe o Originale",
+        "weight": 1,
+        "challengeIds": [
+          "cc-dupe-original-01"
+        ]
+      },
+      {
+        "id": "fragrance_families",
+        "label": "Profumi",
+        "weight": 1,
+        "challengeIds": [
+          "cc-fragrance-families-01"
+        ]
+      },
+      {
+        "id": "brand_emoji",
+        "label": "Brand da Emoji",
+        "weight": 1,
+        "challengeIds": [
+          "cc-brand-emoji-01"
+        ]
+      },
+      {
+        "id": "brand_clues",
+        "label": "Brand a Indizi Progressivi",
+        "weight": 1,
+        "challengeIds": [
+          "cc-brand-clues-01"
+        ]
+      },
+      {
+        "id": "general_culture",
+        "label": "Cultura Generale Mista",
+        "weight": 1,
+        "challengeIds": [
+          "cc-general-culture-01"
+        ]
+      }
+    ]
+  },
+  "subPrizes": [],
+  "unlockCost": 0,
+  "buyAccessCost": 90,
+  "characters": {
+    "guardian": {
+      "id": "andrea-sachs",
+      "name": "Andrea Sachs",
+      "role": "La Curatrice",
+      "imageSrc": "/images/andrea_sachs.png",
+      "fallbackImageSrc": "/images/andrea_sachs.png",
+      "tone": "gold"
+    },
+    "inquisitor": {
+      "id": "amanda-priestly",
+      "name": "Miranda Priestly",
+      "role": "La Critica",
+      "imageSrc": "/images/amanda-priestly.png",
+      "fallbackImageSrc": "/images/amanda-priestly.png",
+      "tone": "silver"
+    }
+  },
+  "introNarrative": {
+    "guardian": {
+      "name": "Andrea Sachs",
+      "message": "Eccoti. Appoggia pure la borsa: per una volta non dobbiamo portare il caffè a nessuno. Tra poco spariranno foto, si confonderanno colori e certi vestiti dovranno parlare senza il volto di chi li indossa. Io ti do una mano. Tu guarda cosa hai davanti, anche quando lei ti farà venire voglia di fissare il pavimento. Ho lavorato per Miranda: quel sopracciglio non è una sentenza. Anche se lei è convinta di sì."
+    },
+    "inquisitor": {
+      "name": "Miranda Priestly",
+      "message": "Dunque saresti tu quella con occhio. Immagino che salvare fotografie sul telefono sia ormai considerato un curriculum. Qui dovrai riconoscere un taglio, una firma, un'immagine senza la didascalia che ti suggerisce cosa pensare. Andrea ti assisterà: ha un debole per le cause impegnative. Io giudicherò le risposte. Risparmiami soltanto il «secondo me». Anche gli errori hanno un'opinione di sé."
+    }
+  },
+  "characterComments": {
+    "onCorrect": [
+      {
+        "speaker": "guardian",
+        "text": "Sì! Goditela un secondo. Io sto già facendo finta di non vedere la sua faccia."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Visto? Quella risposta la sapevi tu. Il suo sopracciglio può farsene una ragione."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Questa me la segno. Nei giorni storti fa comodo ricordarsi di essere capaci."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Brava. E puoi dirlo anche ad alta voce: qui dentro i complimenti scarseggiano, mica le ragioni per farteli."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Ti passerei un cinque sotto la scrivania. Facciamo sopra: ci ha già viste."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Eccola, la soddisfazione di saper rispondere mentre qualcuno spera che tu sbagli. Tienitela stretta."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Hai portato a casa la prova. Ora sciogli le spalle: non dobbiamo posare per la foto del tesserino."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Ci siamo. Se Miranda tace, non aspettare l'applauso: è il momento di sorridere e andare avanti."
+      }
+    ],
+    "onWrong": [
+      {
+        "speaker": "inquisitor",
+        "text": "No. Ma apprezzo la disinvoltura con cui hai consegnato questa risposta. Io avrei chiesto una busta anonima."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Interessante. Avevi a disposizione gli occhi e hai deciso di fare senza."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Questa risposta non passa la selezione. Nemmeno per lo stage non retribuito."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "La sicurezza era impeccabile. Peccato fosse l'unica cosa giusta."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Vorrei chiederti come ci sei arrivata, ma temo che la spiegazione richieda una sedia."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Ho bocciato copertine per molto meno. E almeno quelle erano a fuoco."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Hai scelto. È il solo merito che riesco ad attribuire a questa risposta."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Se volevi stupirmi, ci sei riuscita. Dovrò essere più precisa quando esprimo un desiderio."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Andrea, ricordami di togliere «occhio per i dettagli» dal suo curriculum."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Ti lascio leggere la soluzione. In silenzio, possibilmente: questa risposta ha già detto abbastanza."
+      }
+    ],
+    "onHintUsed": [
+      {
+        "speaker": "guardian",
+        "text": "Tieni, un appiglio. Parti da quello che ti permette di escludere: spesso è più facile togliere una risposta che trovarla subito."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Chiedere una mano va benissimo. Ho imparato più facendo domande che fingendo di sapere tutto al primo giorno."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Leggiamolo con calma. Qual è la cosa che questo indizio ti fa notare e prima ti era sfuggita? Parti da lì."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Ci sono. Se hai due idee in testa, cerca cosa le distingue. Somigliarsi è facile; tradirsi su un particolare, ancora di più."
+      },
+      {
+        "speaker": "guardian",
+        "text": "Non cercare una risposta solo perché suona elegante. Quella giusta deve spiegare l'indizio. Anche vestita in jeans."
+      }
+    ],
+    "onHesitation": [
+      {
+        "speaker": "inquisitor",
+        "text": "Stai aspettando l'ispirazione? Avvisami se arriva. Le farò firmare il ritardo."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Prenditi pure il tuo tempo. La prossima collezione è soltanto fra sei mesi."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Il dubbio ti dona. Peccato che qui chiediamo una risposta."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Devo chiamare qualcuno o questa immobilità fa parte del tuo processo creativo?"
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Andrea, il caffè. A quanto pare avremo il tempo di berlo."
+      },
+      {
+        "speaker": "inquisitor",
+        "text": "Fissare una domanda non la mette in soggezione. Ho già provato. Funziona soltanto con le persone."
+      }
+    ]
+  },
+  "challenges": [
+    {
+      "id": "cc-memory-palette-01",
+      "zoneId": "specchio-cromatico",
+      "type": "memory_palette",
+      "quizSubType": "memory_palette",
+      "difficulty": "medium",
+      "title": "Memory Palette",
+      "prompt": "Osserva ogni immagine, poi rispondi scegliendo un campione di colore.",
+      "subgameIntroText": "Tre secondi volano, lo so. Guarda i colori prima di perderti nella foto: poi scegli il campione che ricordi. Due risposte giuste su tre e ci siamo.",
+      "successMessage": "Andrea: «Hai tenuto a mente i colori anche dopo che la foto è sparita. Io dimentico cosa cercavo appena apro l'armadio: tanto di cappello.»",
+      "failureMessage": "Miranda: «Il colore era lì tre secondi fa. Una carriera breve, ma evidentemente poco memorabile per te.»",
+      "minimumCorrectRounds": 2,
+      "rounds": [
+        {
+          "id": "palette-01",
+          "prompt": "Di che colore erano le cuffie?",
+          "displaySeconds": 3,
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/palette-01.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctColorIds": [
+            "0"
+          ],
+          "colors": [
+            {
+              "id": "0",
+              "name": "Verde",
+              "hex": "#6E8458"
+            },
+            {
+              "id": "1",
+              "name": "Senape",
+              "hex": "#B79B4B"
+            },
+            {
+              "id": "2",
+              "name": "Azzurro grigio",
+              "hex": "#6E8795"
+            },
+            {
+              "id": "3",
+              "name": "Marrone",
+              "hex": "#8C6B51"
+            }
+          ]
+        },
+        {
+          "id": "palette-02",
+          "prompt": "Di che colore era la montatura degli occhiali?",
+          "displaySeconds": 3,
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/palette-02.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctColorIds": [
+            "0"
+          ],
+          "colors": [
+            {
+              "id": "0",
+              "name": "Arancione",
+              "hex": "#C67537"
+            },
+            {
+              "id": "1",
+              "name": "Rosso mattone",
+              "hex": "#98483D"
+            },
+            {
+              "id": "2",
+              "name": "Giallo ocra",
+              "hex": "#B89A3F"
+            },
+            {
+              "id": "3",
+              "name": "Marrone",
+              "hex": "#79563E"
+            }
+          ]
+        },
+        {
+          "id": "palette-03",
+          "prompt": "Di che colore era la borsa?",
+          "displaySeconds": 3,
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/palette-03.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctColorIds": [
+            "0"
+          ],
+          "colors": [
+            {
+              "id": "0",
+              "name": "Borgogna",
+              "hex": "#762E44"
+            },
+            {
+              "id": "1",
+              "name": "Marrone",
+              "hex": "#76503E"
+            },
+            {
+              "id": "2",
+              "name": "Viola",
+              "hex": "#70516F"
+            },
+            {
+              "id": "3",
+              "name": "Rosso mattone",
+              "hex": "#A34B3E"
+            }
+          ]
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 2 risposte o collocazioni corrette.",
+      "creditReward": 6,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "contentVersion": 2,
+      "infoText": "Osserva ogni immagine, poi rispondi scegliendo un campione di colore."
+    },
+    {
+      "id": "cc-timed-detail-01",
+      "zoneId": "specchio-cromatico",
+      "type": "multi_round_quiz",
+      "quizSubType": "timed_detail",
+      "visualMode": "detail",
+      "difficulty": "medium",
+      "title": "Attenzione al Dettaglio",
+      "prompt": "Osserva la foto prima che il dettaglio venga nascosto.",
+      "subgameIntroText": "Hai sette secondi per ogni foto. Fatti un piccolo giro con gli occhi: oggetti, posizioni, particolari. Poi la foto sparisce e arriva la domanda. Te ne servono tre su quattro; io faccio il tifo da qui.",
+      "successMessage": "Andrea: «Foto sparita, dettaglio rimasto. È un bell'occhio, il tuo: fidati anche quando lei prova a farti dubitare.»",
+      "failureMessage": "Miranda: «La fotografia conteneva già tutto il necessario. La prossima volta farò mettere una freccia. Rossa. Molto grande.»",
+      "minimumCorrectRounds": 3,
+      "rounds": [
+        {
+          "id": "dettaglio-01",
+          "prompt": "Quali colori avevano i bracciali?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Oro e marrone"
+            },
+            {
+              "id": "1",
+              "text": "Argento e nero"
+            },
+            {
+              "id": "2",
+              "text": "Oro e nero"
+            },
+            {
+              "id": "3",
+              "text": "Argento e marrone"
+            }
+          ],
+          "correctChoiceId": "0",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-01.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "displaySeconds": 7,
+          "answerAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-01-d.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-01.png",
+              "alt": "Foto originale dopo la risposta",
+              "caption": "Foto originale"
+            }
+          ]
+        },
+        {
+          "id": "dettaglio-02",
+          "prompt": "Di quale marca era la fotocamera?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Canon"
+            },
+            {
+              "id": "1",
+              "text": "Nikon"
+            },
+            {
+              "id": "2",
+              "text": "Olympus"
+            },
+            {
+              "id": "3",
+              "text": "Fujifilm"
+            }
+          ],
+          "correctChoiceId": "0",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-02.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "displaySeconds": 7,
+          "answerAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-02-d.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-02.png",
+              "alt": "Foto originale dopo la risposta",
+              "caption": "Foto originale"
+            }
+          ]
+        },
+        {
+          "id": "dettaglio-03",
+          "prompt": "Verso quale direzione era rivolto il cavallo?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Nord"
+            },
+            {
+              "id": "1",
+              "text": "Sud"
+            },
+            {
+              "id": "2",
+              "text": "Est"
+            },
+            {
+              "id": "3",
+              "text": "Ovest"
+            }
+          ],
+          "correctChoiceId": "2",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-03.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "explanation": "Nord = alto della foto; Est = destra.",
+          "questionNote": "Nord = alto della foto; Est = destra.",
+          "displaySeconds": 7,
+          "answerAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-03-d.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-03.png",
+              "alt": "Foto originale dopo la risposta",
+              "caption": "Foto originale"
+            }
+          ]
+        },
+        {
+          "id": "dettaglio-04",
+          "prompt": "Quale strumento suonava l’uomo nella scena sul dorso?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Una cornamusa"
+            },
+            {
+              "id": "1",
+              "text": "Un flauto traverso"
+            },
+            {
+              "id": "2",
+              "text": "Un oboe"
+            },
+            {
+              "id": "3",
+              "text": "Un violino"
+            }
+          ],
+          "correctChoiceId": "2",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-04.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "displaySeconds": 7,
+          "answerAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-04-d.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/osservazione/dettaglio-04.png",
+              "alt": "Foto originale dopo la risposta",
+              "caption": "Foto originale"
+            }
+          ],
+          "explanation": "La risposta attesa è oboe, interpretato come un oboe barocco nella scena raffigurata."
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 3 risposte o collocazioni corrette.",
+      "creditReward": 6,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "contentVersion": 2,
+      "infoText": "Osserva la foto prima che il dettaglio venga nascosto."
+    },
+    {
+      "id": "cc-hitster-style-01",
+      "zoneId": "passerella-tempo",
+      "type": "visual_timeline",
+      "quizSubType": "hitster_style",
+      "difficulty": "hard",
+      "title": "Hitster With Style",
+      "prompt": "Colloca i look dal più antico al più recente. La quarta casella ospita due look contemporanei.",
+      "minimumCorrectPlacements": 5,
+      "items": [
+        {
+          "id": "flapper-1920",
+          "label": "Look 1",
+          "year": 1920,
+          "acceptedStyleAnswers": [
+            "Flapper",
+            "stile flapper",
+            "anni ruggenti",
+            "roaring twenties",
+            "charleston",
+            "stile charleston"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/01-flapper.jpg",
+              "alt": "Look da collocare 1"
+            }
+          ],
+          "description": ""
+        },
+        {
+          "id": "greaser-1950",
+          "label": "Look 2",
+          "year": 1950,
+          "acceptedStyleAnswers": [
+            "Greaser",
+            "stile greaser",
+            "rockabilly",
+            "rock and roll",
+            "rock n roll",
+            "stile rockabilly"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/02-greaser.jpg",
+              "alt": "Look da collocare 2"
+            }
+          ],
+          "description": ""
+        },
+        {
+          "id": "hippie-1970",
+          "label": "Look 3",
+          "year": 1960,
+          "acceptedStyleAnswers": [
+            "Hippie",
+            "hippy",
+            "figli dei fiori",
+            "figlia dei fiori",
+            "flower power",
+            "stile hippie"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/03-hippie.jpg",
+              "alt": "Look da collocare 3"
+            }
+          ],
+          "description": ""
+        },
+        {
+          "id": "disco-1970",
+          "label": "Look 4",
+          "year": 1970,
+          "acceptedStyleAnswers": [
+            "Disco",
+            "disco music",
+            "disco style",
+            "stile disco",
+            "disco fever"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/04-disco.jpg",
+              "alt": "Look da collocare 4"
+            }
+          ],
+          "description": ""
+        },
+        {
+          "id": "punk-1970",
+          "label": "Look 5",
+          "year": 1970,
+          "acceptedStyleAnswers": [
+            "Punk",
+            "punk rock",
+            "stile punk"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/05-punk.jpg",
+              "alt": "Look da collocare 5"
+            }
+          ],
+          "description": ""
+        },
+        {
+          "id": "hip-hop-1980",
+          "label": "Look 6",
+          "year": 1980,
+          "acceptedStyleAnswers": [
+            "Hip hop",
+            "hiphop",
+            "old school hip hop",
+            "hip hop old school",
+            "b boy",
+            "bboy",
+            "streetwear hip hop"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/06-hip-hop.jpg",
+              "alt": "Look da collocare 6"
+            }
+          ],
+          "description": ""
+        },
+        {
+          "id": "grunge-1990",
+          "label": "Look 7",
+          "year": 1990,
+          "acceptedStyleAnswers": [
+            "Grunge",
+            "stile grunge",
+            "seattle sound"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/hitster-stili/07-grunge.jpg",
+              "alt": "Look da collocare 7"
+            }
+          ],
+          "description": ""
+        }
+      ],
+      "initialOrder": [
+        "punk-1970",
+        "flapper-1920",
+        "grunge-1990",
+        "hippie-1970",
+        "greaser-1950",
+        "hip-hop-1980",
+        "disco-1970"
+      ],
+      "correctOrder": [
+        "flapper-1920",
+        "greaser-1950",
+        "hippie-1970",
+        "disco-1970",
+        "punk-1970",
+        "hip-hop-1980",
+        "grunge-1990"
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 5 risposte o collocazioni corrette.",
+      "creditReward": 12,
+      "hintCost": 4,
+      "contentStatus": "ready",
+      "allowEqualYears": true,
+      "contentVersion": 2,
+      "infoText": "Colloca i look dal più antico al più recente. La quarta casella ospita due look contemporanei.",
+      "subgameIntroText": "Facciamo ordine in questo guardaroba: sette look, dal più antico al più recente, in sei caselle. La quarta ne ospita due contemporanei. Servono cinque collocazioni corrette; nomi e decadi sono bonus facoltativi. Comincia dalle epoche che riconosci e costruisci il resto intorno.",
+      "successMessage": "Andrea: «Hai rimesso in ordine decenni di vestiti. Se ti va, un giorno affrontiamo anche il fondo del mio armadio.»",
+      "failureMessage": "Miranda: «Questa cronologia sembra un guardaroba svuotato durante un trasloco. Le epoche si possono citare, cara. Confonderle è un'altra faccenda.»"
+    },
+    {
+      "id": "cc-iconic-outfits-01",
+      "zoneId": "passerella-tempo",
+      "type": "multi_round_quiz",
+      "quizSubType": "iconic_outfits",
+      "difficulty": "medium",
+      "title": "Outfit Iconico Nascosto",
+      "prompt": "Riconosci il personaggio da un outfit senza volto.",
+      "hint": "",
+      "explanation": "Servono almeno 6 risposte o collocazioni corrette.",
+      "creditReward": 10,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "rounds": [
+        {
+          "id": "marilyn",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Marilyn Monroe",
+            "Marilyn",
+            "Marylin",
+            "Marylin Monroe"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/01-marilyn.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/01-marilyn.jpg",
+              "alt": "Marilyn Monroe",
+              "caption": "Marilyn Monroe"
+            }
+          ]
+        },
+        {
+          "id": "michael-jackson",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Michael Jackson",
+            "Michael",
+            "Jackson",
+            "MJ"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/02-michael-jackson.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/02-michael-jackson.jpg",
+              "alt": "Michael Jackson",
+              "caption": "Michael Jackson"
+            }
+          ]
+        },
+        {
+          "id": "diana",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Lady Diana",
+            "Diana",
+            "Lady D",
+            "Diana Spencer",
+            "principessa Diana",
+            "Princess Diana"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/03-diana.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/03-diana.jpg",
+              "alt": "Lady Diana",
+              "caption": "Lady Diana"
+            }
+          ]
+        },
+        {
+          "id": "audrey",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Audrey Hepburn",
+            "Audrey",
+            "Hepburn"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/04-audrey.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/04-audrey.jpg",
+              "alt": "Audrey Hepburn",
+              "caption": "Audrey Hepburn"
+            }
+          ]
+        },
+        {
+          "id": "undici",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Undici",
+            "Eleven",
+            "El",
+            "Jane",
+            "Jane Hopper",
+            "Jane Ives"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/05-undici.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/05-undici.jpg",
+              "alt": "Undici",
+              "caption": "Undici"
+            }
+          ]
+        },
+        {
+          "id": "frida",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Frida Kahlo",
+            "Frida",
+            "Frida Kalo"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/06-frida.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/06-frida.jpg",
+              "alt": "Frida Kahlo",
+              "caption": "Frida Kahlo"
+            }
+          ]
+        },
+        {
+          "id": "freddie-mercury",
+          "prompt": "Quale personaggio riconosci?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Freddie Mercury",
+            "Freddy Mercury",
+            "Freddie",
+            "Freddy",
+            "Mercury"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/outfit-iconici/07-freddie-mercury.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/outfit-iconici/07-freddie-mercury.jpg",
+              "alt": "Freddie Mercury",
+              "caption": "Freddie Mercury"
+            }
+          ]
+        }
+      ],
+      "minimumCorrectRounds": 6,
+      "contentVersion": 2,
+      "infoText": "Riconosci il personaggio da un outfit senza volto.",
+      "subgameIntroText": "Niente volto: stavolta parla il vestito. Guarda taglio, colori e accessori, poi scrivi il personaggio. Te ne servono sei su sette. Se un nome ti sfugge, prova a ricordare la scena: spesso arriva subito dopo.",
+      "successMessage": "Andrea: «Hai riconosciuto chi c'era dentro quei vestiti. È la parte che preferisco: un outfit capace di raccontare qualcuno.»",
+      "failureMessage": "Miranda: «Abbiamo tolto i volti, non gli indizi. Il guardaroba ha fatto la sua parte. Tu eri attesa alla tua.»"
+    },
+    {
+      "id": "cc-photo-filters-01",
+      "zoneId": "camera-oscura",
+      "type": "multi_round_quiz",
+      "quizSubType": "photo_filters",
+      "difficulty": "medium",
+      "title": "Filtri & Effetti",
+      "prompt": "Confronta le cinque varianti con l’originale e scrivi il nome di ciascun effetto.",
+      "hint": "",
+      "explanation": "Servono almeno 4 risposte o collocazioni corrette.",
+      "creditReward": 9,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "rounds": [
+        {
+          "id": "bn",
+          "prompt": "Quale effetto è stato applicato?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Bianco e nero",
+            "bianco nero",
+            "bianconero",
+            "b/n",
+            "bn",
+            "black and white",
+            "black white",
+            "b&w",
+            "bw",
+            "scala di grigi",
+            "grayscale"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-effetti/01-bianco-e-nero.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "seppia",
+          "prompt": "Quale effetto è stato applicato?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Seppia",
+            "sepia",
+            "effetto seppia",
+            "filtro seppia"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-effetti/02-seppia.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "vignettatura",
+          "prompt": "Quale effetto è stato applicato?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Vignettatura",
+            "vignetta",
+            "vignette",
+            "vignetting",
+            "effetto vignetta",
+            "bordi scuri",
+            "angoli scuri"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-effetti/03-vignettatura.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "sfocatura",
+          "prompt": "Quale effetto è stato applicato?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Sfocatura",
+            "sfocato",
+            "sfocata",
+            "sfuocatura",
+            "sfuocato",
+            "sfuocata",
+            "blur",
+            "effetto sfocato",
+            "effetto blur"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-effetti/04-sfocatura.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "pixelatura",
+          "prompt": "Quale effetto è stato applicato?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Pixelatura",
+            "pixellatura",
+            "pixelato",
+            "pixellato",
+            "pixelata",
+            "pixellata",
+            "pixel",
+            "pixelation",
+            "pixelated",
+            "effetto pixel",
+            "mosaico",
+            "effetto mosaico"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-effetti/05-pixelatura.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        }
+      ],
+      "minimumCorrectRounds": 4,
+      "simultaneousRounds": true,
+      "assets": [
+        {
+          "kind": "image",
+          "src": "/corpo-moda-fotografia/originali/fotografia-effetti/00-scena-urbana.png",
+          "alt": "Immagine della prova",
+          "caption": "Originale"
+        }
+      ],
+      "contentVersion": 2,
+      "infoText": "Confronta le cinque varianti con l’originale e scrivi il nome di ciascun effetto.",
+      "subgameIntroText": "L'originale resta qui accanto alle cinque varianti: confrontale e dai un nome a ogni effetto. Guarda cosa cambia nei colori, nei contorni e nella luce. Quattro nomi giusti bastano; «quello carino» temo che non sia tra quelli accettati.",
+      "successMessage": "Andrea: «Hai dato un nome a quello che vedevi. Adesso, quando qualcuno dice “mettici un effetto”, puoi persino chiedergli quale.»",
+      "failureMessage": "Miranda: «L'originale era accanto alle varianti. Non ti mancava il confronto. Ti mancava qualcosa da dire dopo averlo fatto.»"
+    },
+    {
+      "id": "cc-photo-supports-01",
+      "zoneId": "camera-oscura",
+      "type": "image_option_matching",
+      "quizSubType": "photo_supports",
+      "difficulty": "medium",
+      "title": "Supporto Fotografico",
+      "prompt": "Associa ogni scatto al supporto fotografico. Ogni nome può essere usato una volta.",
+      "minimumCorrectPairs": 4,
+      "items": [
+        {
+          "id": "rullino",
+          "label": "Scatto 1",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-supporti/01-scogliera-rullino-35mm.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctOptionId": "rullino"
+        },
+        {
+          "id": "smartphone",
+          "label": "Scatto 2",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-supporti/02-neve-fuoristrada.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctOptionId": "smartphone"
+        },
+        {
+          "id": "usa-e-getta",
+          "label": "Scatto 3",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-supporti/03-concerto-flash.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctOptionId": "usa-e-getta"
+        },
+        {
+          "id": "polaroid",
+          "label": "Scatto 4",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-supporti/04-ritratto-istantanea.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctOptionId": "polaroid"
+        },
+        {
+          "id": "action-cam",
+          "label": "Scatto 5",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/fotografia-supporti/05-scena-subacquea.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "correctOptionId": "action-cam"
+        }
+      ],
+      "options": [
+        {
+          "id": "rullino",
+          "label": "Fotocamera a pellicola 35 mm"
+        },
+        {
+          "id": "smartphone",
+          "label": "Smartphone"
+        },
+        {
+          "id": "usa-e-getta",
+          "label": "Fotocamera usa e getta"
+        },
+        {
+          "id": "polaroid",
+          "label": "Fotocamera istantanea / Polaroid"
+        },
+        {
+          "id": "action-cam",
+          "label": "Action cam / GoPro"
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 4 risposte o collocazioni corrette.",
+      "creditReward": 9,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "contentVersion": 2,
+      "infoText": "Associa ogni scatto al supporto fotografico. Ogni nome può essere usato una volta.",
+      "subgameIntroText": "Cinque scatti, cinque supporti: ogni nome si usa una volta sola. Cerca gli indizi nell'immagine e puoi spostare gli abbinamenti finché non invii. Te ne servono quattro corretti. Qui sistemare le cose all'ultimo minuto è ancora permesso, approfittiamone.",
+      "successMessage": "Andrea: «Hai ritrovato il supporto dietro gli scatti. Mi piace quando una foto racconta anche come è stata fatta.»",
+      "failureMessage": "Miranda: «Per te queste macchine fanno tutte fotografie e dunque si equivalgono. Una teoria comodissima. La terrei lontana da un set.»"
+    },
+    {
+      "id": "cc-product-names-01",
+      "zoneId": "beauty-lab",
+      "type": "multi_round_quiz",
+      "quizSubType": "product_names",
+      "difficulty": "easy",
+      "title": "Nome Prodotto da Immagine",
+      "prompt": "Riconosci il tipo di prodotto beauty, non soltanto la marca.",
+      "hint": "",
+      "explanation": "Servono almeno 3 risposte o collocazioni corrette.",
+      "creditReward": 5,
+      "hintCost": 2,
+      "contentStatus": "ready",
+      "rounds": [
+        {
+          "id": "prodotto-1",
+          "prompt": "Quale tipo di prodotto è?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Primer",
+            "primer viso",
+            "base trucco",
+            "base per il trucco",
+            "makeup primer",
+            "face primer"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/beauty-prodotti/01-primer-elf.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "recognizedBrands": [
+            "e.l.f.",
+            "elf"
+          ]
+        },
+        {
+          "id": "prodotto-2",
+          "prompt": "Quale tipo di prodotto è?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Spray fissante",
+            "spray fissante trucco",
+            "fissante",
+            "fissante trucco",
+            "fissatore trucco",
+            "spray fissatore",
+            "setting spray",
+            "fixing spray",
+            "makeup setting spray",
+            "all nighter"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/beauty-prodotti/02-setting-spray-urban-decay.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "recognizedBrands": [
+            "Urban Decay"
+          ]
+        },
+        {
+          "id": "prodotto-3",
+          "prompt": "Quale tipo di prodotto è?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Illuminante liquido",
+            "illuminante",
+            "highlighter",
+            "liquid highlighter",
+            "luminizer",
+            "liquid luminizer",
+            "positive light"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/beauty-prodotti/03-illuminante-rare-beauty.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "recognizedBrands": [
+            "Rare Beauty"
+          ]
+        },
+        {
+          "id": "prodotto-4",
+          "prompt": "Quale tipo di prodotto è?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Tinta labbra",
+            "tinta per labbra",
+            "tinta",
+            "rossetto liquido",
+            "rossetto",
+            "liquid lipstick",
+            "lip stain",
+            "vernis a levres",
+            "vinyl cream",
+            "vernis a levres vinyl cream",
+            "rouge pur couture vernis a levres vinyl cream"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/beauty-prodotti/04-prodotto-labbra-ysl.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "recognizedBrands": [
+            "YSL",
+            "Yves Saint Laurent"
+          ]
+        }
+      ],
+      "minimumCorrectRounds": 3,
+      "contentVersion": 2,
+      "infoText": "Riconosci il tipo di prodotto beauty, non soltanto la marca.",
+      "subgameIntroText": "Lasciamo un momento da parte il logo: che prodotto hai davanti? Scrivi il tipo, per tre risposte corrette su quattro. Se conosci la marca, bene; adesso pensa a cosa stai per mettere nel beauty case.",
+      "successMessage": "Andrea: «Beauty case salvo. Sai cosa c'è dentro, e questo vale più di riconoscere una confezione costosa.»",
+      "failureMessage": "Miranda: «La confezione ti ha convinta. Il contenuto, a quanto pare, non ha avuto occasione di presentarsi.»"
+    },
+    {
+      "id": "cc-dupe-original-01",
+      "zoneId": "beauty-lab",
+      "type": "multi_round_quiz",
+      "quizSubType": "dupe_original",
+      "visualMode": "dupe",
+      "difficulty": "medium",
+      "title": "Dupe o Originale",
+      "prompt": "Per ogni coppia scegli l’originale di riferimento tra le immagini fornite.",
+      "minimumCorrectRounds": 3,
+      "rounds": [
+        {
+          "id": "illuminante",
+          "prompt": "Quale illuminante e l'originale iconico?",
+          "mode": "multiple_choice",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/01-illuminante-hollywood.jpg",
+              "caption": "A",
+              "alt": "Prodotto A della coppia"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/01-illuminante-elf.jpg",
+              "caption": "B",
+              "alt": "Prodotto B della coppia"
+            }
+          ],
+          "choices": [
+            {
+              "id": "a",
+              "text": "A"
+            },
+            {
+              "id": "b",
+              "text": "B"
+            }
+          ],
+          "correctChoiceId": "a",
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/01-illuminante-hollywood.jpg",
+              "caption": "Originale: Charlotte Tilbury — Hollywood Flawless Filter",
+              "alt": "Originale: Charlotte Tilbury — Hollywood Flawless Filter"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/01-illuminante-elf.jpg",
+              "caption": "Dupe: e.l.f.",
+              "alt": "Dupe: e.l.f."
+            }
+          ]
+        },
+        {
+          "id": "profumo",
+          "prompt": "Quale profumo e l'originale iconico?",
+          "mode": "multiple_choice",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/02-profumo-jadore.jpg",
+              "caption": "A",
+              "alt": "Prodotto A della coppia"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/02-profumo-lidl.jpg",
+              "caption": "B",
+              "alt": "Prodotto B della coppia"
+            }
+          ],
+          "choices": [
+            {
+              "id": "a",
+              "text": "A"
+            },
+            {
+              "id": "b",
+              "text": "B"
+            }
+          ],
+          "correctChoiceId": "a",
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/02-profumo-jadore.jpg",
+              "caption": "Originale: Dior — J’adore",
+              "alt": "Originale: Dior — J’adore"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/02-profumo-lidl.jpg",
+              "caption": "Dupe: Lidl",
+              "alt": "Dupe: Lidl"
+            }
+          ]
+        },
+        {
+          "id": "borsa",
+          "prompt": "Quale borsa e l'originale iconica?",
+          "mode": "multiple_choice",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/03-borsa-prada.jpg",
+              "caption": "A",
+              "alt": "Prodotto A della coppia"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/03-borsa-jwpei.jpg",
+              "caption": "B",
+              "alt": "Prodotto B della coppia"
+            }
+          ],
+          "choices": [
+            {
+              "id": "a",
+              "text": "A"
+            },
+            {
+              "id": "b",
+              "text": "B"
+            }
+          ],
+          "correctChoiceId": "a",
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/03-borsa-prada.jpg",
+              "caption": "Originale: Prada",
+              "alt": "Originale: Prada"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/03-borsa-jwpei.jpg",
+              "caption": "Dupe: JW PEI",
+              "alt": "Dupe: JW PEI"
+            }
+          ]
+        },
+        {
+          "id": "scarpe",
+          "prompt": "Quale paio di scarpe e l'originale iconico?",
+          "mode": "multiple_choice",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/04-scarpe-prada.jpg",
+              "caption": "A",
+              "alt": "Prodotto A della coppia"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/04-scarpe-zara.jpg",
+              "caption": "B",
+              "alt": "Prodotto B della coppia"
+            }
+          ],
+          "choices": [
+            {
+              "id": "a",
+              "text": "A"
+            },
+            {
+              "id": "b",
+              "text": "B"
+            }
+          ],
+          "correctChoiceId": "a",
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/04-scarpe-prada.jpg",
+              "caption": "Originale: Prada",
+              "alt": "Originale: Prada"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/04-scarpe-zara.jpg",
+              "caption": "Dupe: Zara",
+              "alt": "Dupe: Zara"
+            }
+          ]
+        },
+        {
+          "id": "bracciale",
+          "prompt": "Quale bracciale e l'originale iconico?",
+          "mode": "multiple_choice",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/05-bracciale-vancleef.jpg",
+              "caption": "A",
+              "alt": "Prodotto A della coppia"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/dupe-originale/05-bracciale-swarovski.jpg",
+              "caption": "B",
+              "alt": "Prodotto B della coppia"
+            }
+          ],
+          "choices": [
+            {
+              "id": "a",
+              "text": "A"
+            },
+            {
+              "id": "b",
+              "text": "B"
+            }
+          ],
+          "correctChoiceId": "a",
+          "solutionAssets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/05-bracciale-vancleef.jpg",
+              "caption": "Originale: Van Cleef & Arpels",
+              "alt": "Originale: Van Cleef & Arpels"
+            },
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/05-bracciale-swarovski.jpg",
+              "caption": "Dupe: Swarovski",
+              "alt": "Dupe: Swarovski"
+            }
+          ]
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 3 risposte o collocazioni corrette.",
+      "creditReward": 6,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "alternateDupeSides": true,
+      "dupeOriginalSides": ["b", "b", "a", "b", "a"],
+      "contentVersion": 2,
+      "infoText": "Per ogni coppia scegli l’originale di riferimento tra le immagini fornite.",
+      "subgameIntroText": "Cinque coppie A/B: scegli ogni volta l'originale di riferimento. Confronta scritte, forme e confezioni, senza affezionarti al lato dello schermo. Ne bastano tre giuste. Sì, certe somiglianze sono sfacciate: è proprio il punto.",
+      "successMessage": "Andrea: «Trovati gli originali. E possiamo apprezzare un buon dupe senza farci fregare dall'etichetta: due soddisfazioni insieme.»",
+      "failureMessage": "Miranda: «Capisco perché le copie vendano. Avevo soltanto sperato che tu non diventassi la dimostrazione pratica.»"
+    },
+    {
+      "id": "cc-fragrance-families-01",
+      "zoneId": "beauty-lab",
+      "type": "multi_round_quiz",
+      "quizSubType": "fragrance_families",
+      "visualMode": "notes",
+      "difficulty": "medium",
+      "title": "Profumi",
+      "prompt": "Riconosci il profilo e le note dei tre profumi.",
+      "minimumCorrectRounds": 2,
+      "rounds": [
+        {
+          "id": "soleil",
+          "prompt": "Quale profilo descrive meglio Soleil d’Or?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Legnoso e speziato"
+            },
+            {
+              "id": "1",
+              "text": "Marino e aromatico"
+            },
+            {
+              "id": "2",
+              "text": "Fruttato e floreale"
+            },
+            {
+              "id": "3",
+              "text": "Cuoiato e affumicato"
+            }
+          ],
+          "correctChoiceId": "2",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/profumi/01.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "title": "Bellagio Soleil d’Or EDP",
+          "explanation": "Frutti rossi e pera, gelsomino e lavanda, su un fondo di cedro e ambra."
+        },
+        {
+          "id": "power",
+          "prompt": "Quale trio contiene le note principali dichiarate di Power of You?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Frutto della passione, frangipani, vaniglia"
+            },
+            {
+              "id": "1",
+              "text": "Pera, gelsomino, caffè"
+            },
+            {
+              "id": "2",
+              "text": "Mandarino, rosa, sandalo"
+            },
+            {
+              "id": "3",
+              "text": "Bergamotto, lavanda, vetiver"
+            }
+          ],
+          "correctChoiceId": "0",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/profumi/02.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "title": "Emporio Armani Power of You",
+          "explanation": "Il produttore evidenzia frutto della passione, frangipani e assoluta di vaniglia."
+        },
+        {
+          "id": "libre",
+          "prompt": "Quale trio richiama le note caratteristiche di Libre Eau de Parfum?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Rosa, lampone, patchouli"
+            },
+            {
+              "id": "1",
+              "text": "Caffè, gelsomino, vaniglia"
+            },
+            {
+              "id": "2",
+              "text": "Menta, limone, cedro"
+            },
+            {
+              "id": "3",
+              "text": "Lavanda, fiori d’arancio, vaniglia"
+            }
+          ],
+          "correctChoiceId": "3",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/profumi/03.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ],
+          "title": "YSL Libre Eau de Parfum originale",
+          "explanation": "La firma dell’EDP originale unisce lavanda, fiori d’arancio e vaniglia."
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 2 risposte o collocazioni corrette.",
+      "creditReward": 5,
+      "hintCost": 2,
+      "contentStatus": "ready",
+      "contentVersion": 2,
+      "infoText": "Riconosci il profilo e le note dei tre profumi.",
+      "subgameIntroText": "Tre profumi, quattro opzioni ciascuno. Cerca il profilo e le note che riconosci: due risposte corrette bastano. Da uno schermo non si annusa, purtroppo; oggi ci affidiamo alla memoria. La mia ha ancora un reparto dedicato ai regali sbagliati.",
+      "successMessage": "Andrea: «Hai ritrovato le note senza neanche un tester. La prossima spedizione in profumeria la faccio con te.»",
+      "failureMessage": "Miranda: «Hai composto una fragranza tutta tua. Audace. Peccato che la domanda riguardasse quelle già in commercio.»"
+    },
+    {
+      "id": "cc-brand-emoji-01",
+      "zoneId": "vetrina-segreta",
+      "type": "progressive_clue_rounds",
+      "quizSubType": "brand_emoji",
+      "visualMode": "emoji",
+      "difficulty": "easy",
+      "title": "Brand da Emoji",
+      "prompt": "Indovina il brand: le emoji si rivelano una alla volta.",
+      "minimumCorrectRounds": 3,
+      "rounds": [
+        {
+          "id": "prada",
+          "solutionLabel": "Prada",
+          "acceptedAnswers": [
+            "Prada"
+          ],
+          "clues": [
+            "😈",
+            "👠",
+            "👜"
+          ]
+        },
+        {
+          "id": "versace",
+          "solutionLabel": "Versace",
+          "acceptedAnswers": [
+            "Versace",
+            "Gianni Versace"
+          ],
+          "clues": [
+            "🏛️",
+            "🐍",
+            "👩"
+          ]
+        },
+        {
+          "id": "pandora",
+          "solutionLabel": "Pandora",
+          "acceptedAnswers": [
+            "Pandora"
+          ],
+          "clues": [
+            "📦",
+            "🏺",
+            "📿"
+          ]
+        },
+        {
+          "id": "ralph",
+          "solutionLabel": "Ralph Lauren",
+          "acceptedAnswers": [
+            "Ralph Lauren",
+            "Polo Ralph Lauren",
+            "Ralph"
+          ],
+          "clues": [
+            "👕",
+            "🐎",
+            "🏑"
+          ]
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 3 risposte o collocazioni corrette.",
+      "creditReward": 8,
+      "hintCost": 2,
+      "contentStatus": "ready",
+      "initialVisibleClues": 1,
+      "scoring": {
+        "maxPointsPerRound": 3,
+        "revealPenalty": 1,
+        "minPointsPerRound": 1,
+        "passingScore": 3
+      },
+      "contentVersion": 2,
+      "infoText": "Indovina il brand: le emoji si rivelano una alla volta.",
+      "subgameIntroText": "Quattro brand nascosti nelle emoji. Se non ti viene, rivela il simbolo successivo: prima indovini, più punti descrittivi raccogli. Per superare la prova servono tre brand corretti. Prova a leggere i simboli insieme, come un piccolo rebus.",
+      "successMessage": "Andrea: «Delle emoji e sei arrivata ai brand. Finalmente una competenza da chat di gruppo che possiamo mettere a curriculum.»",
+      "failureMessage": "Miranda: «I marchi spendono fortune per farsi riconoscere. Tu hai appena vanificato parecchie riunioni di marketing.»"
+    },
+    {
+      "id": "cc-brand-clues-01",
+      "zoneId": "vetrina-segreta",
+      "type": "progressive_clue_rounds",
+      "quizSubType": "brand_clues",
+      "difficulty": "hard",
+      "title": "Brand a Indizi Progressivi",
+      "prompt": "Indovina i brand usando meno indizi possibile.",
+      "initialVisibleClues": 1,
+      "scoring": {
+        "maxPointsPerRound": 3,
+        "revealPenalty": 1,
+        "minPointsPerRound": 1,
+        "passingScore": 3
+      },
+      "rounds": [
+        {
+          "id": "chanel",
+          "title": "Indizi storici",
+          "solutionLabel": "Chanel",
+          "acceptedAnswers": [
+            "Chanel",
+            "Coco Chanel"
+          ],
+          "clues": [
+            "Rese elegante il jersey, un tessuto allora insolito nell’alta moda femminile.",
+            "Tra i suoi segni distintivi ci sono tweed, camelie e perle.",
+            "Il suo profumo più famoso porta il numero 5."
+          ]
+        },
+        {
+          "id": "levis",
+          "title": "Indizi storici",
+          "solutionLabel": "Levi’s",
+          "acceptedAnswers": [
+            "Levi’s",
+            "Levi's",
+            "Levis",
+            "Levi Strauss",
+            "Levi Strauss & Co",
+            "Levi Strauss and Co"
+          ],
+          "clues": [
+            "I suoi jeans nacquero per resistere al lavoro nel West americano.",
+            "Sull’etichetta, due cavalli cercano di strappare un paio di pantaloni.",
+            "Il suo modello più celebre è il 501."
+          ]
+        },
+        {
+          "id": "gucci",
+          "title": "Disegna su un foglio",
+          "solutionLabel": "Gucci",
+          "acceptedAnswers": [
+            "Gucci"
+          ],
+          "clues": [
+            "Disegna una freccia spessa verso il basso, più larga che lunga; lascia aperta la base.",
+            "Sopra la freccia, sullo stesso asse verticale, disegna una V rovesciata, sempre spessa.",
+            "Da ciascuna estremità aperta della freccia, traccia un breve segmento orizzontale verso l’esterno; poi scendi in obliquo, facendo incontrare le due linee in un vertice più in basso, sull’asse della freccia.",
+            "Con due archi, uno per lato, collega la punta della freccia al vertice interno della V spessa; ripeti dalla punta del triangolo al vertice esterno."
+          ]
+        },
+        {
+          "id": "under-armour",
+          "title": "Disegna su un foglio",
+          "solutionLabel": "Under Armour",
+          "acceptedAnswers": [
+            "Under Armour",
+            "Under Armor",
+            "UA"
+          ],
+          "clues": [
+            "Disegna due rondini affiancate in orizzontale, con le ali verso l’esterno e le punte rivolte l’una verso l’altra, a una certa distanza.",
+            "Dall’estremità di ogni ala traccia un trattino verso l’esterno: due verso l’alto e due verso il basso.",
+            "Collega le punte delle rondini con due archi, uno sopra e uno sotto, seguendo la curvatura delle ali.",
+            "Collega i due trattini superiori con una U e quelli inferiori con una U rovesciata: le due curve devono quasi toccarsi al centro."
+          ]
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 3 risposte o collocazioni corrette.",
+      "creditReward": 10,
+      "hintCost": 4,
+      "contentStatus": "ready",
+      "minimumCorrectRounds": 3,
+      "contentVersion": 2,
+      "infoText": "Indovina i brand usando meno indizi possibile.",
+      "subgameIntroText": "Qui i brand lasciano tracce: storia, simboli e disegni. Puoi chiedere altri indizi; usarne meno dà più punti descrittivi, ma per passare contano tre nomi giusti su quattro. Tieni insieme le tracce: una sola può farti prendere la strada sbagliata.",
+      "successMessage": "Andrea: «Hai seguito gli indizi fino al nome. È bello vedere che dietro un logo ti ricordi anche una storia.»",
+      "failureMessage": "Miranda: «Una storia, dei simboli, degli indizi. Ti mancava soltanto il nome e hai preferito quello di qualcun altro.»"
+    },
+    {
+      "id": "cc-general-culture-01",
+      "zoneId": "vetrina-segreta",
+      "type": "multi_round_quiz",
+      "quizSubType": "general_culture",
+      "visualMode": "general",
+      "difficulty": "medium",
+      "title": "Cultura Generale Mista",
+      "prompt": "Rispondi alle domande finali tra moda, beauty e fotografia.",
+      "minimumCorrectRounds": 6,
+      "rounds": [
+        {
+          "id": "blu",
+          "prompt": "Quale di queste tonalità di blu è la più scura?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Blu di Prussia"
+            },
+            {
+              "id": "1",
+              "text": "Navy"
+            },
+            {
+              "id": "2",
+              "text": "Cobalto"
+            },
+            {
+              "id": "3",
+              "text": "Ceruleo"
+            }
+          ],
+          "correctChoiceId": "0",
+          "assets": []
+        },
+        {
+          "id": "ottanio",
+          "prompt": "Quale campione rappresenta l’ottanio?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "A",
+              "colorHex": "#006D77"
+            },
+            {
+              "id": "1",
+              "text": "B",
+              "colorHex": "#145B83"
+            },
+            {
+              "id": "2",
+              "text": "C",
+              "colorHex": "#238A82"
+            },
+            {
+              "id": "3",
+              "text": "D",
+              "colorHex": "#475E73"
+            }
+          ],
+          "correctChoiceId": "0",
+          "assets": [],
+          "solutionLabel": "Ottanio"
+        },
+        {
+          "id": "samba",
+          "prompt": "Come si chiama questo modello?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "adidas Samba",
+            "Samba",
+            "Samba OG",
+            "adidas Samba OG"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/cultura-generale/03.png",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "1460",
+          "prompt": "Come si chiama questo modello?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Dr. Martens 1460",
+            "1460",
+            "Doctor Martens 1460",
+            "Doc Martens 1460",
+            "anfibi 1460",
+            "anfibio 1460",
+            "stivali 1460",
+            "boots 1460"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/cultura-generale/04.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "trench",
+          "prompt": "Come si chiama questo capo?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Trench",
+            "trench coat",
+            "trenchcoat",
+            "impermeabile",
+            "cappotto trench",
+            "soprabito trench"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/cultura-generale/05.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "chemisier",
+          "prompt": "Come si chiama questo capo?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Chemisier",
+            "abito chemisier",
+            "vestito chemisier",
+            "abito camicia",
+            "vestito camicia",
+            "abito a camicia",
+            "vestito a camicia",
+            "shirt dress",
+            "shirtdress"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/cultura-generale/06.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "pied-de-poule",
+          "prompt": "Come si chiama questa fantasia?",
+          "mode": "free_text",
+          "acceptedAnswers": [
+            "Pied-de-poule",
+            "pied de poule",
+            "pieddepoule",
+            "pied de poul",
+            "houndstooth",
+            "dogtooth"
+          ],
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/cultura-generale/07.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        },
+        {
+          "id": "prospettiva",
+          "prompt": "Come si chiama il gioco di prospettiva usato?",
+          "mode": "multiple_choice",
+          "choices": [
+            {
+              "id": "0",
+              "text": "Prospettiva forzata"
+            },
+            {
+              "id": "1",
+              "text": "Doppia esposizione"
+            },
+            {
+              "id": "2",
+              "text": "Effetto specchio"
+            },
+            {
+              "id": "3",
+              "text": "Zoom digitale"
+            }
+          ],
+          "correctChoiceId": "0",
+          "assets": [
+            {
+              "kind": "image",
+              "src": "/corpo-moda-fotografia/cultura-generale/08.jpg",
+              "alt": "Immagine della prova",
+              "caption": ""
+            }
+          ]
+        }
+      ],
+      "hint": "",
+      "explanation": "Servono almeno 6 risposte o collocazioni corrette.",
+      "creditReward": 12,
+      "hintCost": 3,
+      "contentStatus": "ready",
+      "contentVersion": 2,
+      "infoText": "Rispondi alle domande finali tra moda, beauty e fotografia.",
+      "subgameIntroText": "Ultimo giro: otto domande fra moda, beauty e fotografia, alcune a scelta e altre aperte. Servono sei risposte corrette. Leggi bene cosa ti chiedono, una alla volta. Ti tengo il posto qui accanto: ormai voglio vedere come va a finire.",
+      "successMessage": "Andrea: «Sei arrivata in fondo anche a queste. Vieni qui: ti meriti un abbraccio e una conversazione senza nessuno che ti interroghi.»",
+      "failureMessage": "Miranda: «La cultura generale ha questo inconveniente: ogni tanto qualcuno la verifica. Oggi è toccato a me. A te, purtroppo, rispondere.»"
+    }
+  ],
+  "finalGift": "Kodak Charmera"
+}

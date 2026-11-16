@@ -10,6 +10,9 @@ export function createChallengeRuntimeState(runtimeState = {}) {
     speedrunCurrentIndex: runtimeState.speedrunCurrentIndex ?? 0,
     speedrunTimeRemaining: runtimeState.speedrunTimeRemaining ?? 0,
     speedrunStarted: runtimeState.speedrunStarted ?? false,
+    progressiveClueVisibleCounts: runtimeState.progressiveClueVisibleCounts ?? {},
+    observationDeadlines: runtimeState.observationDeadlines ?? {},
+    visualTimelineRevealedCount: runtimeState.visualTimelineRevealedCount ?? 0,
   }
 }
 
@@ -36,6 +39,17 @@ export function createChallengeDraftAnswer() {
     columnOrders: [],
     columnBonusNames: {},
     cardSelections: {},
+    memoryPaletteSelections: {},
+    multiRoundAnswers: {},
+    visualTimelineOrderIds: [],
+    visualTimelineStyleAnswers: {},
+    dupeSwappedRoundIds: [],
+    progressiveClueAnswers: {},
+    roundCursor: 0,
+    lockedRounds: {},
+    roundChoiceOrders: {},
+    visualTimelineSlots: {},
+    visualTimelineDecadeAnswers: {},
   }
 }
 
@@ -56,6 +70,7 @@ function shouldRandomizeImageOptionChallenge(challenge) {
   return challenge?.type === 'image_option_matching' && [
     'got_matching',
     'st_matching',
+    'photo_supports',
   ].includes(challenge.quizSubType)
 }
 
@@ -65,6 +80,10 @@ function shouldRandomizeImageOptionChallenge(challenge) {
  */
 export function createInitialDraftAnswerForChallenge(challenge) {
   const baseDraft = createChallengeDraftAnswer()
+  baseDraft.contentVersion = challenge?.contentVersion
+  baseDraft.roundChoiceOrders = Object.fromEntries((challenge?.rounds ?? []).map((round) => [
+    round.id, shuffleIds((round.colors ?? round.choices ?? []).map((choice) => choice.id)),
+  ]))
 
   if (!challenge) {
     return baseDraft
@@ -147,6 +166,42 @@ export function createInitialDraftAnswerForChallenge(challenge) {
     }
   }
 
+  if (challenge.type === 'memory_palette') {
+    return {
+      ...baseDraft,
+      memoryPaletteSelections: {},
+    }
+  }
+
+  if (challenge.type === 'multi_round_quiz') {
+    return {
+      ...baseDraft,
+      multiRoundAnswers: {},
+      dupeSwappedRoundIds: challenge.alternateDupeSides
+        ? challenge.rounds.filter((round, index) => {
+          const side = challenge.dupeOriginalSides?.[index]
+          return side === 'a' || side === 'b'
+            ? side !== round.correctChoiceId
+            : index % 2 === 1
+        }).map((round) => round.id)
+        : [],
+    }
+  }
+
+  if (challenge.type === 'visual_timeline') {
+    return {
+      ...baseDraft,
+      visualTimelineOrderIds: [...challenge.initialOrder],
+    }
+  }
+
+  if (challenge.type === 'progressive_clue_rounds') {
+    return {
+      ...baseDraft,
+      progressiveClueAnswers: {},
+    }
+  }
+
   return baseDraft
 }
 
@@ -182,6 +237,15 @@ export function createInitialRuntimeStateForChallenge(challenge) {
       speedrunCurrentIndex: 0,
       speedrunTimeRemaining: challenge.timerSeconds ?? 40,
       speedrunStarted: false,
+    })
+  }
+
+  if (challenge.type === 'progressive_clue_rounds') {
+    return createChallengeRuntimeState({
+      progressiveClueVisibleCounts: challenge.rounds.reduce((counts, round) => {
+        counts[round.id] = challenge.initialVisibleClues
+        return counts
+      }, {}),
     })
   }
 

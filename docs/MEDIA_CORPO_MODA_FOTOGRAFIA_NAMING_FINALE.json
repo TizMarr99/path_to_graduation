@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-16",
+  "root": "public/corpo-moda-fotografia",
+  "files": [
+    {
+      "old": "cultura-generale/S6031963_UNI.jpg",
+      "new": "cultura-generale/03.jpg",
+      "subject": "adidas Samba",
+      "sha256": "a70732dd028295ca7c6e3eb3b8e322f15197fb23a93d75448bbac68ecaf8ae38",
+      "bytes": 157763
+    },
+    {
+      "old": "cultura-generale/89f69303c3ba227d6b207d39730c5865.jpg",
+      "new": "cultura-generale/04.jpg",
+      "subject": "Dr. Martens 1460",
+      "sha256": "06ea86febdf743ce843f9b8c34c27ffbb74e0a2125ef27e90c9e02b49ff7f7b9",
+      "bytes": 126046
+    },
+    {
+      "old": "cultura-generale/05858716444-a15.jpg",
+      "new": "cultura-generale/05.jpg",
+      "subject": "trench",
+      "sha256": "c373e46d5555c067ea8e6e0ffd68d6037c6b21ed542be3f3805b9269528522a4",
+      "bytes": 365919
+    },
+    {
+      "old": "cultura-generale/f241610_s594-f.jpg",
+      "new": "cultura-generale/06.jpg",
+      "subject": "chemisier",
+      "sha256": "a5ab145a62a960631c6668a1766c81cfe2ed7b43ff275053e8fd3caa15292cc7",
+      "bytes": 269449
+    },
+    {
+      "old": "cultura-generale/IMG_4512-640x640.jpg",
+      "new": "cultura-generale/07.jpg",
+      "subject": "pied-de-poule",
+      "sha256": "1bb6a21284671affd735527138ac862c841dd285d491c4861900acd14639b822",
+      "bytes": 101408
+    },
+    {
+      "old": "cultura-generale/pexels-pixabay-532285.jpg",
+      "new": "cultura-generale/08.jpg",
+      "subject": "prospettiva forzata",
+      "sha256": "99233839d391e932336860a456d676329282684d18e05610a5b5e49651c2b06a",
+      "bytes": 348078
+    },
+    {
+      "old": "profumi/26775foto.jpg",
+      "new": "profumi/01.jpg",
+      "subject": "Bellagio Soleil d Or",
+      "sha256": "7819d3cc613b9fd25ebf270a1a0e15d568009d86830b353cdaccd336a49ff6d7",
+      "bytes": 89356
+    },
+    {
+      "old": "profumi/CX994s1273971-0-dgl-IT.jpg",
+      "new": "profumi/02.jpg",
+      "subject": "Power of You",
+      "sha256": "20c5f8f3b6e93c4ddc725b8ad3d1a880b52c3c5496a98bf11085ad4ea1cd566d",
+      "bytes": 62265
+    },
+    {
+      "old": "profumi/5I2O2r289703-0-dgl-IT.jpg",
+      "new": "profumi/03.jpg",
+      "subject": "Libre EDP",
+      "sha256": "17222b843d555d622967f46cc8fc0123441d96aab3b8208ed1c2d318bb367a1d",
+      "bytes": 22835
+    }
+  ]
+}

@@ -4,6 +4,12 @@ import { getCategories } from '../lib/challengeData'
 
 const musicUnlockTargets = ['serie-film']
 
+const roomIcons = {
+  musica: '🎵',
+  'serie-film': '🎭',
+  'cura-corpo': '📷',
+}
+
 const galleryFrameStyles = {
   unlocked:
     'border-amber-300/30 bg-[radial-gradient(circle_at_center,_rgba(251,191,36,0.10),_transparent_60%),rgba(2,6,23,0.78)] shadow-[0_0_60px_rgba(212,175,55,0.08)]',
@@ -39,7 +45,7 @@ function RoomFrame({ category, isUnlocked, roomProgress }) {
             >
               <div className="relative z-10 text-center">
                 <p className="text-4xl opacity-80 sm:text-5xl">
-                  {category.id === 'musica' ? '🎵' : category.id === 'serie-film' ? '🎭' : '📚'}
+                  {roomIcons[category.id] ?? '📚'}
                 </p>
               </div>
             </div>

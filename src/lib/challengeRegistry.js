@@ -1,4 +1,5 @@
 import { createElement } from 'react'
+import { countVisualTimelinePlacements, resolveQuizRounds, evaluateVisualRound, matchesTimelineDecade } from './visualChallengeRules.js'
 import ChallengeTemplateFallback from '../components/challenges/common/ChallengeTemplateFallback.jsx'
 import CardMatchingChallenge from '../components/challenges/templates/CardMatchingChallenge.jsx'
 import ColumnReorderMatchingChallenge from '../components/challenges/templates/ColumnReorderMatchingChallenge.jsx'
@@ -9,12 +10,16 @@ import GuessTitleAuthorChallenge from '../components/challenges/templates/GuessT
 import HitsterChallenge from '../components/challenges/templates/HitsterChallenge.jsx'
 import ImageOptionMatchingChallenge from '../components/challenges/templates/ImageOptionMatchingChallenge.jsx'
 import IntruderChallenge from '../components/challenges/templates/IntruderChallenge.jsx'
+import MemoryPaletteChallenge from '../components/challenges/templates/MemoryPaletteChallenge.jsx'
 import MultiStageProgressiveRevealChallenge from '../components/challenges/templates/MultiStageProgressiveRevealChallenge.jsx'
+import MultiRoundQuizChallenge from '../components/challenges/templates/MultiRoundQuizChallenge.jsx'
 import MusicalChainChallenge from '../components/challenges/templates/MusicalChainChallenge.jsx'
 import MultipleChoiceChallenge from '../components/challenges/templates/MultipleChoiceChallenge.jsx'
 import OrderingChallenge from '../components/challenges/templates/OrderingChallenge.jsx'
+import ProgressiveClueRoundsChallenge from '../components/challenges/templates/ProgressiveClueRoundsChallenge.jsx'
 import SequenceReconstructionChallenge from '../components/challenges/templates/SequenceReconstructionChallenge.jsx'
 import SpeedrunCharactersChallenge from '../components/challenges/templates/SpeedrunCharactersChallenge.jsx'
+import VisualTimelineChallenge from '../components/challenges/templates/VisualTimelineChallenge.jsx'
 import {
   countCorrectPlacements,
   evaluateCardMatching,
@@ -43,6 +48,10 @@ export const challengeTypeLabels = {
   image_option_matching: 'Abbinamento immagini',
   column_reorder_matching: 'Riordino colonne',
   card_matching: 'Abbinamento carte',
+  memory_palette: 'Memory palette',
+  multi_round_quiz: 'Quiz a round',
+  visual_timeline: 'Timeline visuale',
+  progressive_clue_rounds: 'Indizi progressivi',
 }
 
 function renderMultipleChoiceChallenge(props) {
@@ -103,6 +112,22 @@ function renderColumnReorderMatchingChallenge(props) {
 
 function renderCardMatchingChallenge(props) {
   return createElement(CardMatchingChallenge, props)
+}
+
+function renderMemoryPaletteChallenge(props) {
+  return createElement(MemoryPaletteChallenge, props)
+}
+
+function renderMultiRoundQuizChallenge(props) {
+  return createElement(MultiRoundQuizChallenge, props)
+}
+
+function renderVisualTimelineChallenge(props) {
+  return createElement(VisualTimelineChallenge, props)
+}
+
+function renderProgressiveClueRoundsChallenge(props) {
+  return createElement(ProgressiveClueRoundsChallenge, props)
 }
 
 /**
@@ -194,7 +219,7 @@ function resolveSolutionLines(challenge) {
     return [
       `Ordine corretto: ${challenge.correctOrder
         .map((itemId) => labelsById.get(itemId) ?? itemId)
-        .join(' → ')}`,
+        .join(' → ')}${challenge.allowEqualYears ? ' (stesso periodo: ordine intercambiabile)' : ''}`,
     ]
   }
 
@@ -221,7 +246,7 @@ function resolveSolutionLines(challenge) {
     return [
       `Sequenza corretta: ${challenge.correctOrder
         .map((segmentId) => labelsById.get(segmentId) ?? segmentId)
-        .join(' → ')}`,
+        .join(' → ')}${challenge.allowEqualYears ? ' (stesso periodo: ordine intercambiabile)' : ''}`,
     ]
   }
 
@@ -280,6 +305,39 @@ function resolveSolutionLines(challenge) {
     return challenge.items.map(
       (item) => `${item.id}: ${item.correctNumber} di ${item.correctSuit}`,
     )
+  }
+
+  if (challenge.type === 'memory_palette') {
+    return challenge.rounds.map((round) => {
+      const colorNames = round.correctColorIds
+        .map((colorId) => round.colors.find((color) => color.id === colorId)?.name ?? colorId)
+        .join(', ')
+      return `${round.title || round.id}: ${colorNames}`
+    })
+  }
+
+  if (challenge.type === 'multi_round_quiz') {
+    return challenge.rounds.map((round) => {
+      if (round.mode === 'free_text') {
+        return `${round.title || round.id}: ${round.acceptedAnswers?.[0] ?? 'n/d'}`
+      }
+
+      const correctChoice = round.choices?.find((choice) => choice.id === round.correctChoiceId)
+      return `${round.title || round.id}: ${correctChoice?.text ?? 'n/d'}`
+    })
+  }
+
+  if (challenge.type === 'visual_timeline') {
+    const labelsById = new Map(challenge.items.map((item) => [item.id, `${item.year} · ${item.acceptedStyleAnswers?.[0] || item.label}`]))
+    return [
+      `Ordine corretto: ${challenge.correctOrder
+        .map((itemId) => labelsById.get(itemId) ?? itemId)
+        .join(' → ')}${challenge.allowEqualYears ? ' (stesso periodo: ordine intercambiabile)' : ''}`,
+    ]
+  }
+
+  if (challenge.type === 'progressive_clue_rounds') {
+    return challenge.rounds.map((round) => `${round.title || round.id}: ${round.solutionLabel}`)
   }
 
   return []
@@ -615,6 +673,87 @@ export const challengeTypeRegistry = {
       })
     },
   },
+  memory_palette: {
+    render: renderMemoryPaletteChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateMemoryPalette(
+        draftAnswer.memoryPaletteSelections,
+        challenge.rounds,
+      )
+      const isCorrect = result.matchedCount >= challenge.minimumCorrectRounds
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: result.matchedCount,
+        maxScore: challenge.rounds.length,
+        metadata: result,
+      })
+    },
+  },
+  multi_round_quiz: {
+    render: renderMultiRoundQuizChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const result = evaluateMultiRoundAnswers(
+        draftAnswer.multiRoundAnswers,
+        resolveQuizRounds(challenge, draftAnswer),
+      )
+      const isCorrect = result.matchedCount >= challenge.minimumCorrectRounds
+
+      return buildFeedback({ ...challenge, rounds: resolveQuizRounds(challenge, draftAnswer) }, isCorrect, category, {
+        scoreEarned: result.matchedCount,
+        maxScore: challenge.rounds.length,
+        metadata: result,
+      })
+    },
+  },
+  visual_timeline: {
+    render: renderVisualTimelineChallenge,
+    evaluate: ({ challenge, draftAnswer, category }) => {
+      const correctPlacements = countVisualTimelinePlacements(
+        draftAnswer.visualTimelineOrderIds, challenge.correctOrder, challenge.items, challenge.allowEqualYears,
+      )
+      if (challenge.contentVersion === 2) {
+        const years = [...new Set(challenge.items.map((item) => item.year))].sort((a, b) => a - b)
+        const placements = challenge.items.filter((item) => draftAnswer.visualTimelineSlots?.[item.id] === years.indexOf(item.year)).length
+        const names = challenge.items.filter((item) => matchesAcceptedAnswer(draftAnswer.visualTimelineStyleAnswers?.[item.id] ?? '', item.acceptedStyleAnswers)).length
+        const decades = challenge.items.filter((item) => matchesTimelineDecade(draftAnswer.visualTimelineDecadeAnswers?.[item.id] ?? '', item.year)).length
+        const isCorrect = placements >= challenge.minimumCorrectPlacements
+        return buildFeedback(challenge, isCorrect, category, {
+          scoreEarned: placements, maxScore: challenge.items.length,
+          bonusCredits: names + decades,
+          metadata: { correctPlacements: placements, names, decades, descriptiveScore: placements + names + decades, descriptiveMaxScore: 21 },
+          message: `${resolveFeedbackMessage(challenge, isCorrect)} Ordinamento: ${placements}/7. Nomi: ${names}/7. Decadi: ${decades}/7. Crediti bonus: +${names + decades}.`,
+        })
+      }
+      const styleMatches = challenge.items.filter((item) => matchesAcceptedAnswer(
+        draftAnswer.visualTimelineStyleAnswers?.[item.id] ?? '', item.acceptedStyleAnswers ?? [],
+      )).map((item) => item.id)
+      const isCorrect = correctPlacements >= challenge.minimumCorrectPlacements
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: correctPlacements,
+        maxScore: challenge.correctOrder.length,
+        metadata: { correctPlacements, styleMatches, optionalStyleBonus: styleMatches.length },
+        message: `${resolveFeedbackMessage(challenge, isCorrect)} Stili riconosciuti (bonus facoltativo): ${styleMatches.length}/${challenge.items.filter((item) => item.acceptedStyleAnswers?.length).length}.`,
+      })
+    },
+  },
+  progressive_clue_rounds: {
+    render: renderProgressiveClueRoundsChallenge,
+    evaluate: ({ challenge, draftAnswer, challengeState, category }) => {
+      const result = evaluateProgressiveClues(
+        draftAnswer.progressiveClueAnswers,
+        challengeState.progressiveClueVisibleCounts,
+        challenge,
+      )
+      const isCorrect = result.scoreEarned >= challenge.scoring.passingScore
+
+      return buildFeedback(challenge, isCorrect, category, {
+        scoreEarned: result.scoreEarned,
+        maxScore: challenge.rounds.length * challenge.scoring.maxPointsPerRound,
+        metadata: result,
+      })
+    },
+  },
 }
 
 /**
@@ -638,6 +777,12 @@ export function hasChallengeRenderer(challenge) {
  * @returns {React.ReactElement}
  */
 export function renderChallengeOrFallback(challenge, props) {
+  if (challenge.contentStatus && challenge.contentStatus !== 'ready') {
+    return createElement('p', { className: 'rounded-2xl border border-slate-700 p-5 text-slate-200' },
+      challenge.contentStatus === 'legacy'
+        ? 'Questa prova è stata assorbita nella revisione della stanza. I risultati già salvati restano conservati.'
+        : 'Questa prova attende la conferma dei contenuti o delle soglie. I progressi già salvati restano conservati.')
+  }
   const render = getChallengeRenderStrategy(challenge.type)
 
   if (!render) {
@@ -659,6 +804,27 @@ export function renderChallengeOrFallback(challenge, props) {
  * }} args
  */
 export function evaluateChallenge(args) {
+  if (args.challenge.contentVersion === 2 && args.challenge.rounds) {
+    const { challenge, draftAnswer, category } = args
+    const rounds = resolveQuizRounds(challenge, draftAnswer)
+    const results = rounds.map((round) => {
+      const lock = draftAnswer.lockedRounds?.[round.id]
+      return evaluateVisualRound(challenge, round,
+        challenge.simultaneousRounds ? draftAnswer.multiRoundAnswers?.[round.id] : lock?.answer,
+        lock?.visibleCount)
+    })
+    const matchedCount = results.filter((r) => r.isCorrect).length
+    const descriptiveScore = results.reduce((sum, r) => sum + (r.descriptivePoints ?? 0), 0)
+    const progressive = challenge.type === 'progressive_clue_rounds'
+    const isCorrect = matchedCount >= challenge.minimumCorrectRounds
+    const narrativeMessage = isCorrect ? challenge.successMessage : challenge.failureMessage
+    return buildFeedback(challenge, isCorrect, category, {
+      scoreEarned: matchedCount, maxScore: rounds.length,
+      metadata: { matchedCount, matchedRoundIds: rounds.filter((_, i) => results[i].isCorrect).map((r) => r.id), descriptiveScore, descriptiveMaxScore: progressive ? 12 : rounds.length },
+      solutionLines: results.map((r, i) => `Round ${i + 1}: ${r.solution}`),
+      message: `${narrativeMessage ? `${narrativeMessage} ` : ''}${matchedCount}/${rounds.length} risposte corrette.${progressive ? ` Punti descrittivi: ${descriptiveScore}/12.` : ''}`,
+    })
+  }
   const entry = challengeTypeRegistry[args.challenge.type]
 
   if (!entry) {
@@ -674,4 +840,71 @@ export function evaluateChallenge(args) {
   }
 
   return entry.evaluate(args)
+}
+
+function arraysEqualAsSets(left = [], right = []) {
+  if (left.length !== right.length) return false
+  const expected = new Set(right)
+  return left.every((value) => expected.has(value))
+}
+
+function evaluateMemoryPalette(selections = {}, rounds = []) {
+  const matchedRoundIds = rounds
+    .filter((round) => arraysEqualAsSets(selections[round.id] ?? [], round.correctColorIds))
+    .map((round) => round.id)
+
+  return {
+    matchedRoundIds,
+    matchedCount: matchedRoundIds.length,
+  }
+}
+
+function evaluateMultiRoundAnswers(answers = {}, rounds = []) {
+  const matchedRoundIds = []
+
+  rounds.forEach((round) => {
+    const answer = answers[round.id] ?? ''
+    const matched = round.mode === 'free_text'
+      ? matchesAcceptedAnswer(answer, round.acceptedAnswers)
+      : answer === round.correctChoiceId
+
+    if (matched) {
+      matchedRoundIds.push(round.id)
+    }
+  })
+
+  return {
+    matchedRoundIds,
+    matchedCount: matchedRoundIds.length,
+  }
+}
+
+function evaluateProgressiveClues(answers = {}, visibleCounts = {}, challenge) {
+  let scoreEarned = 0
+  const matchedRoundIds = []
+
+  challenge.rounds.forEach((round) => {
+    if (!matchesAcceptedAnswer(answers[round.id] ?? '', round.acceptedAnswers)) {
+      return
+    }
+
+    const visibleCount = Math.max(
+      challenge.initialVisibleClues,
+      visibleCounts[round.id] ?? challenge.initialVisibleClues,
+    )
+    const roundScore = Math.max(
+      challenge.scoring.minPointsPerRound,
+      challenge.scoring.maxPointsPerRound -
+        Math.max(0, visibleCount - challenge.initialVisibleClues) * challenge.scoring.revealPenalty,
+    )
+
+    scoreEarned += roundScore
+    matchedRoundIds.push(round.id)
+  })
+
+  return {
+    matchedRoundIds,
+    matchedCount: matchedRoundIds.length,
+    scoreEarned,
+  }
 }

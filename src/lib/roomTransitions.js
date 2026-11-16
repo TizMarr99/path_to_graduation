@@ -30,13 +30,12 @@ export const roomTransitionRegistry = {
     },
   },
   'serie-film': {
-    targetCategoryId: 'shadow-hall',
-    destinationPath: '/shadows',
+    targetCategoryId: 'cura-corpo',
     bridgeNarrative: {
       eyebrow: 'Ritorno alla Grotta',
       title: 'Gli schermi si spengono.',
       description:
-        'La sala ha lasciato andare il suo ultimo riflesso. Il Proiettore di Ombre ora e tuo, e la Grotta delle Ombre ne conservera la traccia.',
+        'La sala ha lasciato andare il suo ultimo riflesso. Il Proiettore di Ombre ora e tuo, ma una nuova porta ha iniziato a brillare nella Grotta.',
       ctaLabel: 'Torna alla Sala delle Ombre',
       andrea: {
         name: 'Andrea Sachs',
@@ -50,6 +49,14 @@ export const roomTransitionRegistry = {
         message:
           'Non confondere memoria e talento. Hai solo dimostrato di saper riconoscere una storia anche quando la faccio a pezzi. Tieniti il tuo proiettore, torna pure nella Grotta e prova a goderti il raro privilegio di avermi contraddetta con successo.',
       },
+    },
+    purchasePrompt: {
+      title: 'Vuoi sbloccare la prossima sala?',
+      description:
+        "Puoi acquistare adesso l'accesso alla Sala del Corpo, della Moda e della Fotografia e, se oggi hai ancora tentativi, entrarci subito.",
+      blockedDescription:
+        "Puoi acquistare adesso l'accesso alla prossima sala, ma il primo ingresso dovra attendere domani.",
+      actionLabel: "Sblocca l'accesso",
     },
   },
 }

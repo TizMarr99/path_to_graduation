@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   createInitialDraftAnswerForChallenge,
   createInitialRuntimeStateForChallenge,
 } from '../lib/challengeDraftState'
+import { canSubmitVisualChallenge, reconcileVisualTimelineOrder } from '../lib/visualChallengeRules.js'
 import { evaluateChallenge } from '../lib/challengeRegistry'
 import { computeSubgameStats } from '../lib/challengeRewards'
 
@@ -74,9 +75,18 @@ function resolveInitialDraftAnswer(challenge, persistedDraftAnswer = null) {
     return initialDraft
   }
 
+  // Preserve historic results and snapshots; obsolete, unconfirmed input cannot answer a revised quiz.
+  if (challenge.contentVersion === 2 && persistedDraftAnswer.contentVersion !== 2) {
+    return initialDraft
+  }
+
   return {
     ...initialDraft,
     ...persistedDraftAnswer,
+    dupeSwappedRoundIds: persistedDraftAnswer.dupeSwappedRoundIds ?? [],
+    visualTimelineOrderIds: challenge.type === 'visual_timeline'
+      ? reconcileVisualTimelineOrder(persistedDraftAnswer.visualTimelineOrderIds, challenge.initialOrder)
+      : initialDraft.visualTimelineOrderIds,
     imageOptionSelections:
       persistedDraftAnswer.imageOptionSelections ?? initialDraft.imageOptionSelections,
     imageOptionItemOrderIds:
@@ -162,6 +172,7 @@ function resolvePersistedChallengeStatesByChallengeId(
  * @param {object | null} [persistedSession]
  */
 export function useChallengeSession(category, preferredChallengeId = '', persistedSession = null) {
+  const submittedIdsRef = useRef(new Set(Object.keys(persistedSession?.challengeResults ?? {})))
   const challenges = category?.challenges ?? []
   const initialChallengeId = resolveInitialChallengeId(
     challenges,
@@ -216,7 +227,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   const totalChallenges = challenges.length
   const currentIndex = challenges.findIndex((challenge) => challenge.id === currentChallengeId)
   const challengeNumber = currentIndex >= 0 ? currentIndex + 1 : 0
-  const resolvedChallengeIds = Object.keys(challengeResults)
+  const resolvedChallengeIds = Object.keys(challengeResults).filter((id) => findChallengeById(challenges, id))
   const resolvedChallengeCount = resolvedChallengeIds.length
   const allChallengesResolved = totalChallenges > 0 && resolvedChallengeCount >= totalChallenges
 
@@ -237,6 +248,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   }, [resolvedChallengeCount, totalChallenges])
 
   function resetChallengeState() {
+    submittedIdsRef.current.clear()
     const nextInitialChallenge = findChallengeById(challenges, initialChallengeId)
     const nextInitialDraftAnswer = createInitialDraftAnswerForChallenge(nextInitialChallenge)
     const nextInitialChallengeState = createInitialRuntimeStateForChallenge(nextInitialChallenge)
@@ -268,10 +280,15 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   }
 
   function updateDraftAnswer(partialDraft) {
+    if (isCurrentChallengeResolved) return
     setDraftAnswer((currentDraft) => {
       const nextDraft = {
         ...currentDraft,
         ...partialDraft,
+      }
+      if (currentChallenge?.contentVersion === 2) {
+        nextDraft.lockedRounds = { ...partialDraft.lockedRounds, ...currentDraft.lockedRounds }
+        nextDraft.roundCursor = Math.max(currentDraft.roundCursor ?? 0, nextDraft.roundCursor ?? 0)
       }
 
       if (currentChallengeId) {
@@ -286,10 +303,19 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
   }
 
   function updateChallengeState(partialState) {
+    if (isCurrentChallengeResolved) return
     setChallengeState((currentState) => {
       const nextState = {
         ...currentState,
         ...partialState,
+      }
+      if (currentChallenge?.contentVersion === 2) {
+        nextState.observationDeadlines = { ...partialState.observationDeadlines, ...currentState.observationDeadlines }
+        nextState.progressiveClueVisibleCounts = { ...currentState.progressiveClueVisibleCounts }
+        for (const [id, count] of Object.entries(partialState.progressiveClueVisibleCounts ?? {})) {
+          nextState.progressiveClueVisibleCounts[id] = Math.max(count, currentState.progressiveClueVisibleCounts?.[id] ?? 1)
+        }
+        nextState.visualTimelineRevealedCount = Math.max(currentState.visualTimelineRevealedCount ?? 0, nextState.visualTimelineRevealedCount ?? 0)
       }
 
       if (currentChallengeId) {
@@ -352,6 +378,10 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     if (!currentChallenge || isSubmitting || hasFeedback || isCurrentChallengeResolved) {
       return null
     }
+
+    if (!canSubmitVisualChallenge(currentChallenge, challengeState, Date.now(), draftAnswer)) return null
+    if (submittedIdsRef.current.has(currentChallenge.id)) return null
+    submittedIdsRef.current.add(currentChallenge.id)
 
     setIsSubmitting(true)
     const nextFeedback = evaluateChallenge({
@@ -458,8 +488,10 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     resolvedChallengeCount,
     resolvedChallengeIds,
     selectChallenge,
-    sessionCorrectCount,
-    sessionWrongCount,
+    sessionCorrectCount: category?.id === 'cura-corpo'
+      ? resolvedChallengeIds.filter((id) => challengeResults[id].isCorrect).length : sessionCorrectCount,
+    sessionWrongCount: category?.id === 'cura-corpo'
+      ? resolvedChallengeIds.filter((id) => !challengeResults[id].isCorrect).length : sessionWrongCount,
     subgameTotalCount: subgameStats.subgameTotalCount,
     currentSubgameNumber: subgameStats.currentSubgameNumber,
     subgamesPassedCount: subgameStats.subgamesPassedCount,

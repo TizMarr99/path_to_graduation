@@ -13,6 +13,12 @@ const shadowSlots = [
   { id: 'crittografia-logica', categoryId: 'crittografia-logica',   label: 'Crittografia / Logica', x: '78%',  y: '25%', w: '14%', h: '55%', accent: 'amber' },
 ]
 
+const roomArtifacts = {
+  musica: { src: '/images/rooms/music-artifact-no-bg.png', label: 'Accordatore di Ombre' },
+  'serie-film': { src: '/images/rooms/serie-film-artifact.png', label: 'Proiettore di Ombre' },
+  'cura-corpo': { src: '/images/rooms/corpo-moda-fotografia-artifact.png', label: 'Specchio Prismatico' },
+}
+
 const slotThemes = {
   amber: {
     border: 'rgba(212,175,55,0.55)',
@@ -207,6 +213,7 @@ function ShadowSlot({
   const canReveal = isRevealOnly && typeof onRevealRequest === 'function'
   const isInteractive = (isClickable || canReveal) && !comingSoon
   const theme = slotThemes[slot.accent] ?? slotThemes.amber
+  const artifact = roomArtifacts[slot.categoryId]
   const hasPermanentGlow = staticBright || prizeWon
 
   function handleClick() {
@@ -406,7 +413,7 @@ function ShadowSlot({
       )}
 
       {/* Artifact icon for completed rooms */}
-      {prizeWon && (slot.categoryId === 'musica' || slot.categoryId === 'serie-film') && (
+      {prizeWon && artifact && (
         <div
           style={{
             position: 'absolute',
@@ -418,8 +425,8 @@ function ShadowSlot({
           }}
         >
           <img
-            src={slot.categoryId === 'musica' ? '/images/rooms/music-artifact-no-bg.png' : '/images/rooms/serie-film-artifact.png'}
-            alt={slot.categoryId === 'musica' ? 'Accordatore di Ombre' : 'Proiettore di Ombre'}
+            src={artifact.src}
+            alt={artifact.label}
             style={{
               width: 'clamp(32px, 5vw, 48px)',
               height: 'clamp(32px, 5vw, 48px)',
@@ -604,7 +611,6 @@ export default function ShadowHallPage() {
   // Serie-film card appears when music room is passed (8+ correct) or fully completed
   const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
   const hasSerieFilmCompletion = hasStoredRoomCompletion(serieFilmProgress)
-  const hasCuraCorpoComingSoonReveal = hasSerieFilmCompletion
   const activeBridgeKey = pendingBridge?.bridgeCompletedAt
     ? `${pendingBridge.sourceCategoryId}:${pendingBridge.targetCategoryId}:${pendingBridge.bridgeCompletedAt}`
     : null
@@ -738,11 +744,11 @@ export default function ShadowHallPage() {
             !prizeWon &&
             !activeSessionForSlot &&
             Boolean(slotProgress?.buyAccessAvailable || completed)
-          const comingSoon = slot.categoryId === 'cura-corpo' && hasCuraCorpoComingSoonReveal
+          const comingSoon = false
           const visible = slot.categoryId === 'serie-film'
             ? unlocked || hasSeriesFilmReveal
             : slot.categoryId === 'cura-corpo'
-              ? comingSoon || unlocked
+              ? unlocked || hasSerieFilmCompletion || pendingBridge?.targetCategoryId === 'cura-corpo'
               : unlocked
           const staticBright = prizeWon || (slot.categoryId === 'musica' && hasUnlockedMusicByScore)
           const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot, slotCategory)

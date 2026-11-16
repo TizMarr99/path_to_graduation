@@ -1,0 +1,333 @@
+{
+  "date": "2026-11-15",
+  "renamed": [
+    {
+      "old": "osservazione/243f213789513a3fdcdf91d48480c4cb.jpg",
+      "new": "osservazione/look-06-patchwork-dorso-pantaloni-chiari.jpg",
+      "sha256": "2bb3998cf4d85c8a3d411823c423b73603e900863538d0e7226604e2fed56af4"
+    },
+    {
+      "old": "osservazione/fc84247e69976b752518c4207313061c.jpg",
+      "new": "osservazione/look-07-patchwork-dorso-fiocco-rosa.jpg",
+      "sha256": "396ff22e272c677f414f20df2e843a400128da1949c21970cf9838aa8b1754f0"
+    }
+  ],
+  "inventory": [
+    {
+      "path": "beauty-prodotti/01-primer-elf.png",
+      "sha256": "ceee31e871ad06356a663d0e7fcfec6eaff57e84dc97bee5935094e66ec27a1f"
+    },
+    {
+      "path": "beauty-prodotti/02-setting-spray-urban-decay.png",
+      "sha256": "788503fd19a9af66ebf6afc7b95ec04d87121568f319db78393f2ef0671da04c"
+    },
+    {
+      "path": "beauty-prodotti/03-illuminante-rare-beauty.png",
+      "sha256": "61d26266da47ea1ad46fb7e3316443900c227338207e8e1fada7e7dc1cad38a2"
+    },
+    {
+      "path": "beauty-prodotti/04-prodotto-labbra-ysl.png",
+      "sha256": "494c3fb5aecfaecc8f44a17238f69964cf3dc6ef57d1826ef9004cdb0433c3fb"
+    },
+    {
+      "path": "dupe-originale/01-illuminante-elf.jpg",
+      "sha256": "f5ee07724a0880965288e79feda98e309e85c80ee85781fe02499a813a94bdb2"
+    },
+    {
+      "path": "dupe-originale/01-illuminante-hollywood.jpg",
+      "sha256": "46759e1f68c0795032c82dfa5b69bd406ff684c1f160cc48d61aea54f61b4c18"
+    },
+    {
+      "path": "dupe-originale/02-profumo-jadore.jpg",
+      "sha256": "a30644d68722810b099d169db94451e9f865daf881c9979d4457b54a6e7a5f1b"
+    },
+    {
+      "path": "dupe-originale/02-profumo-lidl.jpg",
+      "sha256": "9c65625d300bbc31e48bdd0c50e3bca42f99ee20e055e445d247cf31a298c104"
+    },
+    {
+      "path": "dupe-originale/03-borsa-jwpei.jpg",
+      "sha256": "463df8e4a56096b65a6ed2c8fd915a24aff21f99b9e8bceaa6683fdc8150bd12"
+    },
+    {
+      "path": "dupe-originale/03-borsa-prada.jpg",
+      "sha256": "abdafd9f4414b1f998ac51cec0b8cd59a9ad4752267ac15e8674ca13ed86ad89"
+    },
+    {
+      "path": "dupe-originale/04-scarpe-prada.jpg",
+      "sha256": "5138b83bc6e26134ca454c91c38e1b949f42824831e5a5dbce7d65c9591fe03a"
+    },
+    {
+      "path": "dupe-originale/04-scarpe-zara.jpg",
+      "sha256": "25f0a2dab4ec27060add2194dffeedbd3f7d8afb0a9b00f76440fe5c236fbd47"
+    },
+    {
+      "path": "dupe-originale/05-bracciale-swarovski.jpg",
+      "sha256": "9416ecce9266daa06f6fd345591287cd14633fe8311690e2518a0d0b102aeccc"
+    },
+    {
+      "path": "dupe-originale/05-bracciale-vancleef.jpg",
+      "sha256": "2d66dc0986eb0150eb4130727b442fc77ef98fe5ea650b5ba9dde2ffd33ce150"
+    },
+    {
+      "path": "fotografia-effetti/01-bianco-e-nero.png",
+      "sha256": "56311369f3c5c3cea93491a6118dd50dcaba4637d2a5a7e532de1bd2a1ebaf82"
+    },
+    {
+      "path": "fotografia-effetti/02-seppia.png",
+      "sha256": "4736aae6b8da22d600d3aaa3bc5f0353e9978b69d52aaba4e56740bc53f663e3"
+    },
+    {
+      "path": "fotografia-effetti/03-vignettatura.png",
+      "sha256": "44a15e4d22c1df9ea29309b4927edcecdf9af622429c1c87624f847dbdba9e5e"
+    },
+    {
+      "path": "fotografia-effetti/04-sfocatura.png",
+      "sha256": "94e5977bff04c2a6b6241ab4032469e8f2f4f22ceb8dc98c3bb4c4af09846cb0"
+    },
+    {
+      "path": "fotografia-effetti/05-pixelatura.png",
+      "sha256": "823765ece641bf76648e09ef33bbe2ac9ed62afbb288441a364b7e8186e10b51"
+    },
+    {
+      "path": "fotografia-supporti/01-scogliera-rullino-35mm.jpg",
+      "sha256": "ade468a4a64a07beabb7ea7172fc16bf543adffe0a95d47fa497ae0d69611d14"
+    },
+    {
+      "path": "fotografia-supporti/02-neve-fuoristrada.jpg",
+      "sha256": "3f42d0da9a9f0cbc6e59ffea9b1f133ac47edf9338acdf81919b85551cc70a90"
+    },
+    {
+      "path": "fotografia-supporti/03-concerto-flash.jpg",
+      "sha256": "69ff38763a8b007618346521de7939325a5a3e149189ba527a33c8f539174a3d"
+    },
+    {
+      "path": "fotografia-supporti/04-ritratto-istantanea.jpg",
+      "sha256": "20dfa1440ba244a93a05925caaba68c0cc1ddb426c93a1ae5d43a126277a0fd9"
+    },
+    {
+      "path": "fotografia-supporti/05-scena-subacquea.jpg",
+      "sha256": "f01a5d3769fa66465912e6d427cf2e50ed990b0720991774a3818687509912c5"
+    },
+    {
+      "path": "hitster-stili/01-flapper.jpg",
+      "sha256": "7523975279c7bafd9eb21f8126bf57e87d08919dd6fa6ed74db9b3f7a1b668c8"
+    },
+    {
+      "path": "hitster-stili/02-greaser.jpg",
+      "sha256": "de4a6516de96a624a2007e6ea7d2f72ff442a6b35098d6e1c019c955086258e0"
+    },
+    {
+      "path": "hitster-stili/03-hippie.jpg",
+      "sha256": "9c77026d34a5edff49bd6be19a4087f8d34a82f1e7b2744f971369edf68a2bdf"
+    },
+    {
+      "path": "hitster-stili/04-disco.jpg",
+      "sha256": "08c564d9195862ca0860e00f14fa38205ab9994d6f232424551f18c626f01c3f"
+    },
+    {
+      "path": "hitster-stili/05-punk.jpg",
+      "sha256": "775bad4490c30decb5b85d0ee9c0b850efaddf3c6c4eecb46cce7e38fcec1fa0"
+    },
+    {
+      "path": "hitster-stili/06-hip-hop.jpg",
+      "sha256": "1b8749cde89d5c05f83e23253d6dd3d1358a3c982ace26d567458d2b341421d6"
+    },
+    {
+      "path": "hitster-stili/07-grunge.jpg",
+      "sha256": "2c0e2af538f055b94e92f04baa48f8c94d1419261ee66c964651ee2bb5d83426"
+    },
+    {
+      "path": "originali/beauty-prodotti/illuminante-rare-beauty.jpg",
+      "sha256": "62da0a99fc28f43b324533971d819e3c6d0e8d5191b7301bfda18390fa215065"
+    },
+    {
+      "path": "originali/beauty-prodotti/setting-spray-urban-decay-in-uso.png",
+      "sha256": "d38ecfe161766b8744e6942d7082422f718fea1097974cc33703acd59847c70e"
+    },
+    {
+      "path": "originali/dupe-originale/01-illuminante-elf.jpg",
+      "sha256": "228b388be39bd69bf8d4549b1b0af7e1d8146b681836b4b07a918670cab1fe4d"
+    },
+    {
+      "path": "originali/dupe-originale/01-illuminante-hollywood.jpg",
+      "sha256": "b6b603c320a02c993cce62dbb1255788b4d53dbdee0b90f2e8393909c340d30f"
+    },
+    {
+      "path": "originali/dupe-originale/02-profumo-jadore.jpg",
+      "sha256": "dac2408cfc3d55805b93ee80d308b50d6039c9ec5265a1d5ef9ba61ee6a8dbd7"
+    },
+    {
+      "path": "originali/dupe-originale/02-profumo-lidl.jpg",
+      "sha256": "e29cd34195b51551efc51795572488bc2baef1353e5208db181a4c9632f2981b"
+    },
+    {
+      "path": "originali/dupe-originale/03-borsa-jwpei.jpg",
+      "sha256": "cb9c9a23dc3d8946247594b4b6b91239c12daf82a6c90e15aefaf1f84045e468"
+    },
+    {
+      "path": "originali/dupe-originale/03-borsa-prada.jpg",
+      "sha256": "a1ebd67cf795e2bcd42b9720219d544f2efb5e0d9778efd5e329cdc282421b4f"
+    },
+    {
+      "path": "originali/dupe-originale/04-scarpe-prada.jpg",
+      "sha256": "6444d692b9a883c9c0e6f48604f45863ebe7cf64331f70be74951d727affdf36"
+    },
+    {
+      "path": "originali/dupe-originale/04-scarpe-zara.jpg",
+      "sha256": "e49c6b1b56ccd5dbc88f382b9bd9641401ad5320d57624abe3b65a1b75a253b1"
+    },
+    {
+      "path": "originali/dupe-originale/05-bracciale-swarovski.jpg",
+      "sha256": "930ede6a6f49bd879d5c77cbda760ed7d6aafb97f7a62c27752ba507940d0cfd"
+    },
+    {
+      "path": "originali/dupe-originale/05-bracciale-vancleef.jpg",
+      "sha256": "05efc7e0be5206527fae1c1f381efc9df4072ae604150df9e1375de09edfee6b"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/01-illuminante-elf.avif",
+      "sha256": "f3d0b9f326726c2dfc58ccd582bd8e681ebcde8a2510961f446e04d0753b2733"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/01-illuminante-hollywood.avif",
+      "sha256": "0c1bae305b898c4444df87d8b353f6fa3d49c823b1ff8dfc77dbdab7f448af0c"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/02-profumo-jadore.avif",
+      "sha256": "d56a9a78a6c2f54afe45225935089b0342bb7102937a0abbbab1031712c93b97"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/02-profumo-lidl.webp",
+      "sha256": "4d8f70ac2b5e2daf58852fa0a6bfd927b2ab7ee70f26322db9ae917c572e8331"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/03-borsa-prada.avif",
+      "sha256": "0ee0ec8fa24f33f9d15249e2cd1bbc98a223601727960a816993d96817f01f0e"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/04-scarpe-prada.avif",
+      "sha256": "f1510eddaacd8b029fe4ee2b1f77b0982acb2f856bb38d707d15a7b191e98516"
+    },
+    {
+      "path": "originali/formati-sorgente/dupe-originale/05-bracciale-vancleef.avif",
+      "sha256": "3e2ef401a894ccf4713bea961413f0db711131dd2cea3c432c8b4424eaeae130"
+    },
+    {
+      "path": "originali/formati-sorgente/osservazione/look-01-camicia-multicolore.webp",
+      "sha256": "4ef91f11ae59ac884acd7b17dfdf7db4049b01f3b74bfb431c02886f6f90e55d"
+    },
+    {
+      "path": "originali/formati-sorgente/osservazione/look-02-metro-giacca-verde.webp",
+      "sha256": "14376d15e85c7ddae6cd870ec57393c98096d2e89df6e5e42899b97187db2eac"
+    },
+    {
+      "path": "originali/formati-sorgente/osservazione/look-03-patchwork-borsa-crema.webp",
+      "sha256": "6f03b2612273aae4e1b56af57572d52e9085f9a9f27137116294624f296d0c4b"
+    },
+    {
+      "path": "originali/formati-sorgente/osservazione/look-04-colletto-bianco.webp",
+      "sha256": "fe41154d2799be6d19a7c84b547335c315b4702960210c7aab156f10f6c093eb"
+    },
+    {
+      "path": "originali/formati-sorgente/osservazione/look-05-giacca-floreale.webp",
+      "sha256": "6fa64498ce7c59bc957f66c9c0bb23fc33fea5dc8da569c605e4d1404748cc87"
+    },
+    {
+      "path": "originali/fotografia-effetti/00-scena-urbana.png",
+      "sha256": "431f21486435b3f8bb19fe4b11def310e7ed9a7778792c599f2b6234f1cabbb3"
+    },
+    {
+      "path": "originali/outfit-iconici/01-marilyn.jpg",
+      "sha256": "bdfc5ada66451ebfd4c1390d879e1374b2d9040481b12e2ce15627433972dbcc"
+    },
+    {
+      "path": "originali/outfit-iconici/02-michael-jackson.jpg",
+      "sha256": "0a38f580cdc06b584092dc066e24570282a929f3f7d7f4e086dd7f2f017ba0c1"
+    },
+    {
+      "path": "originali/outfit-iconici/03-diana.jpg",
+      "sha256": "5b7c7ad0b1ae091170dd1176bafccda8ded424865eca221c9ae8aed18fca23ca"
+    },
+    {
+      "path": "originali/outfit-iconici/04-audrey.jpg",
+      "sha256": "43e32f928448c096c8c505b3b88465fceecbcb5c29fd273a0a3637c42c98602a"
+    },
+    {
+      "path": "originali/outfit-iconici/05-undici.jpg",
+      "sha256": "0eaba3804b0030c1521c92584f8d8dd4af36a88dd45677b6b358e1c91f6f6b95"
+    },
+    {
+      "path": "originali/outfit-iconici/06-frida.jpg",
+      "sha256": "cf689b6731a5d2c9362b12f2f583f224e65e559db85a6fdc070550aee0e0e3a2"
+    },
+    {
+      "path": "originali/outfit-iconici/07-freddie-mercury.jpg",
+      "sha256": "4f85d29b9e206ae7a92602420c7785b1a8e6684d61f775ee7a842e5f7a1ba31c"
+    },
+    {
+      "path": "osservazione/look-01-camicia-multicolore.jpg",
+      "sha256": "e9ba843765b3c11367f26ab9fa59d229add9f5f645ea12c0ca058b8db5497e6c"
+    },
+    {
+      "path": "osservazione/look-02-metro-giacca-verde.jpg",
+      "sha256": "e18e6f2ab669422f5d4cac899ab9edc17c1e01b5954466357df08942796c6b03"
+    },
+    {
+      "path": "osservazione/look-03-patchwork-borsa-crema.jpg",
+      "sha256": "52df5ff15a09c7ae6cfd07d0643f19a9b53093cb60658650f32505be4abe65c5"
+    },
+    {
+      "path": "osservazione/look-04-colletto-bianco.jpg",
+      "sha256": "b7c35446cd9f4635e39f7ea0a9ad757f8b014bad93a978328da941dfd1dcf3dc"
+    },
+    {
+      "path": "osservazione/look-05-giacca-floreale.jpg",
+      "sha256": "4431b09d03885a563ee40dfff5f09443cf90f5cc3e686d8931024e9b538f574d"
+    },
+    {
+      "path": "osservazione/look-06-patchwork-dorso-pantaloni-chiari.jpg",
+      "sha256": "2bb3998cf4d85c8a3d411823c423b73603e900863538d0e7226604e2fed56af4"
+    },
+    {
+      "path": "osservazione/look-07-patchwork-dorso-fiocco-rosa.jpg",
+      "sha256": "396ff22e272c677f414f20df2e843a400128da1949c21970cf9838aa8b1754f0"
+    },
+    {
+      "path": "outfit-iconici/01-marilyn.png",
+      "sha256": "4ab6c126d208a5808a105416fa88b311b33b07db88b33deb29a19a2d4d1c1144"
+    },
+    {
+      "path": "outfit-iconici/02-michael-jackson.png",
+      "sha256": "bed46a21d3df9d621789b07cb060dd6d800e4ca0d16337f3f23c447f2be3b2dc"
+    },
+    {
+      "path": "outfit-iconici/03-diana.png",
+      "sha256": "4e4a32902e1cbcbb31ab8e2256e0d0cca4ffc03c4fab6de41786b90d91896ab0"
+    },
+    {
+      "path": "outfit-iconici/04-audrey.png",
+      "sha256": "b09350fe000b3072101d68664b421cdffa8817f4bafe62cd6a42c7340ae2fd0c"
+    },
+    {
+      "path": "outfit-iconici/05-undici.png",
+      "sha256": "8fbae65a993452555c8f44d7a253b32bc9fe30f2aaf39a115a42366433ca3733"
+    },
+    {
+      "path": "outfit-iconici/06-frida.png",
+      "sha256": "480382fc7b23ae75c12d07d431c53b42a56c7928f0ba822dd4a7cc06570cae11"
+    },
+    {
+      "path": "outfit-iconici/07-freddie-mercury.png",
+      "sha256": "5571b2bd3207a3452302f9d33ee7e06a30a33645c9ee4bee5e1b2e19f72620cb"
+    },
+    {
+      "path": "riserve/beauty-prodotti/primer-elf-variante-verde.png",
+      "sha256": "b78562aa9230d0ad84ce02f69be35df76d46984d872a70ddb7706bfeafbcfaac"
+    },
+    {
+      "path": "riserve/hitster-stili/power-dressing.jpg",
+      "sha256": "e63b1e2f622eadfd151222a5328e86eb11dd5edcd199406c1079f46da4e67a48"
+    }
+  ]
+}

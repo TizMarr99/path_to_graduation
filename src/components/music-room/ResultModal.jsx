@@ -39,7 +39,9 @@ function ResultModal({
 
   const footerParts = [
     `Punteggio: ${formatMetricValue(scoreEarned)}/${formatMetricValue(maxScore)}`,
-    `Crediti: ${formatMetricValue(resolvedAwardedCredits)}/${formatMetricValue(resolvedCreditReward)} 🪙`,
+    typeof feedback.bonusCredits === 'number'
+      ? `Crediti: ${formatMetricValue(resolvedAwardedCredits - feedback.bonusCredits)}/${formatMetricValue(resolvedCreditReward)} + ${formatMetricValue(feedback.bonusCredits)} bonus = ${formatMetricValue(resolvedAwardedCredits)} 🪙`
+      : `Crediti: ${formatMetricValue(resolvedAwardedCredits)}/${formatMetricValue(resolvedCreditReward)} 🪙`,
   ]
 
   return (

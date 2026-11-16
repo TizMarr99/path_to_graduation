@@ -4,9 +4,12 @@ export function resolveChallengeCreditBaseReward(challenge) {
 
 export function resolveChallengeCreditReward(challenge, feedback) {
   const baseReward = resolveChallengeCreditBaseReward(challenge)
+  const bonusCredits = Number.isFinite(feedback?.bonusCredits)
+    ? Math.max(0, Math.floor(feedback.bonusCredits))
+    : 0
 
   if (baseReward <= 0) {
-    return 0
+    return bonusCredits
   }
 
   if (
@@ -15,10 +18,10 @@ export function resolveChallengeCreditReward(challenge, feedback) {
     feedback.maxScore > 0
   ) {
     const clampedScore = Math.max(0, Math.min(feedback.scoreEarned, feedback.maxScore))
-    return Math.round((baseReward * clampedScore) / feedback.maxScore)
+    return Math.round((baseReward * clampedScore) / feedback.maxScore) + bonusCredits
   }
 
-  return feedback?.isCorrect ? baseReward : 0
+  return (feedback?.isCorrect ? baseReward : 0) + bonusCredits
 }
 
 function resolveNormalizedFeedbackScore(feedback) {

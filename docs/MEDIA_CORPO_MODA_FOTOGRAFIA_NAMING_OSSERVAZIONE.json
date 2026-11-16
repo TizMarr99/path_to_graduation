@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-15",
+  "masked_suffix": "-d",
+  "files": [
+    {
+      "old": "osservazione/look-01-camicia-multicolore.jpg",
+      "new": "osservazione/palette-01.jpg",
+      "sha256": "e9ba843765b3c11367f26ab9fa59d229add9f5f645ea12c0ca058b8db5497e6c"
+    },
+    {
+      "old": "osservazione/look-02-metro-giacca-verde.jpg",
+      "new": "osservazione/palette-02.jpg",
+      "sha256": "e18e6f2ab669422f5d4cac899ab9edc17c1e01b5954466357df08942796c6b03"
+    },
+    {
+      "old": "osservazione/look-04-colletto-bianco.jpg",
+      "new": "osservazione/palette-03.jpg",
+      "sha256": "b7c35446cd9f4635e39f7ea0a9ad757f8b014bad93a978328da941dfd1dcf3dc"
+    },
+    {
+      "old": "osservazione/look-03-patchwork-borsa-crema.png",
+      "new": "osservazione/dettaglio-01.png",
+      "sha256": "70202d223d918d881e7424837c896c82d75bd45112cdb8bf2b746a632248f68c"
+    },
+    {
+      "old": "osservazione/look-03-patchwork-borsa-crema-darkened.png",
+      "new": "osservazione/dettaglio-01-d.png",
+      "sha256": "ce0ba7cc722f070cd403a280f53e69e73cf66918513a563f94ee010cd3065684"
+    },
+    {
+      "old": "osservazione/look-05-giacca-floreale.png",
+      "new": "osservazione/dettaglio-02.png",
+      "sha256": "edba937b36f36f1f3e3e1493c90dec5c190d7245c0a9a8a7d7b875c11416c204"
+    },
+    {
+      "old": "osservazione/look-05-giacca-floreale-darkened.png",
+      "new": "osservazione/dettaglio-02-d.png",
+      "sha256": "06c9a5e137a466f496aa591ee51717ed5fafa23adcf02b2fdeb2ba1691ee44c5"
+    },
+    {
+      "old": "osservazione/look-06-patchwork-dorso-pantaloni-chiari.png",
+      "new": "osservazione/dettaglio-03.png",
+      "sha256": "0c6c5048d3a32d78d6d2d7b1a691c16034f9ffced59e82b36aa573525e3f5976"
+    },
+    {
+      "old": "osservazione/look-06-patchwork-dorso-pantaloni-chiari-darkened.png",
+      "new": "osservazione/dettaglio-03-d.png",
+      "sha256": "5555974a5499747f1de1b11b5c8f583cd506228c6361cf32e52333ee382f3896"
+    },
+    {
+      "old": "osservazione/look-07-patchwork-dorso-fiocco-rosa.png",
+      "new": "osservazione/dettaglio-04.png",
+      "sha256": "95ff868815648253de4fe8af91b3eae6340afcb20d8af1a99eed773bcedf7ebb"
+    },
+    {
+      "old": "osservazione/look-07-patchwork-dorso-fiocco-rosa-darkened.png",
+      "new": "osservazione/dettaglio-04-d.png",
+      "sha256": "72aaa7b887ee866d9575b62e1b414282f6e7979ca9c2fa13422639bbfde87b63"
+    }
+  ],
+  "updated_references": []
+}

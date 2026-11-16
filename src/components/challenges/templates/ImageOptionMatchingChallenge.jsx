@@ -13,6 +13,16 @@ function ImageOptionMatchingChallenge({
   const hasAnySelection = Object.values(selections).some(Boolean)
   const isGotMatching = challenge.quizSubType === 'got_matching'
   const isStrangerThingsMatching = challenge.quizSubType === 'st_matching'
+  const sourceListLabel = isGotMatching
+    ? 'Stemmi da assegnare'
+    : isStrangerThingsMatching
+      ? 'Tracce da assegnare'
+      : 'Opzioni da assegnare'
+  const emptyTargetLabel = isGotMatching
+    ? 'Seleziona uno stemma e clicca qui'
+    : isStrangerThingsMatching
+      ? 'Seleziona una traccia e clicca qui'
+      : "Seleziona un'opzione e clicca qui"
   const sourceEntriesById = new Map(challenge.options.map((option) => [option.id, option]))
   const itemsById = new Map(challenge.items.map((item) => [item.id, item]))
   const sourceEntries = draftAnswer.imageOptionSourceOrderIds?.length
@@ -157,7 +167,7 @@ function ImageOptionMatchingChallenge({
           <div>
             <p className="text-sm font-semibold text-slate-100">{item.label}</p>
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">
-              {assignedOption?.label ?? 'Seleziona uno stemma e clicca qui'}
+              {assignedOption?.label ?? emptyTargetLabel}
             </p>
           </div>
           {assignedOption ? (
@@ -179,6 +189,19 @@ function ImageOptionMatchingChallenge({
   }
 
   function renderStTarget(item) {
+    if (challenge.quizSubType === 'photo_supports') {
+      const assigned = challenge.options.find((option) => option.id === selections[item.id])
+      return <article key={item.id} className="space-y-3 rounded-2xl border border-slate-700 p-4">
+        <ChallengeAssetGallery assets={item.assets} />
+        <p className="text-sm text-white">{item.label}</p>
+        <button className="w-full rounded-xl border border-cyan-300/40 p-3 text-cyan-100"
+          type="button" disabled={disabled || !effectiveActiveSourceId} onClick={() => handleAssignToItem(item.id)}>
+          {assigned?.label || emptyTargetLabel}
+        </button>
+        {assigned ? <button type="button" className="text-sm text-rose-300" disabled={disabled}
+          onClick={() => clearItemAssignment(item.id)}>Rimuovi associazione</button> : null}
+      </article>
+    }
     const assignedOption = challenge.options.find((option) => option.id === selections[item.id])
     const assignedOptionLabel = assignedOption
       ? (sourceLabelsById.get(assignedOption.id) ?? assignedOption.label)
@@ -204,7 +227,7 @@ function ImageOptionMatchingChallenge({
           <div>
             {item.label ? <p className="text-sm font-semibold text-slate-100">{item.label}</p> : null}
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">
-              {assignedOptionLabel || 'Seleziona una traccia e clicca qui'}
+              {assignedOptionLabel || emptyTargetLabel}
             </p>
           </div>
           {assignedOption ? (
@@ -236,7 +259,7 @@ function ImageOptionMatchingChallenge({
         <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              {isGotMatching ? 'Stemmi da assegnare' : 'Tracce da assegnare'}
+              {sourceListLabel}
             </p>
             {effectiveActiveSourceId ? (
               <span className="rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-100">
@@ -260,7 +283,8 @@ function ImageOptionMatchingChallenge({
         </div>
       </div>
 
-      <ChallengeSubmitButton disabled={disabled || !hasAnySelection} />
+      <ChallengeSubmitButton disabled={disabled || !hasAnySelection ||
+        (challenge.quizSubType === 'photo_supports' && challenge.items.some((item) => !selections[item.id]))} />
     </form>
   )
 }

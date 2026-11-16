@@ -8,6 +8,18 @@ export default function SeriesFilmVictoryModal({
 }) {
   const guardian = category.characters?.guardian
   const inquisitor = category.characters?.inquisitor
+  const isSeriesFilmRoom = category.id === 'serie-film'
+  const artifactImageSrcByRoom = {
+    'serie-film': '/images/rooms/serie-film-artifact.png',
+    'cura-corpo': '/images/rooms/corpo-moda-fotografia-artifact.png',
+  }
+  const artifactImageSrc = artifactImageSrcByRoom[category.id] ?? '/images/rooms/serie-film-artifact.png'
+  const guardianVictoryLine = isSeriesFilmRoom
+    ? "Hai rimesso insieme scene, legami e battute senza lasciare che il buio decidesse per te. Il Proiettore di Ombre è tuo: da ora in poi anche ciò che sembrava confuso dovrà mostrarti qualcosa in più."
+    : "Hai riconosciuto palette, dettagli, forme e luci senza farti ingannare dalla superficie. Ora questo frammento è tuo: non mostra solo come appaiono le cose, ma come impari a guardarle."
+  const inquisitorVictoryLine = isSeriesFilmRoom
+    ? "Fastidioso, davvero. Hai ricucito una storia anche quando l'avevo lasciata a brandelli. Tieniti pure il tuo trofeo: resta insopportabile vedere qualcuno trasformare il caos in memoria."
+    : "Che ostinazione elegante. Ho provato a confondere marchi, stili, filtri e rituali, ma tu hai trovato il dettaglio che reggeva tutto. Prendi pure il premio: lo hai meritato."
 
   return (
     <div
@@ -72,7 +84,7 @@ export default function SeriesFilmVictoryModal({
               marginBottom: '12px',
             }}
           >
-            Sala delle Serie e dei Film Superata
+            {category.title} Superata
           </h2>
           <div
             style={{
@@ -109,6 +121,11 @@ export default function SeriesFilmVictoryModal({
             />
           </div>
         </div>
+
+        {category.finalGift ? <div className="mb-7 rounded-2xl border border-amber-300/40 bg-amber-300/10 p-5 text-center">
+          <p className="text-sm text-amber-100">Il tuo regalo</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{category.finalGift}</p>
+        </div> : null}
 
         {typeof sessionCorrectCount === 'number' ? (
           <div
@@ -203,7 +220,7 @@ export default function SeriesFilmVictoryModal({
                 fontStyle: 'italic',
               }}
             >
-              "Hai rimesso insieme scene, legami e battute senza lasciare che il buio decidesse per te. Il Proiettore di Ombre è tuo: da ora in poi anche ciò che sembrava confuso dovrà mostrarti qualcosa in più."
+              "{guardianVictoryLine}"
             </p>
           </div>
         ) : null}
@@ -263,7 +280,7 @@ export default function SeriesFilmVictoryModal({
                 fontStyle: 'italic',
               }}
             >
-              "Fastidioso, davvero. Hai ricucito una storia anche quando l'avevo lasciata a brandelli. Tieniti pure il tuo trofeo: resta insopportabile vedere qualcuno trasformare il caos in memoria."
+              "{inquisitorVictoryLine}"
             </p>
           </div>
         ) : null}
@@ -294,7 +311,7 @@ export default function SeriesFilmVictoryModal({
             }}
           >
             <img
-              src="/images/rooms/serie-film-artifact.png"
+              src={artifactImageSrc}
               alt={category.rewardArtifact?.label || 'Proiettore di Ombre'}
               style={{
                 width: '78px',
@@ -315,7 +332,8 @@ export default function SeriesFilmVictoryModal({
           </p>
         </div>
 
-        <div
+        {isSeriesFilmRoom ? (
+          <div
           style={{
             marginBottom: '24px',
             padding: '16px',
@@ -335,7 +353,8 @@ export default function SeriesFilmVictoryModal({
           >
             {'📧 Andrea ti ha inviato la mail con il Proiettore di Ombre.'}
           </p>
-        </div>
+          </div>
+        ) : null}
 
         {emailDispatchError ? (
           <div

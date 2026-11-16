@@ -94,6 +94,10 @@ const HESITATION_TIME_THRESHOLDS_MS = {
   image_option_matching: 90_000,
   column_reorder_matching: 90_000,
   card_matching: 90_000,
+  memory_palette: 120_000,
+  multi_round_quiz: 90_000,
+  visual_timeline: 120_000,
+  progressive_clue_rounds: 140_000,
   default: 50_000,
 }
 
@@ -130,6 +134,24 @@ const subgameLabels = {
   colonna_sonora: 'Colonne sonore',
   intruder: 'Intrusi',
   domande_aperte: 'Domande aperte',
+  memory_palette: 'Memory palette',
+  timed_detail: 'Dettagli',
+  color_intruder: 'Colori',
+  garment_names: 'Guardaroba',
+  style_moodboard: 'Stili',
+  styling_error: 'Errore styling',
+  hitster_style: 'Hitster style',
+  iconic_outfits: 'Outfit iconici',
+  photo_filters: 'Filtri',
+  photo_supports: 'Supporti',
+  makeup_names: 'Makeup',
+  product_names: 'Prodotti',
+  fragrance_families: 'Profumi',
+  dupe_original: 'Dupe o originale',
+  brand_emoji: 'Brand emoji',
+  brand_clues: 'Brand a indizi',
+  brand_products: 'Brand prodotti',
+  general_culture: 'Cultura generale',
 }
 
 function getChallengeSubgameId(challenge) {
@@ -858,6 +880,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }
 
   const shouldShowRoomIntro = isImmersiveRoom && isRoomIntroPending(category.id)
+  const visualCheckpointRef = useRef('')
 
   useEffect(() => {
     if (isComplete && !archivedRoomReadOnly) {
@@ -891,6 +914,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         if (Object.keys(draft.cardSelections ?? {}).length) c.cardSelections = draft.cardSelections
         if (draft.hitsterTrackOrderIds?.some(Boolean)) c.hitsterTrackOrderIds = draft.hitsterTrackOrderIds
         if (Object.keys(draft.hitsterTrackAnswers ?? {}).length) c.hitsterTrackAnswers = draft.hitsterTrackAnswers
+        if (Object.keys(draft.memoryPaletteSelections ?? {}).length) c.memoryPaletteSelections = draft.memoryPaletteSelections
+        if (Object.keys(draft.multiRoundAnswers ?? {}).length) c.multiRoundAnswers = draft.multiRoundAnswers
+        if (draft.visualTimelineOrderIds?.length) c.visualTimelineOrderIds = draft.visualTimelineOrderIds
+        if (Object.keys(draft.visualTimelineStyleAnswers ?? {}).length) c.visualTimelineStyleAnswers = draft.visualTimelineStyleAnswers
+        if (draft.dupeSwappedRoundIds?.length) c.dupeSwappedRoundIds = draft.dupeSwappedRoundIds
+        if (Object.keys(draft.progressiveClueAnswers ?? {}).length) c.progressiveClueAnswers = draft.progressiveClueAnswers
+        if (draft.contentVersion === 2) {
+          c.contentVersion = 2
+          c.roundCursor = draft.roundCursor ?? 0
+          c.lockedRounds = draft.lockedRounds ?? {}
+          c.roundChoiceOrders = draft.roundChoiceOrders ?? {}
+          c.visualTimelineSlots = draft.visualTimelineSlots ?? {}
+          c.visualTimelineDecadeAnswers = draft.visualTimelineDecadeAnswers ?? {}
+        }
         return Object.keys(c).length ? [[id, c]] : []
       }),
     )
@@ -903,9 +940,22 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           s.hitsterRevealedTrackCount !== 0 ||
           s.speedrunCurrentIndex !== 0 ||
           s.speedrunTimeRemaining !== 0 ||
-          s.speedrunStarted),
+          s.speedrunStarted ||
+          s.visualTimelineRevealedCount > 0 ||
+          Object.keys(s.progressiveClueVisibleCounts ?? {}).length > 0 ||
+          Object.keys(s.observationDeadlines ?? {}).length > 0),
       ),
     )
+
+    // Locking, observing and revealing are irreversible: use the provider's immediate save path.
+    const checkpoint = category.id === 'cura-corpo' ? JSON.stringify([
+      currentChallengeId, challengeResults, compactChallengeStatesByChallengeId,
+      Object.entries(compactDraftAnswersByChallengeId).map(([id, draft]) => [id,
+        draft.lockedRounds, draft.roundCursor, draft.roundChoiceOrders,
+        draft.dupeSwappedRoundIds, draft.visualTimelineSlots]),
+    ]) : ''
+    const saveCheckpoint = Boolean(checkpoint && checkpoint !== visualCheckpointRef.current)
+    visualCheckpointRef.current = checkpoint
 
     syncActiveSessionSnapshot(
       {
@@ -917,7 +967,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         sessionCorrectCount,
         sessionWrongCount,
       },
-      { debounced: true },
+      { debounced: !saveCheckpoint },
     )
   }, [
     category.id,
@@ -1016,7 +1066,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   // Show special victory modal when passing threshold reached
   if (shouldShowRoomVictoryModal) {
-    if (category.id === 'serie-film') {
+    if (category.id === 'serie-film' || category.id === 'cura-corpo') {
       return (
         <SeriesFilmVictoryModal
           category={category}

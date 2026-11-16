@@ -78,19 +78,22 @@ function normalizeHintCost(rawHintCost, creditReward) {
  */
 function createChallengeBase(rawChallenge) {
   const creditReward = rawChallenge.creditReward ?? 10
-  const prompt = rawChallenge.prompt ?? rawChallenge.introText ?? ''
-  const hint = rawChallenge.hint ?? ''
+  const ready = !rawChallenge.contentStatus || rawChallenge.contentStatus === 'ready'
+  const prompt = ready ? rawChallenge.prompt ?? rawChallenge.introText ?? '' : 'Prova in revisione editoriale.'
+  const hint = ready ? rawChallenge.hint ?? '' : ''
 
   return {
     id: rawChallenge.id,
+    contentVersion: rawChallenge.contentVersion,
     zoneId: rawChallenge.zoneId ?? '',
     quizSubType: rawChallenge.quizSubType ?? '',
     difficulty: rawChallenge.difficulty,
+    contentStatus: rawChallenge.contentStatus ?? 'ready',
     type: resolveChallengeType(rawChallenge),
     title: rawChallenge.title ?? '',
     prompt,
-    subgameIntroText: rawChallenge.subgameIntroText ?? '',
-    infoText: rawChallenge.infoText ?? prompt,
+    subgameIntroText: ready ? rawChallenge.subgameIntroText ?? '' : prompt,
+    infoText: ready ? rawChallenge.infoText ?? prompt : prompt,
     roundMusicSrc: resolveStaticAssetPath(rawChallenge.roundMusicSrc ?? ''),
     assets: normalizeAssets(rawChallenge.assets),
     hint,
@@ -396,6 +399,98 @@ function normalizeChallenge(rawChallenge) {
     }
   }
 
+  if (challengeType === 'memory_palette') {
+    return {
+      ...baseChallenge,
+      type: 'memory_palette',
+      rounds: (rawChallenge.rounds ?? []).map((round) => ({
+        id: round.id,
+        title: round.title ?? '',
+        prompt: round.prompt ?? '',
+        assets: normalizeAssets(round.assets),
+        displaySeconds: Math.max(1, round.displaySeconds ?? 8),
+        colors: round.colors ?? [],
+        correctColorIds: round.correctColorIds ?? [],
+      })),
+      minimumCorrectRounds: rawChallenge.minimumCorrectRounds ?? 2,
+    }
+  }
+
+  if (challengeType === 'multi_round_quiz') {
+    return {
+      ...baseChallenge,
+      type: 'multi_round_quiz',
+      alternateDupeSides: rawChallenge.alternateDupeSides ?? false,
+      dupeOriginalSides: rawChallenge.dupeOriginalSides ?? [],
+      simultaneousRounds: rawChallenge.simultaneousRounds ?? false,
+      visualMode: rawChallenge.visualMode ?? 'general',
+      rounds: (rawChallenge.rounds ?? []).map((round) => ({
+        id: round.id,
+        title: round.title ?? '',
+        prompt: round.prompt ?? '',
+        displaySeconds: round.displaySeconds,
+        mode: round.mode ?? 'multiple_choice',
+        visualMode: round.visualMode ?? rawChallenge.visualMode ?? 'general',
+        assets: normalizeAssets(round.assets),
+        choices: round.choices ?? [],
+        correctChoiceId: round.correctChoiceId ?? '',
+        acceptedAnswers: round.acceptedAnswers ?? [],
+        notes: round.notes ?? [],
+        explanation: round.explanation ?? '',
+        questionNote: round.questionNote ?? '',
+        solutionLabel: round.solutionLabel ?? '',
+        recognizedBrands: round.recognizedBrands ?? [],
+        answerAssets: normalizeAssets(round.answerAssets),
+        solutionAssets: normalizeAssets(round.solutionAssets),
+      })),
+      minimumCorrectRounds: rawChallenge.minimumCorrectRounds ?? 1,
+    }
+  }
+
+  if (challengeType === 'visual_timeline') {
+    const items = rawChallenge.items ?? []
+    const itemIds = items.map((item) => item.id)
+
+    return {
+      ...baseChallenge,
+      type: 'visual_timeline',
+      items: items.map((item) => ({
+        id: item.id,
+        label: item.label ?? '',
+        description: item.description ?? '',
+        year: item.year,
+        acceptedStyleAnswers: item.acceptedStyleAnswers ?? [],
+        assets: normalizeAssets(item.assets),
+      })),
+      initialOrder: normalizeOrder(rawChallenge.initialOrder, itemIds),
+      correctOrder: normalizeOrder(rawChallenge.correctOrder, itemIds),
+      allowEqualYears: rawChallenge.allowEqualYears ?? false,
+      minimumCorrectPlacements: rawChallenge.minimumCorrectPlacements ?? 4,
+    }
+  }
+
+  if (challengeType === 'progressive_clue_rounds') {
+    return {
+      ...baseChallenge,
+      type: 'progressive_clue_rounds',
+      minimumCorrectRounds: rawChallenge.minimumCorrectRounds ?? 3,
+      rounds: (rawChallenge.rounds ?? []).map((round) => ({
+        id: round.id,
+        title: round.title ?? '',
+        solutionLabel: round.solutionLabel ?? '',
+        acceptedAnswers: round.acceptedAnswers ?? [],
+        clues: round.clues ?? [],
+      })),
+      initialVisibleClues: Math.max(1, rawChallenge.initialVisibleClues ?? 1),
+      scoring: {
+        maxPointsPerRound: rawChallenge.scoring?.maxPointsPerRound ?? 4,
+        revealPenalty: rawChallenge.scoring?.revealPenalty ?? 1,
+        minPointsPerRound: rawChallenge.scoring?.minPointsPerRound ?? 1,
+        passingScore: rawChallenge.scoring?.passingScore ?? 6,
+      },
+    }
+  }
+
   return {
     ...baseChallenge,
     type: 'free_text',
@@ -426,6 +521,7 @@ function normalizeCategory(rawCategory) {
     mapHotspots: normalizeMapHotspots(rawCategory.mapHotspots),
     fear: normalizeFear(rawCategory.fear),
     rewardArtifact: normalizeRewardArtifact(rawCategory.rewardArtifact),
+    finalGift: rawCategory.finalGift ?? '',
     characters: rawCategory.characters ?? null,
     introNarrative: rawCategory.introNarrative ?? null,
     characterComments: rawCategory.characterComments ?? null,

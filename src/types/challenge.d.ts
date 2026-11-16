@@ -14,6 +14,10 @@ export type ChallengeType =
   | 'image_option_matching'
   | 'column_reorder_matching'
   | 'card_matching'
+  | 'memory_palette'
+  | 'multi_round_quiz'
+  | 'visual_timeline'
+  | 'progressive_clue_rounds'
 
 export type ChallengeDifficulty = 'easy' | 'medium' | 'hard'
 export type ChallengeSpeaker = 'guardian' | 'inquisitor' | 'curator' | 'critic' | 'neutral'
@@ -64,6 +68,8 @@ export interface ChoiceItem {
   id: string
   text: string
   description?: string
+  colorHex?: string
+  imageSrc?: string
 }
 
 export interface OrderedItem {
@@ -144,9 +150,11 @@ export interface HitsterTrack {
 }
 
 export interface ChallengeBase<T extends ChallengeType> {
+  contentVersion?: number
   id: string
   zoneId?: string
   quizSubType?: string
+  contentStatus?: 'ready' | 'pending' | 'legacy'
   difficulty: ChallengeDifficulty
   type: T
   title?: string
@@ -305,6 +313,95 @@ export interface CardMatchingChallenge extends ChallengeBase<'card_matching'> {
   minimumCorrect: number
 }
 
+export interface ColorSwatch {
+  id: string
+  name: string
+  hex: string
+}
+
+export interface MemoryPaletteRound {
+  prompt: string
+  id: string
+  title?: string
+  assets: ChallengeAsset[]
+  displaySeconds: number
+  colors: ColorSwatch[]
+  correctColorIds: string[]
+}
+
+export interface MemoryPaletteChallenge extends ChallengeBase<'memory_palette'> {
+  rounds: MemoryPaletteRound[]
+  minimumCorrectRounds: number
+}
+
+export type MultiRoundMode = 'multiple_choice' | 'free_text'
+export type MultiRoundVisualMode = 'detail' | 'intruder' | 'dupe' | 'emoji' | 'notes' | 'general'
+
+export interface MultiRoundQuizRound {
+  questionNote?: string
+  solutionLabel?: string
+  recognizedBrands?: string[]
+  answerAssets?: ChallengeAsset[]
+  /** Revealed only after the round answer is irrevocably confirmed. */
+  solutionAssets?: ChallengeAsset[]
+  displaySeconds?: number
+  id: string
+  title?: string
+  prompt: string
+  mode: MultiRoundMode
+  visualMode?: MultiRoundVisualMode
+  assets: ChallengeAsset[]
+  choices?: ChoiceItem[]
+  correctChoiceId?: string
+  acceptedAnswers?: string[]
+  notes?: string[]
+  explanation?: string
+}
+
+export interface MultiRoundQuizChallenge extends ChallengeBase<'multi_round_quiz'> {
+  simultaneousRounds?: boolean
+  alternateDupeSides: boolean
+  /** Original's side per round, used only when initializing a new draft. */
+  dupeOriginalSides?: Array<'a' | 'b'>
+  visualMode?: MultiRoundVisualMode
+  rounds: MultiRoundQuizRound[]
+  minimumCorrectRounds: number
+}
+
+export interface VisualTimelineItem extends OrderedItem {
+  acceptedStyleAnswers: string[]
+  year: number
+  assets: ChallengeAsset[]
+}
+
+export interface VisualTimelineChallenge extends ChallengeBase<'visual_timeline'> {
+  allowEqualYears: boolean
+  items: VisualTimelineItem[]
+  initialOrder: string[]
+  correctOrder: string[]
+  minimumCorrectPlacements: number
+}
+
+export interface ProgressiveClueRound {
+  id: string
+  title?: string
+  solutionLabel: string
+  acceptedAnswers: string[]
+  clues: string[]
+}
+
+export interface ProgressiveClueRoundsChallenge extends ChallengeBase<'progressive_clue_rounds'> {
+  minimumCorrectRounds: number
+  rounds: ProgressiveClueRound[]
+  initialVisibleClues: number
+  scoring: {
+    maxPointsPerRound: number
+    revealPenalty: number
+    minPointsPerRound: number
+    passingScore: number
+  }
+}
+
 export type Challenge =
   | MultipleChoiceChallenge
   | FreeTextChallenge
@@ -321,8 +418,19 @@ export type Challenge =
   | ImageOptionMatchingChallenge
   | ColumnReorderMatchingChallenge
   | CardMatchingChallenge
+  | MemoryPaletteChallenge
+  | MultiRoundQuizChallenge
+  | VisualTimelineChallenge
+  | ProgressiveClueRoundsChallenge
 
 export interface ChallengeDraftAnswer {
+  contentVersion?: number
+  roundCursor: number
+  lockedRounds: Record<string, { answer: string | string[]; visibleCount: number }>
+  roundChoiceOrders: Record<string, string[]>
+  /** Item ID to zero-based chronological slot; slot 3 accepts two items. */
+  visualTimelineSlots: Record<string, number>
+  visualTimelineDecadeAnswers: Record<string, string>
   selectedChoiceId: string
   selectedItemId: string
   textAnswer: string
@@ -341,18 +449,29 @@ export interface ChallengeDraftAnswer {
   columnOrders: string[][]
   columnBonusNames: Record<string, string>
   cardSelections: Record<string, { number: string; suit: string }>
+  memoryPaletteSelections: Record<string, string[]>
+  multiRoundAnswers: Record<string, string>
+  visualTimelineOrderIds: string[]
+  visualTimelineStyleAnswers: Record<string, string>
+  dupeSwappedRoundIds: string[]
+  progressiveClueAnswers: Record<string, string>
 }
 
 export interface ChallengeRuntimeState {
+  visualTimelineRevealedCount: number
   revealedStageCount: number
   musicalChainStageIndex: number
   hitsterRevealedTrackCount: number
   speedrunCurrentIndex: number
   speedrunTimeRemaining: number
   speedrunStarted: boolean
+  progressiveClueVisibleCounts: Record<string, number>
+  observationDeadlines: Record<string, number>
 }
 
 export interface ChallengeFeedback {
+  /** Extra credits paid once with the result; excluded from score and pass thresholds. */
+  bonusCredits?: number
   isCorrect: boolean
   title: string
   message: string
@@ -367,6 +486,7 @@ export interface ChallengeFeedback {
 }
 
 export interface Category {
+  finalGift?: string
   id: string
   kind: CategoryKind
   title: string
@@ -495,9 +615,12 @@ export interface CategoryCharacterComments {
 }
 
 export interface RawChallengeBase {
+  contentVersion?: number
+  contentStatus?: 'ready' | 'pending' | 'legacy'
   id: string
   zoneId?: string
   quizSubType?: string
+  contentStatus?: 'ready' | 'pending' | 'legacy'
   difficulty: ChallengeDifficulty
   type?: ChallengeType
   mode?: 'multiple_choice' | 'free_text'
@@ -677,6 +800,75 @@ export interface RawCardMatchingChallenge extends RawChallengeBase {
   minimumCorrect?: number
 }
 
+export interface RawMemoryPaletteRound {
+  prompt?: string
+  id: string
+  title?: string
+  assets?: Array<string | ChallengeAsset>
+  displaySeconds?: number
+  colors: ColorSwatch[]
+  correctColorIds: string[]
+}
+
+export interface RawMemoryPaletteChallenge extends RawChallengeBase {
+  type: 'memory_palette'
+  rounds?: RawMemoryPaletteRound[]
+  minimumCorrectRounds?: number
+}
+
+export interface RawMultiRoundQuizRound {
+  questionNote?: string
+  solutionLabel?: string
+  recognizedBrands?: string[]
+  answerAssets?: Array<string | ChallengeAsset>
+  solutionAssets?: Array<string | ChallengeAsset>
+  displaySeconds?: number
+  id: string
+  title?: string
+  prompt: string
+  mode?: MultiRoundMode
+  visualMode?: MultiRoundVisualMode
+  assets?: Array<string | ChallengeAsset>
+  choices?: ChoiceItem[]
+  correctChoiceId?: string
+  acceptedAnswers?: string[]
+  notes?: string[]
+  explanation?: string
+}
+
+export interface RawMultiRoundQuizChallenge extends RawChallengeBase {
+  simultaneousRounds?: boolean
+  type: 'multi_round_quiz'
+  alternateDupeSides?: boolean
+  dupeOriginalSides?: Array<'a' | 'b'>
+  visualMode?: MultiRoundVisualMode
+  rounds?: RawMultiRoundQuizRound[]
+  minimumCorrectRounds?: number
+}
+
+export interface RawVisualTimelineItem extends OrderedItem {
+  acceptedStyleAnswers?: string[]
+  year: number
+  assets?: Array<string | ChallengeAsset>
+}
+
+export interface RawVisualTimelineChallenge extends RawChallengeBase {
+  type: 'visual_timeline'
+  allowEqualYears?: boolean
+  items?: RawVisualTimelineItem[]
+  initialOrder?: string[]
+  correctOrder?: string[]
+  minimumCorrectPlacements?: number
+}
+
+export interface RawProgressiveClueRoundsChallenge extends RawChallengeBase {
+  minimumCorrectRounds?: number
+  type: 'progressive_clue_rounds'
+  rounds?: ProgressiveClueRound[]
+  initialVisibleClues?: number
+  scoring?: Partial<ProgressiveClueRoundsChallenge['scoring']>
+}
+
 export type RawChallenge =
   | RawMultipleChoiceChallenge
   | RawFreeTextChallenge
@@ -693,6 +885,10 @@ export type RawChallenge =
   | RawImageOptionMatchingChallenge
   | RawColumnReorderMatchingChallenge
   | RawCardMatchingChallenge
+  | RawMemoryPaletteChallenge
+  | RawMultiRoundQuizChallenge
+  | RawVisualTimelineChallenge
+  | RawProgressiveClueRoundsChallenge
 
 export interface DailyStats {
   date: string
@@ -740,6 +936,7 @@ export interface RoomProgress {
   buyAccessAvailable: boolean
   lastOutcomeSummary?: RoomOutcomeSummary | null
   victoryModalSeen?: boolean
+  archiveAvailable?: boolean
 }
 
 export interface PendingBridgeTransition {
@@ -770,6 +967,7 @@ export interface PlayerState {
 }
 
 export interface RawCategory {
+  finalGift?: string
   id: string
   kind?: CategoryKind
   title: string
