@@ -76,3 +76,5 @@ Verifiche: tutti i percorsi delle nuove rivelazioni presenti; build superata con
 ### Disposizione dupe approvata — 17 novembre 2026
 
 Il campo opzionale `dupeOriginalSides` configura B/B/A/B/A per l’originale nei cinque round. Normalizzazione e contratti aggiornati; il draft iniziale ricava gli ID da invertire confrontando i lati richiesti con le risposte del JSON. Il resolver esistente allinea domanda, valutazione e rivelazione; i draft già salvati mantengono la propria disposizione.
+
+Verifica: build superata; lint con il solo errore preesistente `.visual-check.jsx:9`. Nessun collaudo browser o remoto.

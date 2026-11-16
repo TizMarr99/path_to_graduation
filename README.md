@@ -1,16 +1,36 @@
-# React + Vite
+# La Mostra delle Ombre Illuminate
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Web game narrativo per un regalo di laurea: accesso con codice personale, sale tematiche, sfide multimediali, crediti, artefatti e premi.
 
-Currently, two official plugins are available:
+## Documentazione
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Parti dall'[indice](docs/README.md). Per orientarti nelle nuove chat consulta [Contesto chat](docs/CONTESTO_CHAT.md); per sapere cosa ? implementato e cosa manca consulta [Stato progetto](docs/STATO_PROGETTO.md).
 
-## React Compiler
+- [Architettura e mappa dei file](docs/ARCHITETTURA.md)
+- [Guida alle implementazioni](docs/GUIDA_SVILUPPO.md)
+- [Configurazione, Supabase ed email](docs/CONFIGURAZIONE.md)
+- [Istruzioni per coding agent](AGENTS.md)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Avvio
 
-## Expanding the ESLint configuration
+```powershell
+npm ci
+# Solo se .env.local non esiste:
+Copy-Item .env.example .env.local
+# Compilare .env.local con i propri valori.
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Il login richiede Supabase con le RPC attese: il repository non contiene ancora lo schema completo per ricreare il backend da zero. Vedere la guida di configurazione.
+
+```powershell
+npm run build
+npm run lint
+npm run preview
+```
+
+`dev` serve anche gli handler email tramite il plugin locale; `preview` serve solo la build statica.
+
+Stack dichiarato: React 19, React Router 7, Vite 8, Tailwind CSS 4, Supabase JS 2 e Resend 6. Dati in `src/data/categories/`, asset in `public/`.
+
+Documentazione riferita al workspace del **24 ottobre 2026**, comprese modifiche locali non committate. Build e lint superati; servizi remoti e flussi end-to-end non collaudati in questa analisi.
