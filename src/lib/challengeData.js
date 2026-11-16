@@ -138,6 +138,7 @@ function normalizeFear(rawFear) {
     icon: rawFear.icon ?? '',
     description: rawFear.description ?? '',
     sfxSrc,
+    spiderImageSrc: resolveStaticAssetPath(rawFear.spiderImageSrc ?? ''),
   }
 }
 

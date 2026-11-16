@@ -392,7 +392,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     category.characterComments,
     category.characters,
   )
-  const { isFearActive, stopWrongAnswerEffect, triggerWrongAnswerEffect } = useFearEffects(category, isMusicEnabled)
+  const { isFearActive, fearEffectKey, stopWrongAnswerEffect, triggerWrongAnswerEffect } = useFearEffects(category, isMusicEnabled)
   const persistedSession = playerState.activeSession?.categoryId === category.id
     ? playerState.activeSession
     : null
@@ -1152,7 +1152,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const awardedCredits = hasFeedback
     ? resolveChallengeCreditReward(feedbackChallenge, feedback)
     : 0
-  const errorImageSources = category.wrongAnswerImageSrcs ?? []
+  const errorImageSources = category.fear?.spiderImageSrc ? [] : category.wrongAnswerImageSrcs ?? []
   const errorVisualIndex = sessionWrongCount > 0 && errorImageSources.length > 0
     ? (sessionWrongCount - 1) % errorImageSources.length
     : 0
@@ -1451,6 +1451,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
           />
 
           <ResultModal
+            spiderImageSrc={isFearActive ? category.fear?.spiderImageSrc : null}
+            fearEffectKey={fearEffectKey}
             awardedCredits={awardedCredits}
             characterComment={feedbackMode === 'fresh' ? resultComment : null}
             creditReward={feedbackCreditReward}

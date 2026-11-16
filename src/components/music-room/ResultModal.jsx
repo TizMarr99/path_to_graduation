@@ -1,3 +1,5 @@
+import SpiderErrorOverlay from './SpiderErrorOverlay.jsx'
+
 const metricFormatter = new Intl.NumberFormat('it-IT', {
   maximumFractionDigits: 2,
 })
@@ -18,6 +20,8 @@ function ResultModal({
   characterComment,
   errorImageSrc,
   errorOpacity,
+  spiderImageSrc,
+  fearEffectKey,
 }) {
   if (!isOpen || !feedback) {
     return null
@@ -50,6 +54,9 @@ function ResultModal({
       className="fixed inset-0 z-[75] flex items-center justify-center bg-slate-950/92 px-4 py-6"
       role="dialog"
     >
+      {!feedback.isCorrect && !isHistoryMode && spiderImageSrc ? (
+        <SpiderErrorOverlay key={fearEffectKey} src={spiderImageSrc} />
+      ) : null}
       {!feedback.isCorrect && errorImageSrc ? (
         <div
           aria-hidden="true"
@@ -67,6 +74,7 @@ function ResultModal({
       <div
         className={[
           'relative z-10 flex w-full max-w-2xl flex-col rounded-[2rem] border p-6 shadow-[0_0_90px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-7',
+          spiderImageSrc ? '!bg-slate-950' : '',
           feedback.isCorrect
             ? 'border-emerald-300/30 bg-emerald-500/10'
             : 'border-rose-300/25 bg-rose-500/10 sm:-translate-x-8 lg:-translate-x-12',

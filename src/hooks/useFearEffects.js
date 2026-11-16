@@ -4,6 +4,7 @@ const FEAR_EFFECT_DURATION_MS = 4000
 
 export function useFearEffects(category, isAudioEnabled = true) {
   const [isFearActive, setIsFearActive] = useState(false)
+  const [fearEffectKey, setFearEffectKey] = useState(0)
   const timeoutRef = useRef(null)
   const audioRef = useRef(null)
 
@@ -61,6 +62,7 @@ export function useFearEffects(category, isAudioEnabled = true) {
   }, [stopWrongAnswerAudio])
 
   const triggerWrongAnswerEffect = useCallback(() => {
+    setFearEffectKey((value) => value + 1)
     setIsFearActive(true)
 
     if (timeoutRef.current) {
@@ -92,6 +94,7 @@ export function useFearEffects(category, isAudioEnabled = true) {
   }, [category?.fear?.sfxSrc, isAudioEnabled, stopWrongAnswerAudio])
 
   return {
+    fearEffectKey,
     isFearActive,
     stopWrongAnswerEffect,
     triggerWrongAnswerEffect,

@@ -12,6 +12,7 @@
   "wrongAnswerImageSrcs": [],
   "fear": {
     "id": "horror-cura-corpo",
+    "spiderImageSrc": "/corpo-moda-fotografia/33fd094fd495745cf38c4fe89a92a1e8.gif",
     "name": "Il Flash alle Spalle",
     "icon": "camera",
     "description": "Scatti improvvisi, specchi appannati, passi sul parquet dell'atelier.",

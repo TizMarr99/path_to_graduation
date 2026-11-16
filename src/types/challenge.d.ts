@@ -39,6 +39,7 @@ export interface CategoryFear {
   icon?: string
   description: string
   sfxSrc?: string | string[]
+  spiderImageSrc?: string
 }
 
 export interface RewardArtifact {

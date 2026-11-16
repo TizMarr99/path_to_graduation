@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+@keyframes spiderCrossing {
+  from { transform: translate(var(--spider-x), var(--spider-y)) rotate(var(--spider-angle)); }
+  to { transform: translate(var(--spider-end-x), var(--spider-end-y)) rotate(var(--spider-angle)); }
+}
+
+@keyframes spiderErrorFlash {
+  0%, 45%, 100% { opacity: 0; }
+  20%, 65% { opacity: 1; }
+}
+
+.spider-error-crawler {
+  animation: spiderCrossing 3s linear infinite;
+}
+
+.spider-error-flash {
+  animation: spiderErrorFlash 550ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spider-error-crawler, .spider-error-flash { display: none; }
+}
+
 @keyframes horrorFlicker {
   0%   { opacity: 0; }
   3%   { opacity: 0.90; }
