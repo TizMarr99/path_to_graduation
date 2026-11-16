@@ -1,6 +1,6 @@
 import TimedObservation from './TimedObservation.jsx'
 import ChallengeAssetGallery from './ChallengeAssetGallery.jsx'
-import { resolveQuizRounds, evaluateVisualRound } from '../../../lib/visualChallengeRules.js'
+import { evaluateVisualRound } from '../../../lib/visualChallengeRules.js'
 
 const buttonClass = 'rounded-full border border-cyan-300/40 px-5 py-3 text-cyan-100 disabled:opacity-50'
 
@@ -9,7 +9,7 @@ export default function SequentialRoundChallenge({ challenge, draftAnswer, chall
   onDraftAnswerChange, onChallengeStateChange, onSubmit, disabled }) {
   const palette = challenge.type === 'memory_palette'
   const progressive = challenge.type === 'progressive_clue_rounds'
-  const rounds = resolveQuizRounds(challenge, draftAnswer)
+  const rounds = challenge.rounds
   const index = Math.min(draftAnswer.roundCursor ?? 0, rounds.length - 1)
   const round = rounds[index]
   const field = palette ? 'memoryPaletteSelections' : progressive ? 'progressiveClueAnswers' : 'multiRoundAnswers'
@@ -78,13 +78,7 @@ export default function SequentialRoundChallenge({ challenge, draftAnswer, chall
     {locked ? <div role="status" className="space-y-4 rounded-2xl border border-slate-700 p-5 text-white">
       <p className={result.isCorrect ? 'text-emerald-300' : 'text-rose-300'}>{result.isCorrect ? 'Risposta corretta' : 'Risposta sbagliata'}</p>
       <p>Soluzione: {result.solution}</p>
-      <ChallengeAssetGallery key={`${round.id}-solution`} assets={
-        challenge.alternateDupeSides
-          ? (round.solutionAssets ?? []).map((asset, i) => ({
-            ...asset, caption: `${i === 0 ? 'A' : 'B'} · ${asset.caption}`,
-          }))
-          : round.solutionAssets
-      } />
+      <ChallengeAssetGallery key={`${round.id}-solution`} assets={round.solutionAssets} />
       {round.explanation ? <p>{round.explanation}</p> : null}
       {index < rounds.length - 1 ? <button className={buttonClass} type="button" disabled={disabled}
         onClick={() => onDraftAnswerChange({ roundCursor: index + 1 })}>Round successivo</button>

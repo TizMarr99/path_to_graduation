@@ -361,9 +361,6 @@ export interface MultiRoundQuizRound {
 
 export interface MultiRoundQuizChallenge extends ChallengeBase<'multi_round_quiz'> {
   simultaneousRounds?: boolean
-  alternateDupeSides: boolean
-  /** Original's side per round, used only when initializing a new draft. */
-  dupeOriginalSides?: Array<'a' | 'b'>
   visualMode?: MultiRoundVisualMode
   rounds: MultiRoundQuizRound[]
   minimumCorrectRounds: number
@@ -454,7 +451,6 @@ export interface ChallengeDraftAnswer {
   multiRoundAnswers: Record<string, string>
   visualTimelineOrderIds: string[]
   visualTimelineStyleAnswers: Record<string, string>
-  dupeSwappedRoundIds: string[]
   progressiveClueAnswers: Record<string, string>
 }
 
@@ -840,8 +836,6 @@ export interface RawMultiRoundQuizRound {
 export interface RawMultiRoundQuizChallenge extends RawChallengeBase {
   simultaneousRounds?: boolean
   type: 'multi_round_quiz'
-  alternateDupeSides?: boolean
-  dupeOriginalSides?: Array<'a' | 'b'>
   visualMode?: MultiRoundVisualMode
   rounds?: RawMultiRoundQuizRound[]
   minimumCorrectRounds?: number

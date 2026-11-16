@@ -421,8 +421,6 @@ function normalizeChallenge(rawChallenge) {
     return {
       ...baseChallenge,
       type: 'multi_round_quiz',
-      alternateDupeSides: rawChallenge.alternateDupeSides ?? false,
-      dupeOriginalSides: rawChallenge.dupeOriginalSides ?? [],
       simultaneousRounds: rawChallenge.simultaneousRounds ?? false,
       visualMode: rawChallenge.visualMode ?? 'general',
       rounds: (rawChallenge.rounds ?? []).map((round) => ({

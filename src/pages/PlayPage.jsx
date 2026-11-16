@@ -918,7 +918,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
         if (Object.keys(draft.multiRoundAnswers ?? {}).length) c.multiRoundAnswers = draft.multiRoundAnswers
         if (draft.visualTimelineOrderIds?.length) c.visualTimelineOrderIds = draft.visualTimelineOrderIds
         if (Object.keys(draft.visualTimelineStyleAnswers ?? {}).length) c.visualTimelineStyleAnswers = draft.visualTimelineStyleAnswers
-        if (draft.dupeSwappedRoundIds?.length) c.dupeSwappedRoundIds = draft.dupeSwappedRoundIds
         if (Object.keys(draft.progressiveClueAnswers ?? {}).length) c.progressiveClueAnswers = draft.progressiveClueAnswers
         if (draft.contentVersion === 2) {
           c.contentVersion = 2
@@ -952,7 +951,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       currentChallengeId, challengeResults, compactChallengeStatesByChallengeId,
       Object.entries(compactDraftAnswersByChallengeId).map(([id, draft]) => [id,
         draft.lockedRounds, draft.roundCursor, draft.roundChoiceOrders,
-        draft.dupeSwappedRoundIds, draft.visualTimelineSlots]),
+        draft.visualTimelineSlots]),
     ]) : ''
     const saveCheckpoint = Boolean(checkpoint && checkpoint !== visualCheckpointRef.current)
     visualCheckpointRef.current = checkpoint

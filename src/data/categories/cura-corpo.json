@@ -1500,13 +1500,13 @@
           "assets": [
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/dupe-originale/01-illuminante-hollywood.jpg",
+              "src": "/corpo-moda-fotografia/dupe-originale/01-illuminante-elf.jpg",
               "caption": "A",
               "alt": "Prodotto A della coppia"
             },
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/dupe-originale/01-illuminante-elf.jpg",
+              "src": "/corpo-moda-fotografia/dupe-originale/01-illuminante-hollywood.jpg",
               "caption": "B",
               "alt": "Prodotto B della coppia"
             }
@@ -1521,19 +1521,19 @@
               "text": "B"
             }
           ],
-          "correctChoiceId": "a",
+          "correctChoiceId": "b",
           "solutionAssets": [
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/originali/dupe-originale/01-illuminante-hollywood.jpg",
-              "caption": "Originale: Charlotte Tilbury — Hollywood Flawless Filter",
-              "alt": "Originale: Charlotte Tilbury — Hollywood Flawless Filter"
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/01-illuminante-elf.jpg",
+              "caption": "A · Dupe: e.l.f.",
+              "alt": "Dupe: e.l.f."
             },
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/originali/dupe-originale/01-illuminante-elf.jpg",
-              "caption": "Dupe: e.l.f.",
-              "alt": "Dupe: e.l.f."
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/01-illuminante-hollywood.jpg",
+              "caption": "B · Originale: Charlotte Tilbury — Hollywood Flawless Filter",
+              "alt": "Originale: Charlotte Tilbury — Hollywood Flawless Filter"
             }
           ]
         },
@@ -1544,13 +1544,13 @@
           "assets": [
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/dupe-originale/02-profumo-jadore.jpg",
+              "src": "/corpo-moda-fotografia/dupe-originale/02-profumo-lidl.jpg",
               "caption": "A",
               "alt": "Prodotto A della coppia"
             },
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/dupe-originale/02-profumo-lidl.jpg",
+              "src": "/corpo-moda-fotografia/dupe-originale/02-profumo-jadore.jpg",
               "caption": "B",
               "alt": "Prodotto B della coppia"
             }
@@ -1565,19 +1565,19 @@
               "text": "B"
             }
           ],
-          "correctChoiceId": "a",
+          "correctChoiceId": "b",
           "solutionAssets": [
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/originali/dupe-originale/02-profumo-jadore.jpg",
-              "caption": "Originale: Dior — J’adore",
-              "alt": "Originale: Dior — J’adore"
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/02-profumo-lidl.jpg",
+              "caption": "A · Dupe: Lidl",
+              "alt": "Dupe: Lidl"
             },
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/originali/dupe-originale/02-profumo-lidl.jpg",
-              "caption": "Dupe: Lidl",
-              "alt": "Dupe: Lidl"
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/02-profumo-jadore.jpg",
+              "caption": "B · Originale: Dior — J’adore",
+              "alt": "Originale: Dior — J’adore"
             }
           ]
         },
@@ -1614,13 +1614,13 @@
             {
               "kind": "image",
               "src": "/corpo-moda-fotografia/originali/dupe-originale/03-borsa-prada.jpg",
-              "caption": "Originale: Prada",
+              "caption": "A · Originale: Prada",
               "alt": "Originale: Prada"
             },
             {
               "kind": "image",
               "src": "/corpo-moda-fotografia/originali/dupe-originale/03-borsa-jwpei.jpg",
-              "caption": "Dupe: JW PEI",
+              "caption": "B · Dupe: JW PEI",
               "alt": "Dupe: JW PEI"
             }
           ]
@@ -1632,13 +1632,13 @@
           "assets": [
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/dupe-originale/04-scarpe-prada.jpg",
+              "src": "/corpo-moda-fotografia/dupe-originale/04-scarpe-zara.jpg",
               "caption": "A",
               "alt": "Prodotto A della coppia"
             },
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/dupe-originale/04-scarpe-zara.jpg",
+              "src": "/corpo-moda-fotografia/dupe-originale/04-scarpe-prada.jpg",
               "caption": "B",
               "alt": "Prodotto B della coppia"
             }
@@ -1653,19 +1653,19 @@
               "text": "B"
             }
           ],
-          "correctChoiceId": "a",
+          "correctChoiceId": "b",
           "solutionAssets": [
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/originali/dupe-originale/04-scarpe-prada.jpg",
-              "caption": "Originale: Prada",
-              "alt": "Originale: Prada"
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/04-scarpe-zara.jpg",
+              "caption": "A · Dupe: Zara",
+              "alt": "Dupe: Zara"
             },
             {
               "kind": "image",
-              "src": "/corpo-moda-fotografia/originali/dupe-originale/04-scarpe-zara.jpg",
-              "caption": "Dupe: Zara",
-              "alt": "Dupe: Zara"
+              "src": "/corpo-moda-fotografia/originali/dupe-originale/04-scarpe-prada.jpg",
+              "caption": "B · Originale: Prada",
+              "alt": "Originale: Prada"
             }
           ]
         },
@@ -1702,13 +1702,13 @@
             {
               "kind": "image",
               "src": "/corpo-moda-fotografia/originali/dupe-originale/05-bracciale-vancleef.jpg",
-              "caption": "Originale: Van Cleef & Arpels",
+              "caption": "A · Originale: Van Cleef & Arpels",
               "alt": "Originale: Van Cleef & Arpels"
             },
             {
               "kind": "image",
               "src": "/corpo-moda-fotografia/originali/dupe-originale/05-bracciale-swarovski.jpg",
-              "caption": "Dupe: Swarovski",
+              "caption": "B · Dupe: Swarovski",
               "alt": "Dupe: Swarovski"
             }
           ]
@@ -1719,8 +1719,6 @@
       "creditReward": 6,
       "hintCost": 3,
       "contentStatus": "ready",
-      "alternateDupeSides": true,
-      "dupeOriginalSides": ["b", "b", "a", "b", "a"],
       "contentVersion": 2,
       "infoText": "Per ogni coppia scegli l’originale di riferimento tra le immagini fornite.",
       "subgameIntroText": "Cinque coppie A/B: scegli ogni volta l'originale di riferimento. Confronta scritte, forme e confezioni, senza affezionarti al lato dello schermo. Ne bastano tre giuste. Sì, certe somiglianze sono sfacciate: è proprio il punto.",

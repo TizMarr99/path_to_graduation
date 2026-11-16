@@ -43,7 +43,6 @@ export function createChallengeDraftAnswer() {
     multiRoundAnswers: {},
     visualTimelineOrderIds: [],
     visualTimelineStyleAnswers: {},
-    dupeSwappedRoundIds: [],
     progressiveClueAnswers: {},
     roundCursor: 0,
     lockedRounds: {},
@@ -177,14 +176,6 @@ export function createInitialDraftAnswerForChallenge(challenge) {
     return {
       ...baseDraft,
       multiRoundAnswers: {},
-      dupeSwappedRoundIds: challenge.alternateDupeSides
-        ? challenge.rounds.filter((round, index) => {
-          const side = challenge.dupeOriginalSides?.[index]
-          return side === 'a' || side === 'b'
-            ? side !== round.correctChoiceId
-            : index % 2 === 1
-        }).map((round) => round.id)
-        : [],
     }
   }
 

@@ -48,22 +48,6 @@ export function reconcileVisualTimelineOrder(order = [], initialOrder = []) {
   return [...new Set([...order.filter((id) => valid.has(id)), ...initialOrder])]
 }
 
-// Layout is part of the saved draft. Missing layouts keep the legacy A/B meaning.
-export function resolveQuizRounds(challenge, draftAnswer) {
-  const swapped = new Set(draftAnswer.dupeSwappedRoundIds ?? [])
-  return challenge.rounds.map((round) => {
-    if (!challenge.alternateDupeSides || !swapped.has(round.id) || round.assets.length !== 2) return round
-    return {
-      ...round,
-      assets: [...round.assets].reverse().map((asset, index) => ({
-        ...asset, caption: index ? 'B' : 'A', alt: `Prodotto ${index ? 'B' : 'A'} della coppia`,
-      })),
-      solutionAssets: [...(round.solutionAssets ?? [])].reverse(),
-      correctChoiceId: round.correctChoiceId === 'a' ? 'b' : 'a',
-    }
-  })
-}
-
 // Persist absolute deadlines, never a fresh countdown on remount/refresh.
 export function observationPhase(deadline, now) {
   if (!Number.isFinite(deadline)) return 'unseen'

@@ -83,7 +83,6 @@ function resolveInitialDraftAnswer(challenge, persistedDraftAnswer = null) {
   return {
     ...initialDraft,
     ...persistedDraftAnswer,
-    dupeSwappedRoundIds: persistedDraftAnswer.dupeSwappedRoundIds ?? [],
     visualTimelineOrderIds: challenge.type === 'visual_timeline'
       ? reconcileVisualTimelineOrder(persistedDraftAnswer.visualTimelineOrderIds, challenge.initialOrder)
       : initialDraft.visualTimelineOrderIds,

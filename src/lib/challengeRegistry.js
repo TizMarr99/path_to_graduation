@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { countVisualTimelinePlacements, resolveQuizRounds, evaluateVisualRound, matchesTimelineDecade } from './visualChallengeRules.js'
+import { countVisualTimelinePlacements, evaluateVisualRound, matchesTimelineDecade } from './visualChallengeRules.js'
 import ChallengeTemplateFallback from '../components/challenges/common/ChallengeTemplateFallback.jsx'
 import CardMatchingChallenge from '../components/challenges/templates/CardMatchingChallenge.jsx'
 import ColumnReorderMatchingChallenge from '../components/challenges/templates/ColumnReorderMatchingChallenge.jsx'
@@ -694,11 +694,11 @@ export const challengeTypeRegistry = {
     evaluate: ({ challenge, draftAnswer, category }) => {
       const result = evaluateMultiRoundAnswers(
         draftAnswer.multiRoundAnswers,
-        resolveQuizRounds(challenge, draftAnswer),
+        challenge.rounds,
       )
       const isCorrect = result.matchedCount >= challenge.minimumCorrectRounds
 
-      return buildFeedback({ ...challenge, rounds: resolveQuizRounds(challenge, draftAnswer) }, isCorrect, category, {
+      return buildFeedback(challenge, isCorrect, category, {
         scoreEarned: result.matchedCount,
         maxScore: challenge.rounds.length,
         metadata: result,
@@ -806,7 +806,7 @@ export function renderChallengeOrFallback(challenge, props) {
 export function evaluateChallenge(args) {
   if (args.challenge.contentVersion === 2 && args.challenge.rounds) {
     const { challenge, draftAnswer, category } = args
-    const rounds = resolveQuizRounds(challenge, draftAnswer)
+    const rounds = challenge.rounds
     const results = rounds.map((round) => {
       const lock = draftAnswer.lockedRounds?.[round.id]
       return evaluateVisualRound(challenge, round,
