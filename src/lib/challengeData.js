@@ -1,4 +1,4 @@
-import rawCategories from '../data/categories.json'
+import rawCategories from '../data/categories/index.js'
 import { normalizeRoomSpeaker } from './roomSpeakers'
 
 const STATIC_ASSET_PREFIXES = new Map([

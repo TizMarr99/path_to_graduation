@@ -1,9 +1,10 @@
 import json
 import re
 from copy import deepcopy
+from pathlib import Path
 
-INPUT = "categories.json"
-OUTPUT = "categories.fixed.json"
+INPUT_DIR = Path("categories")
+OUTPUT_DIR = Path("categories.fixed")
 
 # 1. Parole abbastanza sicure da correggere sempre quando sono parole isolate
 SAFE_REPLACEMENTS = {
@@ -107,18 +108,30 @@ def walk(value, path="$", changes=None):
     return value
 
 
-with open(INPUT, "r", encoding="utf-8") as f:
-    data = json.load(f)
+OUTPUT_DIR.mkdir(exist_ok=True)
 
-changes = []
-fixed_data = walk(deepcopy(data), changes=changes)
+all_changes = []
 
-with open(OUTPUT, "w", encoding="utf-8") as f:
-    json.dump(fixed_data, f, ensure_ascii=False, indent=2)
+for input_path in sorted(INPUT_DIR.glob("*.json")):
+    with input_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    changes = []
+    fixed_data = walk(deepcopy(data), changes=changes)
+    output_path = OUTPUT_DIR / input_path.name
+
+    with output_path.open("w", encoding="utf-8") as f:
+        json.dump(fixed_data, f, ensure_ascii=False, indent=2)
+
+    for change in changes:
+        all_changes.append({
+            "file": str(input_path),
+            **change,
+        })
 
 with open("accent-report.json", "w", encoding="utf-8") as f:
-    json.dump(changes, f, ensure_ascii=False, indent=2)
+    json.dump(all_changes, f, ensure_ascii=False, indent=2)
 
-print(f"Creato: {OUTPUT}")
-print(f"Modifiche proposte/applicate: {len(changes)}")
+print(f"Creati file in: {OUTPUT_DIR}")
+print(f"Modifiche proposte/applicate: {len(all_changes)}")
 print("Report: accent-report.json")
