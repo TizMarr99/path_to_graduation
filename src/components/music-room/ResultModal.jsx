@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import SpiderErrorOverlay from './SpiderErrorOverlay.jsx'
 
 const metricFormatter = new Intl.NumberFormat('it-IT', {
@@ -9,6 +10,9 @@ function formatMetricValue(value) {
 }
 
 function ResultModal({
+  children,
+  showMetrics = true,
+  continueLabel = 'Continua',
   isOpen,
   feedback,
   mode = 'fresh',
@@ -48,7 +52,7 @@ function ResultModal({
       : `Crediti: ${formatMetricValue(resolvedAwardedCredits)}/${formatMetricValue(resolvedCreditReward)} 🪙`,
   ]
 
-  return (
+  return createPortal(
     <div
       aria-modal="true"
       className="fixed inset-0 z-[75] flex items-center justify-center bg-slate-950/92 px-4 py-6"
@@ -73,7 +77,7 @@ function ResultModal({
 
       <div
         className={[
-          'relative z-10 flex w-full max-w-2xl flex-col rounded-[2rem] border p-6 shadow-[0_0_90px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-7',
+          'relative z-10 max-h-[90dvh] overflow-y-auto flex w-full max-w-2xl flex-col rounded-[2rem] border p-6 shadow-[0_0_90px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-7',
           spiderImageSrc ? '!bg-slate-950' : '',
           feedback.isCorrect
             ? 'border-emerald-300/30 bg-emerald-500/10'
@@ -140,9 +144,10 @@ function ResultModal({
           </div>
         ) : null}
 
+        {children}
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-200/75">
-            {footerParts.join(' | ')}
+            {showMetrics ? footerParts.join(' | ') : ''}
           </p>
 
           <button
@@ -151,11 +156,11 @@ function ResultModal({
             onClick={isHistoryMode ? onClose : onContinue}
             type="button"
           >
-            {isHistoryMode ? 'Chiudi' : 'Continua'}
+            {isHistoryMode ? 'Chiudi' : continueLabel}
           </button>
         </div>
       </div>
-    </div>
+    </div>, document.body
   )
 }
 

@@ -13,6 +13,11 @@ function ChallengeRenderer({
   showHeader = true,
   credits,
   onBuyTime,
+  roundFeedback,
+  onRoundFeedback,
+  onRoundFeedbackClose,
+  isResolved = false,
+  onReview,
 }) {
   return (
     <div className="space-y-5">
@@ -48,6 +53,11 @@ function ChallengeRenderer({
         onSubmit,
         credits,
         onBuyTime,
+        roundFeedback,
+        onRoundFeedback,
+        onRoundFeedbackClose,
+        isResolved,
+        onReview,
       })}
     </div>
   )

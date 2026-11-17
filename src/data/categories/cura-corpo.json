@@ -348,15 +348,15 @@
       "difficulty": "medium",
       "title": "Memory Palette",
       "prompt": "Osserva ogni immagine, poi rispondi scegliendo un campione di colore.",
-      "subgameIntroText": "Tre secondi volano, lo so. Guarda i colori prima di perderti nella foto: poi scegli il campione che ricordi. Due risposte giuste su tre e ci siamo.",
+      "subgameIntroText": "Hai cinque secondi, con la foto già aperta a tutto schermo. Guarda i colori prima di perderti nei dettagli: poi scegli il campione che ricordi. Due risposte giuste su tre e ci siamo.",
       "successMessage": "Andrea: «Hai tenuto a mente i colori anche dopo che la foto è sparita. Io dimentico cosa cercavo appena apro l'armadio: tanto di cappello.»",
-      "failureMessage": "Miranda: «Il colore era lì tre secondi fa. Una carriera breve, ma evidentemente poco memorabile per te.»",
+      "failureMessage": "Miranda: «Il colore era lì quattro secondi fa. Una carriera breve, ma evidentemente poco memorabile per te.»",
       "minimumCorrectRounds": 2,
       "rounds": [
         {
           "id": "palette-01",
           "prompt": "Di che colore erano le cuffie?",
-          "displaySeconds": 3,
+          "displaySeconds": 5,
           "assets": [
             {
               "kind": "image",
@@ -371,30 +371,30 @@
           "colors": [
             {
               "id": "0",
-              "name": "Verde",
+              "name": "Verde oliva desaturato",
               "hex": "#6E8458"
             },
             {
               "id": "1",
-              "name": "Senape",
-              "hex": "#B79B4B"
+              "name": "Verde oliva dorato",
+              "hex": "#858653"
             },
             {
               "id": "2",
-              "name": "Azzurro grigio",
-              "hex": "#6E8795"
+              "name": "Verde salvia",
+              "hex": "#7D9280"
             },
             {
               "id": "3",
-              "name": "Marrone",
-              "hex": "#8C6B51"
+              "name": "Verde muschio",
+              "hex": "#506A49"
             }
           ]
         },
         {
           "id": "palette-02",
           "prompt": "Di che colore era la montatura degli occhiali?",
-          "displaySeconds": 3,
+          "displaySeconds": 5,
           "assets": [
             {
               "kind": "image",
@@ -409,30 +409,30 @@
           "colors": [
             {
               "id": "0",
-              "name": "Arancione",
+              "name": "Arancione bruciato",
               "hex": "#C67537"
             },
             {
               "id": "1",
               "name": "Rosso mattone",
-              "hex": "#98483D"
+              "hex": "#B96745"
             },
             {
               "id": "2",
               "name": "Giallo ocra",
-              "hex": "#B89A3F"
+              "hex": "#C58A48"
             },
             {
               "id": "3",
-              "name": "Marrone",
-              "hex": "#79563E"
+              "name": "Caramello",
+              "hex": "#AF794C"
             }
           ]
         },
         {
           "id": "palette-03",
           "prompt": "Di che colore era la borsa?",
-          "displaySeconds": 3,
+          "displaySeconds": 5,
           "assets": [
             {
               "kind": "image",
@@ -452,18 +452,18 @@
             },
             {
               "id": "1",
-              "name": "Marrone",
-              "hex": "#76503E"
+              "name": "Prugna bruno",
+              "hex": "#70404A"
             },
             {
               "id": "2",
-              "name": "Viola",
-              "hex": "#70516F"
+              "name": "Viola prugna",
+              "hex": "#823C60"
             },
             {
               "id": "3",
               "name": "Rosso mattone",
-              "hex": "#A34B3E"
+              "hex": "#9C3E42"
             }
           ]
         }
@@ -485,7 +485,7 @@
       "difficulty": "medium",
       "title": "Attenzione al Dettaglio",
       "prompt": "Osserva la foto prima che il dettaglio venga nascosto.",
-      "subgameIntroText": "Hai sette secondi per ogni foto. Fatti un piccolo giro con gli occhi: oggetti, posizioni, particolari. Poi la foto sparisce e arriva la domanda. Te ne servono tre su quattro; io faccio il tifo da qui.",
+      "subgameIntroText": "Hai dieci secondi per ogni foto. Fatti un piccolo giro con gli occhi: oggetti, posizioni, particolari. Poi la foto sparisce e arriva la domanda. Te ne servono tre su quattro; io faccio il tifo da qui.",
       "successMessage": "Andrea: «Foto sparita, dettaglio rimasto. È un bell'occhio, il tuo: fidati anche quando lei prova a farti dubitare.»",
       "failureMessage": "Miranda: «La fotografia conteneva già tutto il necessario. La prossima volta farò mettere una freccia. Rossa. Molto grande.»",
       "minimumCorrectRounds": 3,
@@ -521,7 +521,7 @@
               "caption": ""
             }
           ],
-          "displaySeconds": 7,
+          "displaySeconds": 10,
           "answerAssets": [
             {
               "kind": "image",
@@ -570,7 +570,7 @@
               "caption": ""
             }
           ],
-          "displaySeconds": 7,
+          "displaySeconds": 10,
           "answerAssets": [
             {
               "kind": "image",
@@ -621,7 +621,7 @@
           ],
           "explanation": "Nord = alto della foto; Est = destra.",
           "questionNote": "Nord = alto della foto; Est = destra.",
-          "displaySeconds": 7,
+          "displaySeconds": 10,
           "answerAssets": [
             {
               "kind": "image",
@@ -670,7 +670,7 @@
               "caption": ""
             }
           ],
-          "displaySeconds": 7,
+          "displaySeconds": 10,
           "answerAssets": [
             {
               "kind": "image",
@@ -884,6 +884,7 @@
       "id": "cc-iconic-outfits-01",
       "zoneId": "passerella-tempo",
       "type": "multi_round_quiz",
+      "simultaneousRounds": true,
       "quizSubType": "iconic_outfits",
       "difficulty": "medium",
       "title": "Outfit Iconico Nascosto",
@@ -1356,6 +1357,7 @@
       "id": "cc-product-names-01",
       "zoneId": "beauty-lab",
       "type": "multi_round_quiz",
+      "simultaneousRounds": true,
       "quizSubType": "product_names",
       "difficulty": "easy",
       "title": "Nome Prodotto da Immagine",

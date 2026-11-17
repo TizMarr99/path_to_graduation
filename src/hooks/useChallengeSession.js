@@ -406,12 +406,18 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
     return nextFeedback
   }
 
-  function goToNextChallenge() {
-    if (!currentChallenge || !hasFeedback) {
+  function goToNextChallenge({ submittedFeedback = null } = {}) {
+    if (!currentChallenge || (!hasFeedback && !submittedFeedback)) {
       return null
     }
 
-    if (resolvedChallengeCount >= totalChallenges) {
+    // Final-round Continue can submit and advance in the same React batch,
+    // before challengeResults and hasFeedback contain the new result.
+    const nextResolvedChallengeIds = submittedFeedback
+      ? [...new Set([...resolvedChallengeIds, submittedFeedback.attemptedChallengeId])]
+      : resolvedChallengeIds
+
+    if (nextResolvedChallengeIds.length >= totalChallenges) {
       setFeedback(createFeedback(category))
       setFeedbackMode('closed')
       setIsSubmitting(false)
@@ -420,7 +426,7 @@ export function useChallengeSession(category, preferredChallengeId = '', persist
 
     const nextChallengeId = findNextUnresolvedChallengeId(
       challenges,
-      resolvedChallengeIds,
+      nextResolvedChallengeIds,
       currentChallenge.id,
     )
     const nextChallenge = findChallengeById(challenges, nextChallengeId)

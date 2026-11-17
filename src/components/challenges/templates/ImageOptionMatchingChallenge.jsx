@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import ChallengeAssetGallery from '../common/ChallengeAssetGallery.jsx'
 import ChallengeSubmitButton from '../common/ChallengeSubmitButton.jsx'
+import '../common/round-games.css'
+import './photo-support-matching.css'
 
 function ImageOptionMatchingChallenge({
   challenge,
@@ -12,13 +14,14 @@ function ImageOptionMatchingChallenge({
   const selections = draftAnswer.imageOptionSelections ?? {}
   const hasAnySelection = Object.values(selections).some(Boolean)
   const isGotMatching = challenge.quizSubType === 'got_matching'
+  const isPhotoSupports = challenge.quizSubType === 'photo_supports_grid'
   const isStrangerThingsMatching = challenge.quizSubType === 'st_matching'
-  const sourceListLabel = isGotMatching
+  const sourceListLabel = isPhotoSupports ? 'Scatti da assegnare' : isGotMatching
     ? 'Stemmi da assegnare'
     : isStrangerThingsMatching
       ? 'Tracce da assegnare'
       : 'Opzioni da assegnare'
-  const emptyTargetLabel = isGotMatching
+  const emptyTargetLabel = isPhotoSupports ? 'Seleziona uno scatto e clicca qui' : isGotMatching
     ? 'Seleziona uno stemma e clicca qui'
     : isStrangerThingsMatching
       ? 'Seleziona una traccia e clicca qui'
@@ -33,7 +36,7 @@ function ImageOptionMatchingChallenge({
   const sourceLabelsById = new Map(
     sourceEntries.map((entry, index) => [
       entry.id,
-      isStrangerThingsMatching ? `Traccia ${index + 1}` : entry.label,
+      isPhotoSupports ? `Scatto ${index + 1}` : isStrangerThingsMatching ? `Traccia ${index + 1}` : entry.label,
     ]),
   )
   const orderedItems = draftAnswer.imageOptionItemOrderIds?.length
@@ -45,7 +48,8 @@ function ImageOptionMatchingChallenge({
 
   function getNextUnassignedSourceId(nextSelections = selections) {
     const assignedOptionIds = new Set(Object.values(nextSelections))
-    return challenge.options.find((option) => !assignedOptionIds.has(option.id))?.id ?? ''
+    const candidates = isPhotoSupports ? sourceEntries : challenge.options
+    return candidates.find((option) => !assignedOptionIds.has(option.id))?.id ?? ''
   }
   const effectiveActiveSourceId = sourceEntries.some((entry) => entry.id === activeSourceId)
     ? activeSourceId
@@ -87,6 +91,31 @@ function ImageOptionMatchingChallenge({
     const isActive = effectiveActiveSourceId === entry.id
     const isAssigned = Object.values(selections).includes(entry.id)
     const sourceLabel = sourceLabelsById.get(entry.id) ?? entry.label
+
+    if (isPhotoSupports) {
+      const assignedTarget = orderedItems.find((item) => selections[item.id] === entry.id)
+      return <article key={entry.id} className={`photo-source-card ${isActive ? 'is-active' : ''} ${isAssigned ? 'is-assigned' : ''}`}>
+        <button className="photo-source-select" type="button" disabled={disabled} aria-pressed={isActive}
+          onClick={() => setActiveSourceId(entry.id)} aria-label={`Seleziona ${sourceLabel}`}>
+          <strong>{sourceLabel}</strong><span>{isActive ? 'Selezionato' : 'Seleziona'}</span>
+        </button>
+        <ChallengeAssetGallery compact assets={entry.assets} imageClassName="h-36 w-full bg-slate-950 object-contain sm:h-40" />
+        <p className="photo-source-assignment">{assignedTarget ? `Abbinato a: ${assignedTarget.label}` : 'Ancora da abbinare'}</p>
+      </article>
+    }
+
+    if (entry.assets?.some((asset) => asset.kind === 'image')) {
+      return <article key={entry.id} className={`space-y-3 rounded-2xl border p-3 ${isActive ? 'border-cyan-300/55 bg-cyan-400/14' : 'border-slate-700 bg-slate-950/70'}`}>
+        <ChallengeAssetGallery assets={entry.assets} imageClassName="h-32 w-full object-contain sm:h-40" />
+        <button type="button" disabled={disabled} aria-pressed={isActive}
+          className="w-full rounded-xl border border-cyan-300/40 p-3 text-cyan-100 disabled:opacity-50"
+          onClick={() => setActiveSourceId(entry.id)}>
+          <span>{sourceLabel}</span>
+          {isAssigned ? <span className="ml-2 inline-block text-xs">Abbinato</span> : null}
+          {isActive ? <span className="ml-2 inline-block text-xs">Selezionato</span> : null}
+        </button>
+      </article>
+    }
 
     return (
       <button
@@ -167,7 +196,7 @@ function ImageOptionMatchingChallenge({
           <div>
             <p className="text-sm font-semibold text-slate-100">{item.label}</p>
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">
-              {assignedOption?.label ?? emptyTargetLabel}
+              {(assignedOption ? sourceLabelsById.get(assignedOption.id) : '') || emptyTargetLabel}
             </p>
           </div>
           {assignedOption ? (
@@ -189,19 +218,6 @@ function ImageOptionMatchingChallenge({
   }
 
   function renderStTarget(item) {
-    if (challenge.quizSubType === 'photo_supports') {
-      const assigned = challenge.options.find((option) => option.id === selections[item.id])
-      return <article key={item.id} className="space-y-3 rounded-2xl border border-slate-700 p-4">
-        <ChallengeAssetGallery assets={item.assets} />
-        <p className="text-sm text-white">{item.label}</p>
-        <button className="w-full rounded-xl border border-cyan-300/40 p-3 text-cyan-100"
-          type="button" disabled={disabled || !effectiveActiveSourceId} onClick={() => handleAssignToItem(item.id)}>
-          {assigned?.label || emptyTargetLabel}
-        </button>
-        {assigned ? <button type="button" className="text-sm text-rose-300" disabled={disabled}
-          onClick={() => clearItemAssignment(item.id)}>Rimuovi associazione</button> : null}
-      </article>
-    }
     const assignedOption = challenge.options.find((option) => option.id === selections[item.id])
     const assignedOptionLabel = assignedOption
       ? (sourceLabelsById.get(assignedOption.id) ?? assignedOption.label)
@@ -248,6 +264,45 @@ function ImageOptionMatchingChallenge({
     )
   }
 
+  if (isPhotoSupports) {
+    const assignedCount = orderedItems.filter((item) => selections[item.id]).length
+    const activeLabel = sourceLabelsById.get(effectiveActiveSourceId)
+    return <form className="photo-support-game space-y-5" onSubmit={onSubmit}>
+      <header className="round-game-header">
+        <div><p className="round-eyebrow">Dietro l’obiettivo</p><h3 className="text-xl font-semibold text-white sm:text-2xl">{challenge.title}</h3>
+          <p className="round-game-description">Abbina ogni foto allo strumento con cui è stata scattata. Ogni strumento si usa una sola volta.</p></div>
+        <div className="round-goal"><strong>{challenge.minimumCorrectPairs}<span> / {orderedItems.length}</span></strong><small>abbinamenti corretti per superare la prova</small></div>
+      </header>
+      <div className="photo-match-status" role="status"><strong>{assignedCount} / {orderedItems.length} abbinati</strong>
+        <span>{activeLabel ? `${activeLabel} selezionato: scegli lo strumento.` : 'Tutti gli scatti sono abbinati. Puoi ancora modificarli.'}</span></div>
+      <div className="photo-match-workspace">
+        <section aria-labelledby={`${challenge.id}-photos`}>
+          <h4 className="photo-step-heading" id={`${challenge.id}-photos`}><span>1</span> Seleziona uno scatto</h4>
+          <div className="photo-source-grid">{sourceEntries.map(renderSourceEntry)}</div>
+        </section>
+        <section aria-labelledby={`${challenge.id}-tools`}>
+          <h4 className="photo-step-heading" id={`${challenge.id}-tools`}><span>2</span> Abbina lo strumento</h4>
+          <div className="photo-target-list">{orderedItems.map((item) => {
+            const assignedSource = sourceEntriesById.get(selections[item.id])
+            const image = assignedSource?.assets?.find((asset) => asset.kind === 'image')
+            const label = sourceLabelsById.get(assignedSource?.id)
+            return <article key={item.id} className={`photo-target ${assignedSource ? 'is-filled' : ''}`}>
+              <button type="button" disabled={disabled || !effectiveActiveSourceId} onClick={() => handleAssignToItem(item.id)}
+                aria-label={activeLabel ? `Abbina ${activeLabel} a ${item.label}${label ? `, sostituisce ${label}` : ''}` : `${item.label}: ${label || 'nessuno scatto'}`}>
+                {image ? <img src={image.src} alt="" /> : <span className="photo-empty-slot" aria-hidden="true">+</span>}
+                <span><strong>{item.label}</strong><small>{label || 'Tocca per abbinare'}</small></span>
+              </button>
+              {assignedSource ? <button className="photo-unassign" type="button" disabled={disabled} onClick={() => clearItemAssignment(item.id)} aria-label={`Rimuovi ${label} da ${item.label}`}>Rimuovi</button> : null}
+            </article>
+          })}</div>
+        </section>
+      </div>
+      <div className="round-submit-row"><p>Puoi spostare e correggere gli abbinamenti.<small>Conferma quando hai assegnato tutti e cinque gli scatti.</small></p>
+        <button className="round-confirm" type="submit" disabled={disabled || assignedCount < orderedItems.length}>Conferma abbinamenti <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+  }
+
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
       <div className="space-y-4">
@@ -277,16 +332,31 @@ function ImageOptionMatchingChallenge({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {isGotMatching
+          {isGotMatching || isPhotoSupports
             ? orderedItems.map((item) => renderGotTarget(item))
             : orderedItems.map((item) => renderStTarget(item))}
         </div>
       </div>
 
       <ChallengeSubmitButton disabled={disabled || !hasAnySelection ||
-        (challenge.quizSubType === 'photo_supports' && challenge.items.some((item) => !selections[item.id]))} />
+        (isPhotoSupports && challenge.items.some((item) => !selections[item.id]))} />
     </form>
   )
 }
 
-export default ImageOptionMatchingChallenge
+// Present photos as sources and support names as targets, preserving the saved item-to-option contract.
+export default function MatchingChallenge(props) {
+  if (props.challenge.quizSubType !== 'photo_supports') return <ImageOptionMatchingChallenge {...props} />
+  const { challenge, draftAnswer, onDraftAnswerChange } = props
+  const invert = (selections) => Object.fromEntries(Object.entries(selections).map(([item, option]) => [option, item]))
+  return <ImageOptionMatchingChallenge {...props}
+    challenge={{ ...challenge, quizSubType: 'photo_supports_grid',
+      options: challenge.items.map((item, index) => ({ ...item, label: `Scatto ${index + 1}` })),
+      items: challenge.options,
+    }}
+    draftAnswer={{ ...draftAnswer, imageOptionSelections: invert(draftAnswer.imageOptionSelections ?? {}),
+      imageOptionSourceOrderIds: draftAnswer.imageOptionItemOrderIds,
+      imageOptionItemOrderIds: draftAnswer.imageOptionSourceOrderIds,
+    }}
+    onDraftAnswerChange={(patch) => onDraftAnswerChange({ imageOptionSelections: invert(patch.imageOptionSelections) })} />
+}

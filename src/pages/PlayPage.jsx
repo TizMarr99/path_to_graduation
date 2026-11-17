@@ -1,3 +1,4 @@
+import ChallengeAssetGallery from '../components/challenges/common/ChallengeAssetGallery.jsx'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ChallengeCompleted from '../components/challenges/ChallengeCompleted.jsx'
@@ -736,7 +737,21 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     totalChallenges,
   ])
 
-  function handleSubmit(event) {
+  function handleContinue(submittedFeedback = null) {
+    stopWrongAnswerEffect()
+    setIsRoomMapVisible(false)
+    setHintModalChallengeId('')
+    setInfoModalChallengeId('')
+    dismissPanel()
+    clearResultComment()
+    const nextChallenge = goToNextChallenge({ submittedFeedback })
+
+    if (nextChallenge && getChallengeSubgameKey(category, nextChallenge) !== currentSubgameKey) {
+      setPendingIntroSubgameKey(getChallengeSubgameKey(category, nextChallenge))
+    }
+  }
+
+  function handleSubmit(event, { continueToNext = false } = {}) {
     event.preventDefault()
     if (archivedRoomReadOnly) {
       return
@@ -799,6 +814,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
       challengeId: feedbackChallenge.id,
       challengeTitle: feedbackChallenge.title,
     })
+
+    if (continueToNext) {
+      handleContinue(nextFeedback)
+      return
+    }
 
     if (nextFeedback.isCorrect) {
       showComment('onCorrect')
@@ -1382,11 +1402,20 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                           challengeState={challengeState}
                           credits={credits}
                           disabled={controlsDisabled}
+                          isResolved={isCurrentChallengeResolved}
+                          onReview={() => selectChallenge(currentChallengeId)}
                           draftAnswer={draftAnswer}
                           onAudioPlay={handleAudioPlay}
                           onBuyTime={(seconds, cost) => spendCredits(cost, { kind: 'extra_time', label: `Tempo aggiuntivo: ${seconds} secondi`, categoryId: category.id, challengeId: currentChallengeId })}
                           onChallengeStateChange={updateChallengeState}
                           onDraftAnswerChange={updateDraftAnswer}
+                          roundFeedback={{ hidden: hasFeedback, characterComment: resultComment, spiderImageSrc: isFearActive ? category.fear?.spiderImageSrc : null, fearEffectKey }}
+                          onRoundFeedback={(isCorrect) => {
+                            dismissPanel()
+                            showComment(isCorrect ? 'onCorrect' : 'onWrong')
+                            if (!isCorrect) triggerWrongAnswerEffect()
+                          }}
+                          onRoundFeedbackClose={() => { stopWrongAnswerEffect(); clearResultComment() }}
                           onSubmit={handleSubmit}
                           showHeader={false}
                         />
@@ -1471,19 +1500,12 @@ function PlayCategorySession({ category, preferredChallengeId }) {
               clearResultComment()
               dismissFeedback()
             }}
-            onContinue={() => {
-              stopWrongAnswerEffect()
-              setIsRoomMapVisible(false)
-              setHintModalChallengeId('')
-              setInfoModalChallengeId('')
-              clearResultComment()
-              const nextChallenge = goToNextChallenge()
-
-              if (nextChallenge && getChallengeSubgameKey(category, nextChallenge) !== currentSubgameKey) {
-                setPendingIntroSubgameKey(getChallengeSubgameKey(category, nextChallenge))
-              }
-            }}
-          />
+            onContinue={() => handleContinue()}
+          >
+            {hasFeedback && currentChallenge?.simultaneousRounds ? <div className="mt-4">
+              <ChallengeAssetGallery assets={currentChallenge.rounds.flatMap((round) => round.solutionAssets ?? [])} />
+            </div> : null}
+          </ResultModal>
         </>
       ) : (
         <ChallengeLayout
@@ -1535,6 +1557,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                 challengeState={challengeState}
                 credits={credits}
                 disabled={controlsDisabled}
+                isResolved={isCurrentChallengeResolved}
+                onReview={() => selectChallenge(currentChallengeId)}
                 draftAnswer={draftAnswer}
                 onAudioPlay={handleAudioPlay}
                 onBuyTime={(seconds, cost) => spendCredits(cost, { kind: 'extra_time', label: `Tempo aggiuntivo: ${seconds} secondi`, categoryId: category.id, challengeId: currentChallengeId })}

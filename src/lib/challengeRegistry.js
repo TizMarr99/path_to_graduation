@@ -630,11 +630,22 @@ export const challengeTypeRegistry = {
         challenge.items,
       )
       const isCorrect = result.matchedCount >= challenge.minimumCorrectPairs
+      const presentation = {}
+      if (challenge.quizSubType === 'photo_supports') {
+        const itemsById = new Map(challenge.items.map((item) => [item.id, item]))
+        const visibleItems = draftAnswer.imageOptionItemOrderIds?.length
+          ? draftAnswer.imageOptionItemOrderIds.map((id) => itemsById.get(id)).filter(Boolean)
+          : challenge.items
+        const optionsById = new Map(challenge.options.map((option) => [option.id, option.label]))
+        presentation.solutionLines = visibleItems.map((item, index) =>
+          `Scatto ${index + 1} → ${optionsById.get(item.correctOptionId) ?? '?'}`)
+      }
 
       return buildFeedback(challenge, isCorrect, category, {
         scoreEarned: result.matchedCount,
         maxScore: challenge.items.length,
         metadata: result,
+        ...presentation,
       })
     },
   },
@@ -810,7 +821,7 @@ export function evaluateChallenge(args) {
     const results = rounds.map((round) => {
       const lock = draftAnswer.lockedRounds?.[round.id]
       return evaluateVisualRound(challenge, round,
-        challenge.simultaneousRounds ? draftAnswer.multiRoundAnswers?.[round.id] : lock?.answer,
+        challenge.simultaneousRounds ? draftAnswer.multiRoundAnswers?.[round.id] ?? lock?.answer : lock?.answer,
         lock?.visibleCount)
     })
     const matchedCount = results.filter((r) => r.isCorrect).length

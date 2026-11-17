@@ -1,14 +1,30 @@
+import ResultModal from '../../music-room/ResultModal.jsx'
 import TimedObservation from './TimedObservation.jsx'
 import ChallengeAssetGallery from './ChallengeAssetGallery.jsx'
+import ProgressiveClueBoard from './ProgressiveClueBoard.jsx'
+import DupeRoundChoices from './DupeRoundChoices.jsx'
+import CultureRoundQuestion from './CultureRoundQuestion.jsx'
+import './round-games.css'
 import { evaluateVisualRound } from '../../../lib/visualChallengeRules.js'
 
 const buttonClass = 'rounded-full border border-cyan-300/40 px-5 py-3 text-cyan-100 disabled:opacity-50'
 
 /** Round confirmations lock drafts; the existing session pays only at completion. */
 export default function SequentialRoundChallenge({ challenge, draftAnswer, challengeState,
-  onDraftAnswerChange, onChallengeStateChange, onSubmit, disabled }) {
+  onDraftAnswerChange, onChallengeStateChange, onSubmit, disabled, roundFeedback, onRoundFeedback, onRoundFeedbackClose,
+  isResolved = false, onReview }) {
+  // Locked rounds persist for review. They must not reopen an intermediate
+  // dialog after the parent has already evaluated the entire challenge.
+  if (isResolved) {
+    return <section className="space-y-4 rounded-2xl border border-cyan-300/20 bg-cyan-400/5 p-5">
+      <h3 className="text-xl font-semibold text-white">Prova conclusa</h3>
+      <p className="text-sm leading-6 text-slate-300">Le risposte sono state registrate. Puoi consultare il risultato o scegliere un altro gioco dalla mappa.</p>
+      {onReview ? <button className={buttonClass} type="button" onClick={onReview}>Rivedi risultato</button> : null}
+    </section>
+  }
   const palette = challenge.type === 'memory_palette'
   const progressive = challenge.type === 'progressive_clue_rounds'
+  const dupe = challenge.quizSubType === 'dupe_original'
   const rounds = challenge.rounds
   const index = Math.min(draftAnswer.roundCursor ?? 0, rounds.length - 1)
   const round = rounds[index]
@@ -31,32 +47,27 @@ export default function SequentialRoundChallenge({ challenge, draftAnswer, chall
   function confirm(event) {
     event.preventDefault()
     if (disabled || locked || !hasAnswer) return
+    onRoundFeedback?.(evaluateVisualRound(challenge, round, value, visible).isCorrect)
     onDraftAnswerChange({ lockedRounds: {
       ...draftAnswer.lockedRounds, [round.id]: { answer: value, visibleCount: visible },
     } })
   }
 
-  const question = (
-    <div className="space-y-4">
-      {round.title ? <h4 className="text-lg font-semibold text-white">{round.title}</h4> : null}
-      <p className="text-lg text-white">{round.prompt || 'Quale brand riconosci?'}</p>
+  const question = challenge.quizSubType === 'general_culture' ? <CultureRoundQuestion challenge={challenge} round={round} choices={orderedChoices}
+    value={value} disabled={disabled} onChange={change} /> : (
+    <div className="space-y-5">
+      {!progressive && round.title ? <h4 className="text-lg font-semibold text-white">{round.title}</h4> : null}
+      {!progressive ? <p className="text-lg text-white">{round.prompt || 'Quale brand riconosci?'}</p> : null}
       {round.questionNote ? <p className="text-sm text-slate-300">{round.questionNote}</p> : null}
-      <ChallengeAssetGallery key={`${round.id}-answer`} assets={round.displaySeconds ? round.answerAssets : round.assets} />
-      {progressive ? <div className="space-y-3">
-        {round.clues.slice(0, visible).map((clue, i) => (
-          <p key={i} className={challenge.quizSubType === 'brand_emoji' ? 'inline-block p-3 text-5xl' : 'rounded-xl border border-slate-700 p-4 text-slate-200'}>{clue}</p>
-        ))}
-        <p className="text-sm text-slate-300">{Math.max(1, 4 - visible)} punti descrittivi se indovini.</p>
-        <button type="button" className={buttonClass} disabled={disabled || visible >= round.clues.length}
-          onClick={() => onChallengeStateChange({ progressiveClueVisibleCounts: {
-            ...challengeState.progressiveClueVisibleCounts, [round.id]: visible + 1,
-          } })}>Altro indizio</button>
-      </div> : null}
-      {palette || round.mode !== 'free_text' && !progressive ? (
-        <fieldset disabled={disabled} className="grid grid-cols-2 gap-3" aria-label="Scegli la risposta">
+      {!dupe ? <ChallengeAssetGallery key={`${round.id}-answer`} assets={round.displaySeconds ? round.answerAssets : round.assets} /> : null}
+      {progressive ? <ProgressiveClueBoard challenge={challenge} round={round} visible={visible} value={value} disabled={disabled}
+        onChange={change} onReveal={() => onChallengeStateChange({ progressiveClueVisibleCounts: {
+          ...challengeState.progressiveClueVisibleCounts, [round.id]: visible + 1,
+        } })} /> : dupe ? <DupeRoundChoices challenge={challenge} round={round} value={value} disabled={disabled} onChange={change} /> : palette || round.mode !== 'free_text' ? (
+        <fieldset disabled={disabled} className="round-options" aria-label="Scegli la risposta">
           {orderedChoices.map((choice, i) => {
             const selected = palette ? value.includes(choice.id) : value === choice.id
-            return <label key={choice.id} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 ${selected ? 'border-amber-300 bg-amber-300/10' : 'border-slate-700 bg-slate-950'}`}>
+            return <label key={choice.id} className={`round-option ${selected ? 'is-selected' : ''}`}>
               <input type="radio" name={`${challenge.id}-${round.id}`} checked={selected}
                 onChange={() => change(palette ? [choice.id] : choice.id)} />
               {choice.colorHex ? <span className="h-16 flex-1 rounded border border-white/25" style={{ backgroundColor: choice.colorHex }} /> : null}
@@ -64,26 +75,43 @@ export default function SequentialRoundChallenge({ challenge, draftAnswer, chall
             </label>
           })}
         </fieldset>
-      ) : <label className="block text-slate-200">La tua risposta
-        <input className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-white"
+      ) : <label className="round-answer-label block">La tua risposta
+        <input className="round-text-input mt-2"
           autoComplete="off" disabled={disabled} value={value} onChange={(e) => change(e.target.value)} />
       </label>}
-      <button className={buttonClass} disabled={disabled || !hasAnswer} type="submit">Conferma risposta</button>
+      {!progressive ? <div className="round-submit-row">
+        <p role="status">{hasAnswer ? dupe ? `Hai scelto ${choices.find((choice) => choice.id === value)?.text} come originale.` : 'Risposta pronta per la conferma.' : dupe ? 'Seleziona il prodotto che ritieni originale.' : 'Scegli o scrivi una risposta per continuare.'}<small>La risposta confermata è definitiva.</small></p>
+        <button className="round-confirm" disabled={disabled || !hasAnswer} type="submit">Conferma risposta <span aria-hidden="true">→</span></button>
+      </div> : null}
     </div>
   )
 
-  return <form className="space-y-5" onSubmit={locked ? (event) => event.preventDefault() : confirm}>
-    <h3 className="text-xl font-semibold text-white">{challenge.prompt}</h3>
-    <p className="text-sm text-slate-300">Round {index + 1} di {rounds.length} · Servono {challenge.minimumCorrectRounds} risposte corrette. Le risposte confermate sono definitive.</p>
-    {locked ? <div role="status" className="space-y-4 rounded-2xl border border-slate-700 p-5 text-white">
-      <p className={result.isCorrect ? 'text-emerald-300' : 'text-rose-300'}>{result.isCorrect ? 'Risposta corretta' : 'Risposta sbagliata'}</p>
-      <p>Soluzione: {result.solution}</p>
-      <ChallengeAssetGallery key={`${round.id}-solution`} assets={round.solutionAssets} />
-      {round.explanation ? <p>{round.explanation}</p> : null}
-      {index < rounds.length - 1 ? <button className={buttonClass} type="button" disabled={disabled}
-        onClick={() => onDraftAnswerChange({ roundCursor: index + 1 })}>Round successivo</button>
-        : <button className={buttonClass} type="button" disabled={disabled} onClick={onSubmit}>Termina prova</button>}
-    </div> : round.displaySeconds ? <TimedObservation key={round.id} round={round} challengeState={challengeState}
+  return <form className="sequential-game space-y-5" onSubmit={locked ? (event) => event.preventDefault() : confirm}>
+    <header className="round-game-header">
+      <div><p className="round-eyebrow">{progressive ? 'Vetrina segreta' : dupe ? 'Occhio all’originale' : 'La tua sfida'}</p>
+        <h3 className="text-xl font-semibold text-white sm:text-2xl">{challenge.title || challenge.prompt}</h3>
+        <p className="round-game-description">{challenge.prompt}</p></div>
+      <div className="round-goal"><strong>{challenge.minimumCorrectRounds}<span> / {rounds.length}</span></strong><small>corrette per superare la prova</small></div>
+    </header>
+    <div className="round-progress"><span>Round <strong>{index + 1}</strong> di {rounds.length}</span>
+      <ol aria-label="Avanzamento dei round">{rounds.map((entry, i) => <li key={entry.id} aria-current={i === index ? 'step' : undefined} className={i === index ? 'is-current' : draftAnswer.lockedRounds?.[entry.id] ? 'is-complete' : ''}><span className="sr-only">Round {i + 1}{draftAnswer.lockedRounds?.[entry.id] ? ', confermato' : ''}</span></li>)}</ol>
+    </div>
+    {locked ? <ResultModal isOpen={!roundFeedback?.hidden} feedback={{
+      isCorrect: result.isCorrect,
+      title: result.isCorrect ? 'Risposta corretta' : 'Risposta sbagliata',
+      message: `Soluzione: ${result.solution}${round.explanation ? `. ${round.explanation}` : ''}`,
+    }} showMetrics={false} disabled={disabled}
+      characterComment={roundFeedback?.characterComment}
+      spiderImageSrc={roundFeedback?.spiderImageSrc}
+      fearEffectKey={roundFeedback?.fearEffectKey}
+      continueLabel={index < rounds.length - 1 ? 'Round successivo' : 'Continua'}
+      onContinue={(event) => {
+        onRoundFeedbackClose?.()
+        if (index < rounds.length - 1) onDraftAnswerChange({ roundCursor: index + 1 })
+        else onSubmit(event, { continueToNext: true })
+      }}>
+      <div className="mt-4"><ChallengeAssetGallery key={`${round.id}-solution`} assets={round.solutionAssets} /></div>
+    </ResultModal> : round.displaySeconds ? <TimedObservation key={round.id} round={round} challengeState={challengeState}
       onChallengeStateChange={onChallengeStateChange} disabled={disabled}>{question}</TimedObservation> : question}
   </form>
 }
