@@ -1,5 +1,11 @@
 # Stato del progetto e lavoro rimanente
 
+## Schermo intero facoltativo — 18 novembre 2026
+
+**Implementato localmente:** comando con icona accanto alla musica, disponibile in tutte le pagine sui browser che espongono la Fullscreen API. Il clic porta l'intero documento a schermo intero; il comando consente di uscirne e si aggiorna anche all'uscita tramite Esc o comandi del browser. Richieste concorrenti disabilitate durante il cambio e messaggio recuperabile in caso di rifiuto. I controlli condividono un contenitore che rispetta le aree sicure; la barra inferiore delle prove riserva spazio per entrambi su desktop. Nessuna modifica a mappe, ID, progressi o backend. Dettagli nella [guida sviluppo](GUIDA_SVILUPPO.md#schermo-intero).
+
+**Verificato localmente:** build e lint superati; resta il warning bundle preesistente. Finestra Chrome individuata tramite Computer Use, ma il collaudo visivo è stato interrotto automaticamente al tentativo di aprire una scheda locale perché non era possibile verificare l'URL corrente con sufficiente certezza. L'anteprima isolata con backend simulato è stata predisposta e poi rimossa; ingresso/uscita effettivi, mappe, scroll e dialoghi fotografici in fullscreen **non verificati nel browser**. Nessuna scrittura remota, risposta di gioco, email o reset.
+
 ## Abbinamento scatti e cultura generale — 18 novembre 2026
 
 **Implementato localmente:** numeri degli scatti assegnati nell'ordine effettivamente visibile, con identiche etichette sulle destinazioni e sulle nuove soluzioni; selezione automatica del prossimo scatto libero in quell'ordine. Rimossi i «?» tra numero e stato. Abbinamento con due passaggi espliciti, miniature degli scatti assegnati, rimozione separata, contatore e conferma finale. Cultura generale con foto più grandi e risposta affiancata, campioni colore e opzioni più leggibili. ID, risposte, punteggi e progressi conservati. Dettagli nelle [rifiniture UI giochi](RIFINITURE_UI_GIOCHI.md#abbinamento-scatti-e-cultura-generale--18-novembre-2026).

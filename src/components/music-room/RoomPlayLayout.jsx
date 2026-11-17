@@ -97,7 +97,7 @@ function RoomPlayLayout({
         </div>
 
         {/* Bottom bar: hint circle + progress */}
-        <div className="flex items-center gap-3 border-t border-white/10 bg-slate-950/55 px-5 pb-20 pt-3 backdrop-blur-xl sm:py-3 sm:pl-7 sm:pr-44">
+        <div className="flex items-center gap-3 border-t border-white/10 bg-slate-950/55 px-5 pb-20 pt-3 backdrop-blur-xl sm:py-3 sm:pl-7 sm:pr-60">
           <button
             aria-label="Apri informazioni sulla prova"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-400/10 text-sm font-bold text-cyan-100 transition hover:border-cyan-200/55 hover:bg-cyan-400/18 disabled:cursor-not-allowed disabled:opacity-60"

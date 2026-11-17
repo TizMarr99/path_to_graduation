@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import GlobalMusicToggle from './components/GlobalMusicToggle.jsx'
+import GlobalFullscreenToggle from './components/GlobalFullscreenToggle.jsx'
 import PlayerSyncNotice from './components/PlayerSyncNotice.jsx'
 import { usePlayerState } from './hooks/usePlayerState'
 import BridgePage from './pages/BridgePage.jsx'
@@ -88,7 +89,10 @@ function ProtectedRoute({ children, requireAdmin = false }) {
 function App() {
   return (
     <BrowserRouter>
-      <GlobalMusicToggle />
+      <div role="group" aria-label="Schermo e musica" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] z-[120] flex items-center gap-2">
+        <GlobalFullscreenToggle />
+        <GlobalMusicToggle />
+      </div>
       <PlayerSyncNotice />
       <Routes>
         <Route path="/" element={<HomePage />} />

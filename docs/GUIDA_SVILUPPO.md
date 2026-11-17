@@ -14,6 +14,14 @@
 | Cambiare un'email | Handler specifico in `api/mail/`; trigger in `PlayPage.jsx` |
 | Risolvere sincronizzazione | `usePlayerState.js` → `playerStateSnapshot.js` → `supabaseGameApi.js` → RPC remota |
 
+## Schermo intero
+
+Dal 18 novembre 2026 `App` dispone i comandi globali di schermo e musica in un unico gruppo fisso in basso a destra, rispettando le aree sicure. `GlobalMusicToggle` riceve il posizionamento dal gruppo: non è più autonomamente `fixed`. `RoomPlayLayout` riserva spazio a entrambi i controlli nella barra inferiore desktop; su mobile mantiene lo spazio inferiore già previsto.
+
+`GlobalFullscreenToggle` usa `useFullscreen`: rileva `document.fullscreenEnabled` e `document.documentElement.requestFullscreen`, nascondendosi se non supportati. La richiesta parte esclusivamente dal clic e riguarda `document.documentElement`, così navigazione React Router, controlli globali, portali e dialoghi fotografici restano nello stesso documento fullscreen. Nessun rientro automatico dopo refresh o uscita: lo stato segue `fullscreenchange` tramite `useSyncExternalStore`, incluso Esc. Lo stato di attesa disabilita altre richieste; un eventuale rifiuto produce un messaggio e permette di riprovare. Il fullscreen non entra nello stato del giocatore o nei salvataggi.
+
+Per il collaudo verificare ingresso/uscita tramite pulsante ed Esc, navigazione tra hub e sale senza refresh, mappa/lista laterale, scroll delle prove lunghe e zoom/osservazione con dialoghi nativi. Controllare anche finestre basse e mobile; i browser senza API mantengono il normale layout e il comando musica.
+
 ## Aggiungere una sfida di tipo esistente
 
 Per le interfacce condivise di emoji, indizi, Dupe e round/griglie fotografiche consultare le [rifiniture UI del 17 novembre 2026](RIFINITURE_UI_GIOCHI.md): `ProgressiveClueBoard`, `DupeRoundChoices` e `round-games.css` gestiscono la presentazione conservando i contratti di draft e runtime.
