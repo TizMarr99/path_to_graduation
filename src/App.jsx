@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import GlobalMusicToggle from './components/GlobalMusicToggle.jsx'
 import { usePlayerState } from './hooks/usePlayerState'
 import BridgePage from './pages/BridgePage.jsx'
@@ -9,6 +9,7 @@ import ShadowHallPage from './pages/ShadowHallPage.jsx'
 
 function AppShell() {
   const { isAuthenticated, role } = usePlayerState()
+  const isPlayRoute = useLocation().pathname.startsWith('/play/')
   const navItems = [
     { to: '/', label: 'Home', end: true },
     ...(isAuthenticated ? [{ to: '/shadows', label: 'Sala Ombre' }] : []),
@@ -45,7 +46,7 @@ function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+      <main className={isPlayRoute ? 'w-full' : 'mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8'}>
         <Outlet />
       </main>
     </div>

@@ -20,7 +20,7 @@ function RoomMapModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="flex w-full max-w-6xl max-h-[94vh] flex-col rounded-[2rem] border border-cyan-300/20 bg-slate-950/95 p-4 shadow-[0_0_90px_rgba(34,211,238,0.08)] backdrop-blur-xl">
+      <div className="flex w-full max-w-7xl max-h-[94dvh] flex-col rounded-[1.5rem] border border-cyan-300/20 bg-slate-950/95 p-4 shadow-[0_0_90px_rgba(34,211,238,0.08)] backdrop-blur-xl sm:p-5">
         {/* Compact header row */}
         <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
           <div>
@@ -40,19 +40,18 @@ function RoomMapModal({
           </button>
         </div>
 
-        {/* Body: map + legend, same height, no scroll */}
-        <div className="flex min-h-0 flex-1 gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
+        <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto lg:grid-cols-[minmax(0,1fr)_minmax(15rem,19rem)] lg:overflow-hidden">
           {/* Map column */}
-          <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35">
+          <div className="relative self-start overflow-hidden rounded-[1rem] bg-black/35">
             {category.mapImage ? (
               <img
                 alt={`Mappa di ${category.title}`}
-                className="block w-full"
+                className="block h-auto w-full"
                 src={category.mapImage}
               />
             ) : null}
 
-            {hotspots.map((hotspot) => {
+            {hotspots.map((hotspot, index) => {
               const isActive = activeZoneIds.includes(hotspot.id)
               const isCurrent = currentZoneId === hotspot.id
               const xPct = hotspot.x + hotspot.width / 2
@@ -62,52 +61,52 @@ function RoomMapModal({
                 <button
                   key={hotspot.id}
                   className={[
-                    'absolute flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-base shadow-lg backdrop-blur-sm transition',
+                    'absolute flex h-8 min-w-8 max-w-[24%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg border px-1.5 py-1 text-[0.65rem] font-semibold leading-tight shadow-lg backdrop-blur-md transition sm:h-auto sm:min-h-10 sm:px-3 sm:text-xs',
                     isCurrent
-                      ? 'border-amber-200/80 bg-amber-300/30 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
+                      ? 'border-amber-200/80 bg-amber-950/90 text-amber-50 shadow-[0_0_14px_rgba(251,191,36,0.35)]'
                       : isActive
-                        ? 'border-cyan-300/60 bg-slate-900/70 hover:border-cyan-200/80 hover:bg-slate-800/80'
-                        : 'border-slate-500/40 bg-slate-900/50 opacity-50',
+                        ? 'border-cyan-300/60 bg-slate-950/85 text-white hover:border-cyan-200/80 hover:bg-slate-800/90'
+                        : 'border-slate-500/40 bg-slate-900/65 text-slate-300 opacity-60',
                     interactionDisabled ? 'cursor-not-allowed' : '',
                   ].join(' ')}
                   disabled={interactionDisabled || !isActive}
                   onClick={() => onSelectZone(hotspot.id)}
                   style={{ left: `${xPct}%`, top: `${yPct}%` }}
+                  aria-label={hotspot.label}
                   title={hotspot.label}
                   type="button"
                 >
-                  {hotspot.icon || '•'}
+                  <span className="text-amber-200" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span className="ml-1 hidden truncate sm:inline">{hotspot.label}</span>
                 </button>
               )
             })}
           </div>
 
-          {/* Legend column — stretches to map height, entries distribute evenly */}
-          <div className="flex flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 p-3">
-            <p className="mb-2 shrink-0 text-[0.58rem] font-semibold uppercase tracking-[0.32em] text-slate-300/70">
-              Zone attive
+          <div className="flex min-h-0 flex-col rounded-[1rem] bg-white/[0.04] p-3 sm:p-4">
+            <p className="mb-3 shrink-0 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-cyan-200/80">
+              Scegli una zona
             </p>
-            <div className="flex flex-1 flex-col gap-1.5 min-h-0">
-              {hotspots.map((hotspot) => {
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 lg:overflow-y-auto">
+              {hotspots.map((hotspot, index) => {
                 const isEnabled = activeZoneIds.includes(hotspot.id)
 
                 return (
                   <button
                     key={`${hotspot.id}-list`}
                     className={[
-                      'flex flex-1 min-h-0 w-full items-center gap-2.5 rounded-xl border px-3 py-0 text-left transition',
+                      'flex min-h-14 w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition disabled:cursor-not-allowed',
                       currentZoneId === hotspot.id
-                        ? 'border-amber-300/35 bg-amber-300/10'
+                        ? 'border-amber-300/55 bg-amber-300/15'
                         : isEnabled
-                          ? 'border-white/10 bg-slate-950/40 hover:border-cyan-300/35'
+                          ? 'border-white/10 bg-slate-950/55 hover:border-cyan-300/50 hover:bg-cyan-300/10'
                           : 'border-white/5 bg-slate-950/25 opacity-55',
                     ].join(' ')}
                     disabled={interactionDisabled || !isEnabled}
                     onClick={() => onSelectZone(hotspot.id)}
                     type="button"
                   >
-                    <span className="shrink-0 text-base leading-none">{hotspot.icon || '•'}</span>
-                    <span className="block truncate text-sm font-semibold text-white">
+                    <span className="shrink-0 text-xs font-bold tracking-widest text-amber-200" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="block text-sm font-semibold leading-snug text-white">
                       {hotspot.label}
                     </span>
                   </button>

@@ -623,7 +623,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }, [category.id, navigate, queuePendingBridge, roomTransition, shouldTriggerBridgeTransition])
 
   useEffect(() => {
-    const shouldPersist = isComplete || earlyMusicVictory
+    const shouldPersist = !archivedRoomReadOnly && (isComplete || earlyMusicVictory)
     if (!shouldPersist || hasPersistedOutcomeRef.current || isPersistingOutcomeRef.current) {
       return
     }
@@ -726,6 +726,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     draftAnswersByChallengeId,
     earlyMusicVictory,
     immediateUnlockTargets,
+    archivedRoomReadOnly,
     isComplete,
     normalizePrizeEmailError,
     passedRoom,
@@ -1032,11 +1033,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   }, [hesitationScopeKey, hasFeedback, isComplete, currentChallenge, shouldPauseHesitationTimer, showComment])
 
   const ambientAudioSrc = category.ambientAudioSrc || '/audio/bg_music_room.mp3'
-  const shouldPlayAmbientAudio =
-    isImmersiveRoom &&
-    isMusicEnabled &&
-    (isChallengeIntroVisible || isRoomMapVisible) &&
-    !hasFeedback
   const shouldPlayRoundMusic =
     isImmersiveRoom &&
     isMusicEnabled &&
@@ -1049,6 +1045,11 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     !isCurrentChallengeResolved &&
     !currentChallengeLocked &&
     !archivedRoomReadOnly
+  const shouldPlayAmbientAudio =
+    isImmersiveRoom &&
+    isMusicEnabled &&
+    !shouldShowRoomIntro &&
+    !shouldPlayRoundMusic
 
   useBackgroundAudio({ src: ambientAudioSrc, volume: 0.15 }, shouldPlayAmbientAudio)
   useBackgroundAudio({ src: currentChallenge?.roundMusicSrc, volume: 0.18 }, shouldPlayRoundMusic)

@@ -208,7 +208,7 @@ function ShadowSlot({
   revealCost = null,
   scoreLabel = null,
 }) {
-  const isClickable = unlocked && (!dailyBlocked || completed)
+  const isClickable = unlocked
   const isRevealOnly = visible && !unlocked && !comingSoon
   const canReveal = isRevealOnly && typeof onRevealRequest === 'function'
   const isInteractive = (isClickable || canReveal) && !comingSoon
@@ -525,7 +525,7 @@ function ShadowSlot({
               color: defeated ? 'rgba(148, 163, 184, 0.78)' : theme.muted,
             }}
           >
-            🔒 Torna domani
+            👁 Visita · gioca domani
           </p>
         ) : (
           <p
