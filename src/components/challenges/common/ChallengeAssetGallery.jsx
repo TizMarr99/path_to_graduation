@@ -61,7 +61,7 @@ function ChallengeAssetGallery({ assets = [], onAudioPlay, imageClassName = '', 
                       onError={onImageError}
                       src={asset.src}
                     />
-                    <span className="mt-3 block text-left text-xs uppercase tracking-[0.24em] text-cyan-300/80">
+                    <span className="mt-3 block px-2 pb-2 text-left text-xs uppercase tracking-[0.24em] text-cyan-300/80">
                       Tocca per ingrandire
                     </span>
                   </button>
