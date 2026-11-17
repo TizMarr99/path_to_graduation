@@ -1,5 +1,11 @@
 # Stato del progetto e lavoro rimanente
 
+## Correzione sblocco Sala delle Ombre — 17 novembre 2026
+
+**Implementato:** saldo crediti sempre visibile nella mappa. Le porte rivelate di serie-film e cura-corpo aprono la conferma acquisto anche senza un `pendingBridge` conservato nel salvataggio. La disponibilità segue gli stessi requisiti della rivelazione (progressi musica per serie-film; completamento serie-film o passaggio pendente per cura-corpo). Un passaggio narrativo ancora da completare continua a portare alla route bridge. La modale mostra costo, saldo e crediti mancanti; soltanto la conferma acquisto è disabilitata con saldo insufficiente. Con limiti giornalieri esauriti è possibile acquistare, entrando il giorno seguente. Nessuna modifica a prezzi, progressi salvati o servizi remoti.
+
+**Verificato localmente:** lint e build superati; resta il warning sulle dimensioni del bundle. Nessun collaudo browser o con Supabase.
+
 Aggiornamento **16 novembre 2026**, cura-corpo: **implementati** i dodici giochi definitivi, 59 elementi, vittoria 8/12, regalo Kodak Charmera e nessun sottopremio attivo. Round sequenziali irreversibili, timer 3/7 secondi, timeline a sei caselle e stato persistibile: vedere [implementazione e compatibilità](IMPLEMENTAZIONE_CORPO_MODA_FOTO.md). Mappa, sfondo, audio e personaggi sono fuori da questo intervento. Le cifre 18 giochi/11 vittorie riportate nell'analisi storica sotto sono superate per la configurazione attiva della stanza. Verifiche di questa revisione: solo lint e build, senza browser o collaudi di gioco.
 
 Verifiche del **17 novembre 2026** per questa revisione: build superata; lint segnala l'errore preesistente `react-refresh/only-export-components` in `.visual-check.jsx:9` (file dell'utente non modificato né eseguito). Dettagli nella nota d'implementazione.

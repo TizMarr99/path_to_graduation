@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
-import { getRoomTransition } from '../lib/roomTransitions'
+import { getIncomingRoomTransition } from '../lib/roomTransitions'
 
 const shadowSlots = [
   { id: 'musica',              categoryId: 'musica',                label: 'Sala delle Frequenze', x: '8%',    y: '25%', w: '14%', h: '55%', accent: 'amber' },
@@ -580,12 +580,12 @@ export default function ShadowHallPage() {
   const navigate = useNavigate()
   const dailyBlocked = !canAttemptQuiz()
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
-  const pendingTargetCategory = pendingBridge ? getCategoryById(pendingBridge.targetCategoryId) : null
-  const pendingSourceTransition = pendingBridge ? getRoomTransition(pendingBridge.sourceCategoryId) : null
   const credits = getCredits()
-  const pendingRoomCost = pendingTargetCategory?.buyAccessCost ?? 0
-  const hasCreditsForPendingRoom = credits >= pendingRoomCost
-  const [purchaseModalBridgeKey, setPurchaseModalBridgeKey] = useState(null)
+  const [purchaseCategoryId, setPurchaseCategoryId] = useState(null)
+  const purchaseTargetCategory = getCategoryById(purchaseCategoryId)
+  const purchaseSourceTransition = getIncomingRoomTransition(purchaseCategoryId)?.[1] ?? null
+  const purchaseRoomCost = purchaseTargetCategory?.buyAccessCost ?? 0
+  const hasCreditsForPurchase = credits >= purchaseRoomCost
 
   useBackgroundAudio({ src: '/audio/shadow-hall-ambient.mp3', volume: 0.28 }, isMusicEnabled)
 
@@ -611,15 +611,19 @@ export default function ShadowHallPage() {
   // Serie-film card appears when music room is passed (8+ correct) or fully completed
   const hasSeriesFilmReveal = hasUnlockedMusicByScore || isMusicRoomFullyCompleted
   const hasSerieFilmCompletion = hasStoredRoomCompletion(serieFilmProgress)
-  const activeBridgeKey = pendingBridge?.bridgeCompletedAt
-    ? `${pendingBridge.sourceCategoryId}:${pendingBridge.targetCategoryId}:${pendingBridge.bridgeCompletedAt}`
-    : null
-  const isPurchaseModalOpen =
-    purchaseModalBridgeKey !== null &&
-    purchaseModalBridgeKey === activeBridgeKey &&
-    Boolean(pendingBridge?.bridgeCompletedAt) &&
-    Boolean(pendingTargetCategory) &&
-    !unlockedCategoryIds.includes(pendingTargetCategory?.id)
+  function isRoomRevealed(categoryId) {
+    if (categoryId === 'serie-film') return hasSeriesFilmReveal
+    if (categoryId === 'cura-corpo') {
+      return hasSerieFilmCompletion || pendingBridge?.targetCategoryId === categoryId
+    }
+    return false
+  }
+
+  const isPurchaseModalOpen = Boolean(
+    purchaseTargetCategory &&
+    isRoomRevealed(purchaseCategoryId) &&
+    !unlockedCategoryIds.includes(purchaseCategoryId),
+  )
 
   useEffect(() => {
     if (pendingBridge && !pendingBridge.bridgeCompletedAt) {
@@ -636,33 +640,28 @@ export default function ShadowHallPage() {
     }
   }, [clearPendingBridge, pendingBridge, unlockedCategoryIds])
 
-  function handlePendingRoomPurchase() {
-    if (!pendingBridge || !pendingTargetCategory) {
+  function handleRoomPurchase() {
+    if (!isPurchaseModalOpen || !hasCreditsForPurchase) {
       return
     }
 
-    const cost = pendingTargetCategory.buyAccessCost ?? 0
-    const purchaseSucceeded = buyRoomAccess(pendingTargetCategory.id, cost)
+    const cost = purchaseTargetCategory.buyAccessCost ?? 0
+    const purchaseSucceeded = buyRoomAccess(purchaseTargetCategory.id, cost)
 
     if (!purchaseSucceeded) {
       return
     }
 
-    setPurchaseModalBridgeKey(null)
+    setPurchaseCategoryId(null)
 
     if (canAttemptQuiz()) {
-      navigate(`/play/${pendingTargetCategory.id}`)
+      navigate(`/play/${purchaseTargetCategory.id}`)
     }
   }
 
   function handleRevealRequest(categoryId) {
-    if (
-      pendingBridge?.bridgeCompletedAt &&
-      pendingTargetCategory?.id === categoryId &&
-      !unlockedCategoryIds.includes(categoryId) &&
-      hasCreditsForPendingRoom
-    ) {
-      setPurchaseModalBridgeKey(activeBridgeKey)
+    if (isRoomRevealed(categoryId) && getCategoryById(categoryId) && !unlockedCategoryIds.includes(categoryId)) {
+      setPurchaseCategoryId(categoryId)
     }
   }
 
@@ -745,23 +744,14 @@ export default function ShadowHallPage() {
             !activeSessionForSlot &&
             Boolean(slotProgress?.buyAccessAvailable || completed)
           const comingSoon = false
-          const visible = slot.categoryId === 'serie-film'
-            ? unlocked || hasSeriesFilmReveal
-            : slot.categoryId === 'cura-corpo'
-              ? unlocked || hasSerieFilmCompletion || pendingBridge?.targetCategoryId === 'cura-corpo'
-              : unlocked
+          const visible = unlocked || isRoomRevealed(slot.categoryId)
           const staticBright = prizeWon || (slot.categoryId === 'musica' && hasUnlockedMusicByScore)
           const scoreLabel = resolvePortalScoreLabel(slotProgress, activeSessionForSlot, slotCategory)
           const defeatedImageSrc = defeated
             ? resolveDefeatedPortalImage(slotCategory, slotOutcome)
             : null
           const revealCost = !unlocked && !comingSoon ? slotCategory?.buyAccessCost ?? null : null
-          const canOpenRevealModal =
-            pendingBridge?.bridgeCompletedAt &&
-            pendingTargetCategory?.id === slot.categoryId &&
-            !unlocked &&
-            !comingSoon &&
-            hasCreditsForPendingRoom
+          const canOpenRevealModal = visible && !unlocked && !comingSoon && Boolean(slotCategory)
 
           return (
             <ShadowSlot
@@ -785,9 +775,9 @@ export default function ShadowHallPage() {
         })}
       </div>
 
-      {pendingBridge?.bridgeCompletedAt && pendingTargetCategory && !unlockedCategoryIds.includes(pendingTargetCategory.id) && hasCreditsForPendingRoom && isPurchaseModalOpen ? (
+      {isPurchaseModalOpen ? (
         <div
-          onClick={() => setPurchaseModalBridgeKey(null)}
+          onClick={() => setPurchaseCategoryId(null)}
           style={{
             position: 'absolute',
             inset: 0,
@@ -798,7 +788,7 @@ export default function ShadowHallPage() {
         />
       ) : null}
 
-      {pendingBridge?.bridgeCompletedAt && pendingTargetCategory && !unlockedCategoryIds.includes(pendingTargetCategory.id) && hasCreditsForPendingRoom && isPurchaseModalOpen ? (
+      {isPurchaseModalOpen ? (
         <div
           onClick={(event) => event.stopPropagation()}
           style={{
@@ -824,7 +814,7 @@ export default function ShadowHallPage() {
               color: 'rgba(191, 219, 254, 0.82)',
             }}
           >
-            {pendingSourceTransition?.bridgeNarrative?.eyebrow ?? 'Passaggio aperto'}
+            {purchaseSourceTransition?.bridgeNarrative?.eyebrow ?? 'Passaggio aperto'}
           </p>
           <h2
             style={{
@@ -834,7 +824,7 @@ export default function ShadowHallPage() {
               fontWeight: '600',
             }}
           >
-            {pendingSourceTransition?.purchasePrompt?.title ?? 'La Soglia di Mezzo e pronta.'}
+            {purchaseSourceTransition?.purchasePrompt?.title ?? 'La Soglia di Mezzo e pronta.'}
           </h2>
           <p
             style={{
@@ -845,8 +835,8 @@ export default function ShadowHallPage() {
             }}
           >
             {dailyBlocked
-              ? pendingSourceTransition?.purchasePrompt?.blockedDescription
-              : pendingSourceTransition?.purchasePrompt?.description}
+              ? purchaseSourceTransition?.purchasePrompt?.blockedDescription
+              : purchaseSourceTransition?.purchasePrompt?.description}
           </p>
           <div
             style={{
@@ -867,13 +857,13 @@ export default function ShadowHallPage() {
                 fontSize: '0.9rem',
               }}
             >
-              <span>{pendingTargetCategory.title}</span>
-              <span>Costo: {pendingTargetCategory.buyAccessCost ?? 0} 🪙</span>
+              <span>{purchaseTargetCategory.title}</span>
+              <span>Costo: {purchaseTargetCategory.buyAccessCost ?? 0} 🪙</span>
               <span>Crediti disponibili: {credits} 🪙</span>
             </div>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
-                onClick={() => setPurchaseModalBridgeKey(null)}
+                onClick={() => setPurchaseCategoryId(null)}
                 style={{
                   borderRadius: '999px',
                   border: '1px solid rgba(148, 163, 184, 0.32)',
@@ -888,27 +878,32 @@ export default function ShadowHallPage() {
                 Annulla
               </button>
               <button
-                disabled={!hasCreditsForPendingRoom}
-                onClick={handlePendingRoomPurchase}
+                disabled={!hasCreditsForPurchase}
+                onClick={handleRoomPurchase}
                 style={{
                   borderRadius: '999px',
                   border: '1px solid rgba(147, 197, 253, 0.42)',
-                  background: !hasCreditsForPendingRoom
+                  background: !hasCreditsForPurchase
                     ? 'rgba(30, 41, 59, 0.55)'
                     : 'rgba(96, 165, 250, 0.14)',
-                  color: !hasCreditsForPendingRoom
+                  color: !hasCreditsForPurchase
                     ? 'rgba(148, 163, 184, 0.85)'
                     : '#eff6ff',
                   padding: '10px 18px',
-                  cursor: !hasCreditsForPendingRoom ? 'not-allowed' : 'pointer',
+                  cursor: !hasCreditsForPurchase ? 'not-allowed' : 'pointer',
                   fontWeight: '600',
                 }}
                 type="button"
               >
-                {pendingSourceTransition?.purchasePrompt?.actionLabel ?? 'Acquista l’accesso'}
+                {purchaseSourceTransition?.purchasePrompt?.actionLabel ?? 'Acquista l’accesso'}
               </button>
             </div>
           </div>
+          {!hasCreditsForPurchase ? (
+            <p role="status" className="mt-3 text-sm text-amber-200">
+              Ti mancano {purchaseRoomCost - credits} crediti per sbloccare questa sala.
+            </p>
+          ) : null}
           {dailyBlocked ? (
             <p
               style={{
@@ -923,6 +918,14 @@ export default function ShadowHallPage() {
           ) : null}
         </div>
       ) : null}
+
+      <div
+        className="absolute bottom-6 left-6 z-10 rounded-full border border-amber-300/40 bg-slate-950/85 px-5 py-3 text-sm text-amber-100 shadow-lg"
+        role="status"
+        aria-live="polite"
+      >
+        Crediti disponibili: <strong>{credits}</strong> 🪙
+      </div>
 
       {/* Top navigation bar */}
       <div
