@@ -103,6 +103,7 @@ export default function SequentialRoundChallenge({ challenge, draftAnswer, chall
     }} showMetrics={false} disabled={disabled}
       characterComment={roundFeedback?.characterComment}
       spiderImageSrc={roundFeedback?.spiderImageSrc}
+      flyingInsectImageSrcs={roundFeedback?.flyingInsectImageSrcs}
       fearEffectKey={roundFeedback?.fearEffectKey}
       continueLabel={index < rounds.length - 1 ? 'Round successivo' : 'Continua'}
       onContinue={(event) => {

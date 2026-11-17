@@ -9,7 +9,7 @@ const SPIDERS = [
 
 export default function SpiderErrorOverlay({ src }) {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-hidden select-none">
       <div className="spider-error-flash absolute inset-0 bg-red-700/40" />
       {SPIDERS.map((spider, index) => (
         <img
@@ -25,8 +25,8 @@ export default function SpiderErrorOverlay({ src }) {
             '--spider-end-x': spider.endX,
             '--spider-end-y': spider.endY,
             '--spider-angle': `${spider.angle}deg`,
-            animationDuration: `${spider.duration}s`,
-            animationDelay: `${spider.delay}s`,
+            animationDuration: `${spider.duration * 3}s`,
+            animationDelay: `${spider.delay * 3}s`,
           }}
         />
       ))}

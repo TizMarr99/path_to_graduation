@@ -1066,8 +1066,8 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     !shouldShowRoomIntro &&
     !shouldPlayRoundMusic
 
-  useBackgroundAudio({ src: ambientAudioSrc, volume: 0.15 }, shouldPlayAmbientAudio)
-  useBackgroundAudio({ src: currentChallenge?.roundMusicSrc, volume: 0.18 }, shouldPlayRoundMusic)
+  useBackgroundAudio({ src: ambientAudioSrc, volume: isFearActive ? 0.015 : 0.15 }, shouldPlayAmbientAudio)
+  useBackgroundAudio({ src: currentChallenge?.roundMusicSrc, volume: isFearActive ? 0.018 : 0.18 }, shouldPlayRoundMusic)
 
   // Immersive room intro narrative gate (shown once)
   if (shouldShowRoomIntro) {
@@ -1166,7 +1166,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   const awardedCredits = hasFeedback
     ? resolveChallengeCreditReward(feedbackChallenge, feedback)
     : 0
-  const errorImageSources = category.fear?.spiderImageSrc ? [] : category.wrongAnswerImageSrcs ?? []
+  const errorImageSources = category.fear?.spiderImageSrc || category.fear?.flyingInsectImageSrcs?.length ? [] : category.wrongAnswerImageSrcs ?? []
   const errorVisualIndex = sessionWrongCount > 0 && errorImageSources.length > 0
     ? (sessionWrongCount - 1) % errorImageSources.length
     : 0
@@ -1409,7 +1409,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                           onBuyTime={(seconds, cost) => spendCredits(cost, { kind: 'extra_time', label: `Tempo aggiuntivo: ${seconds} secondi`, categoryId: category.id, challengeId: currentChallengeId })}
                           onChallengeStateChange={updateChallengeState}
                           onDraftAnswerChange={updateDraftAnswer}
-                          roundFeedback={{ hidden: hasFeedback, characterComment: resultComment, spiderImageSrc: isFearActive ? category.fear?.spiderImageSrc : null, fearEffectKey }}
+                          roundFeedback={{ hidden: hasFeedback, characterComment: resultComment, spiderImageSrc: isFearActive ? category.fear?.spiderImageSrc : null, flyingInsectImageSrcs: isFearActive ? category.fear?.flyingInsectImageSrcs : null, fearEffectKey }}
                           onRoundFeedback={(isCorrect) => {
                             dismissPanel()
                             showComment(isCorrect ? 'onCorrect' : 'onWrong')
@@ -1475,6 +1475,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
           <ResultModal
             spiderImageSrc={isFearActive ? category.fear?.spiderImageSrc : null}
+            flyingInsectImageSrcs={isFearActive ? category.fear?.flyingInsectImageSrcs : null}
             fearEffectKey={fearEffectKey}
             awardedCredits={awardedCredits}
             characterComment={feedbackMode === 'fresh' ? resultComment : null}

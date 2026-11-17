@@ -40,6 +40,7 @@ export interface CategoryFear {
   description: string
   sfxSrc?: string | string[]
   spiderImageSrc?: string
+  flyingInsectImageSrcs?: string[]
 }
 
 export interface RewardArtifact {

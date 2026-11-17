@@ -139,6 +139,9 @@ function normalizeFear(rawFear) {
     description: rawFear.description ?? '',
     sfxSrc,
     spiderImageSrc: resolveStaticAssetPath(rawFear.spiderImageSrc ?? ''),
+    flyingInsectImageSrcs: Array.isArray(rawFear.flyingInsectImageSrcs)
+      ? rawFear.flyingInsectImageSrcs.filter((src) => typeof src === 'string' && src.trim()).map(resolveStaticAssetPath)
+      : [],
   }
 }
 

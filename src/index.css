@@ -6,8 +6,8 @@
 }
 
 @keyframes spiderErrorFlash {
-  0%, 45%, 100% { opacity: 0; }
-  20%, 65% { opacity: 1; }
+  0%, 50%, 100% { opacity: 0; }
+  25%, 75% { opacity: 0.75; }
 }
 
 .spider-error-crawler {
@@ -15,11 +15,17 @@
 }
 
 .spider-error-flash {
-  animation: spiderErrorFlash 550ms ease-out forwards;
+  animation: spiderErrorFlash 2.4s ease-in-out infinite;
+}
+
+.flying-insect-bug {
+  filter: brightness(1.8) contrast(1.2) saturate(0.85)
+    drop-shadow(0 0 1px rgb(255 244 212 / 0.75))
+    drop-shadow(0 2px 3px rgb(0 0 0 / 0.9));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spider-error-crawler, .spider-error-flash { display: none; }
+  .spider-error-crawler, .spider-error-flash, .flying-insects-error-overlay { display: none; }
 }
 
 @keyframes horrorFlicker {
