@@ -435,7 +435,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     sessionCorrectCount,
     sessionWrongCount,
     revealHint,
-    restartSession,
     submitChallenge,
     totalChallenges,
     updateChallengeState,
@@ -796,6 +795,9 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     applyChallengeFeedbackOutcome({
       awardedCredits,
       consumeLife,
+      categoryId: category.id,
+      challengeId: feedbackChallenge.id,
+      challengeTitle: feedbackChallenge.title,
     })
 
     if (nextFeedback.isCorrect) {
@@ -854,7 +856,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
 
   function handleHintReveal() {
     const cost = currentChallenge?.hintCost ?? 15
-    if (!isHintVisible && !spendCredits(cost)) return
+    if (!isHintVisible && !spendCredits(cost, { kind: 'hint', label: 'Acquisto indizio', categoryId: category.id, challengeId: currentChallengeId })) return
 
     revealHint()
 
@@ -871,13 +873,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
   function openInfoModal() {
     setHintModalChallengeId('')
     setInfoModalChallengeId(currentChallengeId)
-  }
-
-  function handleRestart() {
-    hasPersistedOutcomeRef.current = false
-    isPersistingOutcomeRef.current = false
-    hasTriggeredPrizeEmailsRef.current = false
-    restartSession()
   }
 
   const shouldShowRoomIntro = isImmersiveRoom && isRoomIntroPending(category.id)
@@ -1113,7 +1108,6 @@ function PlayCategorySession({ category, preferredChallengeId }) {
     return (
       <ChallengeCompleted
         category={category}
-        onRestart={handleRestart}
         passedRoom={passedRoom}
         sessionCorrectCount={sessionCorrectCount}
         sessionWrongCount={sessionWrongCount}
@@ -1390,7 +1384,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                           disabled={controlsDisabled}
                           draftAnswer={draftAnswer}
                           onAudioPlay={handleAudioPlay}
-                          onBuyTime={(seconds, cost) => spendCredits(cost)}
+                          onBuyTime={(seconds, cost) => spendCredits(cost, { kind: 'extra_time', label: `Tempo aggiuntivo: ${seconds} secondi`, categoryId: category.id, challengeId: currentChallengeId })}
                           onChallengeStateChange={updateChallengeState}
                           onDraftAnswerChange={updateDraftAnswer}
                           onSubmit={handleSubmit}
@@ -1543,7 +1537,7 @@ function PlayCategorySession({ category, preferredChallengeId }) {
                 disabled={controlsDisabled}
                 draftAnswer={draftAnswer}
                 onAudioPlay={handleAudioPlay}
-                onBuyTime={(seconds, cost) => spendCredits(cost)}
+                onBuyTime={(seconds, cost) => spendCredits(cost, { kind: 'extra_time', label: `Tempo aggiuntivo: ${seconds} secondi`, categoryId: category.id, challengeId: currentChallengeId })}
                 onChallengeStateChange={updateChallengeState}
                 onDraftAnswerChange={updateDraftAnswer}
                 onSubmit={handleSubmit}

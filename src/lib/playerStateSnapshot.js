@@ -31,6 +31,7 @@ export function createDefaultRoomProgress(categoryId) {
   return {
     categoryId,
     startedAt: null,
+    introSeen: null,
     sessions: [],
     completionCount: 0,
     totalResolvedChallenges: 0,
@@ -48,6 +49,7 @@ export function createDefaultRoomProgress(categoryId) {
 export function createDefaultPlayerState() {
   return {
     version: 1,
+    stateRevision: 0,
     createdAt: Date.now(),
     credits: 0,
     stats: createDefaultStats(),
@@ -199,6 +201,7 @@ export function normalizeSnapshot(snapshot) {
     role: snapshot?.role ?? '',
     playerState: {
       version: 1,
+      stateRevision: progress?.state_revision ?? 0,
       createdAt: progress?.created_at ? Date.parse(progress.created_at) || Date.now() : Date.now(),
       credits: progress?.credits ?? 0,
       stats: {
@@ -232,8 +235,8 @@ export function normalizeSnapshot(snapshot) {
         : null,
       lastPlayedAt: progress?.last_played_at ?? null,
       transitionState: normalizeTransitionState(progress?.transition_state),
-      rewardState: normalizeJsonObject(snapshot?.reward_state),
-      emailState: normalizeJsonObject(snapshot?.email_state),
+      rewardState: normalizeJsonObject(progress?.reward_state ?? snapshot?.reward_state),
+      emailState: normalizeJsonObject(progress?.email_state ?? snapshot?.email_state),
     },
   }
 }
@@ -262,6 +265,7 @@ export function buildProgressPayload(playerState) {
   )
 
   return {
+    state_revision: playerState.stateRevision ?? 0,
     credits: playerState.credits,
     unlocked_category_ids: playerState.unlockedCategoryIds,
     current_room: playerState.currentRoom,

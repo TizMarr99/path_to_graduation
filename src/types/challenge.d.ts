@@ -921,6 +921,8 @@ export interface RoomCompletedSessionSnapshot {
 export interface RoomProgress {
   categoryId: string
   startedAt: number | string | null
+  /** Explicit narrative gate; null/absent uses the legacy startedAt fallback. */
+  introSeen?: boolean | null
   sessions: RoomSessionSummary[]
   completionCount?: number
   totalResolvedChallenges?: number
@@ -947,6 +949,7 @@ export interface TransitionState {
 
 export interface PlayerState {
   version: 1
+  stateRevision: number
   createdAt: number
   credits: number
   stats: DailyStats
@@ -959,6 +962,44 @@ export interface PlayerState {
   transitionState: TransitionState
   rewardState?: Record<string, unknown>
   emailState?: Record<string, unknown>
+  /** Unsaved entries only; acknowledged IDs are removed by the provider. */
+  _creditMovements?: PendingCreditMovement[]
+  _roomArchives?: Array<{ id: string; categoryId: string; archive: Record<string, unknown> }>
+}
+
+export interface PendingCreditMovement {
+  id: string
+  delta: number
+  kind: 'challenge_reward' | 'hint' | 'extra_time' | 'room_access' | 'bundle_access' | 'bonus' | 'spend'
+  label: string
+  category_id: string | null
+  challenge_id: string | null
+}
+
+export interface CreditMovement {
+  id: string
+  seq: number
+  root_id: string
+  reverses_id: string | null
+  operation_id: string | null
+  is_effective: boolean
+  is_current?: boolean
+  kind: string
+  label: string
+  delta: number
+  balance_after: number
+  category_id: string | null
+  challenge_id: string | null
+  created_at: string
+}
+
+export interface AdminMoneyLine {
+  label: string
+  source_ids: string[]
+  defaultDelta: number
+  delta: number
+  category_id?: string | null
+  challenge_id?: string | null
 }
 
 export interface RawCategory {

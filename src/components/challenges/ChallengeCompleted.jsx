@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom'
+import { usePlayerState } from '../../hooks/usePlayerState'
 
 function ChallengeCompleted({
   category,
   totalChallenges,
-  onRestart,
   passedRoom,
   sessionCorrectCount,
   sessionWrongCount,
   unlockedCategoryIds,
 }) {
+  const { role } = usePlayerState()
   return (
     <section className="space-y-6 rounded-[2rem] border border-amber-300/20 bg-slate-950/75 p-8 shadow-[0_0_90px_rgba(8,145,178,0.08)] backdrop-blur-xl sm:p-10">
       <div>
@@ -38,19 +39,13 @@ function ChallengeCompleted({
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          className="inline-flex items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/12 px-5 py-3 text-sm font-semibold text-cyan-50 transition hover:border-cyan-200/60 hover:bg-cyan-400/20"
-          onClick={onRestart}
-          type="button"
-        >
-          Riapri la sala
-        </button>
         <Link
           className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900/80 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-amber-300/45 hover:text-amber-100"
-          to="/dev"
+          to="/shadows"
         >
-          Torna alla DevPage
+          Torna alla mappa
         </Link>
+        {role === 'admin' ? <Link className="rounded-full border border-cyan-300/40 px-5 py-3 text-sm text-cyan-100" to="/dev">Gestisci dal pannello admin</Link> : null}
       </div>
     </section>
   )

@@ -1,26 +1,16 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createPlayerSaveQueue } from '../lib/playerSaveQueue.js'
 import {
-  appClearRoomArchives,
   appGetRoomArchive,
-  adminResetDailyLimits,
-  adminResetPlayer,
   appGetSnapshot,
   appLogin,
-  appSaveRoomArchive,
   appSaveSnapshot,
 } from '../lib/supabaseGameApi'
 import {
-  applyAdminStateOverrides,
-  buildDailyPayload,
-  buildProgressPayload,
   buildRoomArchivePayload,
   createDefaultPlayerState,
   createDefaultRoomProgress,
-  MAX_DAILY_LIVES,
-  MAX_DAILY_QUIZ_ATTEMPTS,
   normalizeSnapshot,
-  resetCurrentPositionInPlayerState,
-  resetMusicRoomIntroInPlayerState,
 } from '../lib/playerStateSnapshot'
 
 const PlayerStateContext = createContext(null)
@@ -28,6 +18,20 @@ const ACCESS_CODE_STORAGE_KEY = 'path-to-graduation:access-code'
 const MUSIC_ENABLED_STORAGE_KEY = 'path-to-graduation:music-enabled'
 const VIP_ACCESS_STORAGE_KEY = 'path-to-graduation:vip-access'
 const SAVE_DEBOUNCE_MS = 900
+
+function withCreditMovement(state, delta, context = {}) {
+  if (!delta) return state
+  return {
+    ...state,
+    _creditMovements: [...(state._creditMovements ?? []), {
+      id: crypto.randomUUID(), delta,
+      kind: context.kind ?? (delta > 0 ? 'bonus' : 'spend'),
+      label: context.label ?? (delta > 0 ? 'Crediti ottenuti' : 'Crediti spesi'),
+      category_id: context.categoryId ?? state.currentRoom ?? null,
+      challenge_id: context.challengeId !== undefined ? context.challengeId : state.currentChallengeId || null,
+    }],
+  }
+}
 
 function loadStoredAccessCode() {
   if (typeof window === 'undefined') {
@@ -209,6 +213,20 @@ export function PlayerStateProvider({ children }) {
   const playerStateRef = useRef(playerState)
   const accessCodeRef = useRef(accessCode)
   const debouncedSaveTimeoutRef = useRef(null)
+  const [persistence] = useState(() => createPlayerSaveQueue({
+    save: appSaveSnapshot,
+    onSyncing: setIsSyncing,
+    onError(error) { setSyncError(error ? getFallbackErrorMessage(error, 'Impossibile salvare il progresso.') : '') },
+    onSaved(snapshot, acknowledged, archived) {
+      const current = {
+        ...playerStateRef.current, stateRevision: snapshot.progress.state_revision,
+        _creditMovements: (playerStateRef.current._creditMovements ?? []).filter((row) => !acknowledged.has(row.id)),
+        _roomArchives: (playerStateRef.current._roomArchives ?? []).filter((row) => !archived.has(row.id)),
+      }
+      playerStateRef.current = current
+      setPlayerState(current)
+    },
+  }))
 
   useEffect(() => {
     playerStateRef.current = playerState
@@ -230,11 +248,12 @@ export function PlayerStateProvider({ children }) {
     }
   }, [])
 
-  function applySnapshot(snapshot, nextCode = accessCodeRef.current) {
+  const applySnapshot = useCallback((snapshot, nextCode = accessCodeRef.current) => {
     const normalized = normalizeSnapshot(snapshot)
 
     playerStateRef.current = normalized.playerState
     accessCodeRef.current = nextCode
+    persistence.reset(nextCode, normalized.playerState.stateRevision)
 
     setPlayerState(normalized.playerState)
     setRole(normalized.role)
@@ -242,7 +261,7 @@ export function PlayerStateProvider({ children }) {
     setAccessCode(nextCode)
 
     return normalized
-  }
+  }, [persistence])
 
   const clearScheduledSave = useCallback(() => {
     if (debouncedSaveTimeoutRef.current) {
@@ -259,6 +278,7 @@ export function PlayerStateProvider({ children }) {
 
     playerStateRef.current = defaultPlayerState
     accessCodeRef.current = ''
+    persistence.reset('', 0)
 
     setPlayerState(defaultPlayerState)
     setRole('')
@@ -266,7 +286,7 @@ export function PlayerStateProvider({ children }) {
     setAccessCode('')
     setAuthError('')
     setSyncError('')
-  }, [clearScheduledSave])
+  }, [clearScheduledSave, persistence])
 
   useEffect(() => {
     let isMounted = true
@@ -305,7 +325,7 @@ export function PlayerStateProvider({ children }) {
     return () => {
       isMounted = false
     }
-  }, [resetLocalSession])
+  }, [applySnapshot, resetLocalSession])
 
   function buildRoomOutcomePlayerState(currentState, {
     categoryId,
@@ -349,7 +369,7 @@ export function PlayerStateProvider({ children }) {
             (previousProgress.totalResolvedChallenges ?? 0) + correctCount + wrongCount,
           lastSessionSummary: nextSessionSummary,
           lastCompletedSession:
-            correctCount + wrongCount >= totalChallenges
+            correctCount + wrongCount > 0
               ? {
                   challengeResults,
                   challengeStatesByChallengeId,
@@ -378,34 +398,26 @@ export function PlayerStateProvider({ children }) {
     }
   }
 
-  const persistPlayerState = useCallback(async (nextPlayerState, { silent = false } = {}) => {
-    if (!accessCodeRef.current) {
-      return { ok: false }
-    }
+  const persistPlayerState = useCallback((state, options) => persistence.enqueue(state, options), [persistence])
 
-    if (!silent) {
-      setIsSyncing(true)
-    }
+  async function flushPlayerState() {
+    const scheduled = Boolean(debouncedSaveTimeoutRef.current)
+    clearScheduledSave()
+    await persistence.wait()
+    if (persistence.blocked) return { ok: false }
+    const state = playerStateRef.current
+    if (scheduled || persistence.hasFailedPacket || state._creditMovements?.length || state._roomArchives?.length) return persistPlayerState(state)
+    return { ok: true }
+  }
 
+  async function refreshPlayerState(snapshot = null) {
+    clearScheduledSave()
+    await persistence.wait()
+    const code = accessCodeRef.current
+    if (!code) return
+    applySnapshot(snapshot ?? await appGetSnapshot(code), code)
     setSyncError('')
-
-    try {
-      await appSaveSnapshot(
-        accessCodeRef.current,
-        buildProgressPayload(nextPlayerState),
-        buildDailyPayload(nextPlayerState),
-      )
-
-      return { ok: true }
-    } catch (error) {
-      setSyncError(getFallbackErrorMessage(error, 'Impossibile salvare il progresso.'))
-      return { ok: false, error }
-    } finally {
-      if (!silent) {
-        setIsSyncing(false)
-      }
-    }
-  }, [])
+  }
 
   const commitPlayerState = useCallback((nextPlayerState, { persist = 'immediate' } = {}) => {
     playerStateRef.current = nextPlayerState
@@ -540,19 +552,12 @@ export function PlayerStateProvider({ children }) {
       unlockedCategoryIds,
     })
 
-    if (accessCodeRef.current) {
-      const archivePayload = buildRoomArchivePayload(nextPlayerState, categoryId)
-
-      if (archivePayload) {
-        try {
-          await appSaveRoomArchive(accessCodeRef.current, categoryId, archivePayload)
-          nextPlayerState = markRoomArchiveAvailableInState(nextPlayerState, categoryId)
-        } catch (error) {
-          if (!isMissingArchiveRpcError(error)) {
-            console.warn('Room archive save failed; falling back to full progress snapshot.', error)
-          }
-        }
-      }
+    const archivePayload = buildRoomArchivePayload(nextPlayerState, categoryId)
+    if (archivePayload) {
+      nextPlayerState = markRoomArchiveAvailableInState(nextPlayerState, categoryId)
+      nextPlayerState._roomArchives = [...(nextPlayerState._roomArchives ?? []), {
+        id: crypto.randomUUID(), categoryId, archive: archivePayload,
+      }]
     }
 
     playerStateRef.current = nextPlayerState
@@ -562,28 +567,28 @@ export function PlayerStateProvider({ children }) {
     return persistPlayerState(nextPlayerState)
   }, [clearScheduledSave, persistPlayerState])
 
-  function addCredits(amount) {
+  function addCredits(amount, context) {
     if (amount <= 0) {
       return
     }
 
     updatePlayerState(
-      (currentState) => ({
+      (currentState) => withCreditMovement({
         ...currentState,
         credits: currentState.credits + amount,
         lastPlayedAt: new Date().toISOString(),
-      }),
+      }, amount, context),
       { persist: 'debounced' },
     )
   }
 
-  function applyChallengeFeedbackOutcome({ awardedCredits = 0, consumeLife = false }) {
+  function applyChallengeFeedbackOutcome({ awardedCredits = 0, consumeLife = false, categoryId, challengeId, challengeTitle }) {
     if (awardedCredits <= 0 && !consumeLife) {
       return
     }
 
     updatePlayerState(
-      (currentState) => ({
+      (currentState) => withCreditMovement({
         ...currentState,
         credits: currentState.credits + Math.max(0, awardedCredits),
         stats: {
@@ -593,12 +598,12 @@ export function PlayerStateProvider({ children }) {
             : currentState.stats.livesRemaining,
         },
         lastPlayedAt: new Date().toISOString(),
-      }),
+      }, Math.max(0, awardedCredits), { kind: 'challenge_reward', label: challengeTitle ? `Ricompensa: ${challengeTitle}` : 'Ricompensa gioco', categoryId, challengeId }),
       { persist: 'debounced' },
     )
   }
 
-  function spendCredits(amount) {
+  function spendCredits(amount, context) {
     if (amount <= 0) {
       return true
     }
@@ -610,11 +615,11 @@ export function PlayerStateProvider({ children }) {
     }
 
     updatePlayerState(
-      {
+      withCreditMovement({
         ...currentState,
         credits: currentState.credits - amount,
         lastPlayedAt: new Date().toISOString(),
-      },
+      }, -amount, context),
       { persist: 'debounced' },
     )
 
@@ -647,46 +652,6 @@ export function PlayerStateProvider({ children }) {
       }),
       { persist: 'debounced' },
     )
-  }
-
-  function resetDailyCounters() {
-    updatePlayerState((currentState) => ({
-      ...currentState,
-      stats: {
-        ...currentState.stats,
-        attemptsRemaining: MAX_DAILY_QUIZ_ATTEMPTS,
-        livesRemaining: MAX_DAILY_LIVES,
-        lastResetAt: Date.now(),
-      },
-    }))
-  }
-
-  async function resetPlayerState() {
-    const nextPlayerState = {
-      ...createDefaultPlayerState(),
-      createdAt: playerStateRef.current.createdAt,
-    }
-
-    clearScheduledSave()
-
-    if (accessCodeRef.current) {
-      try {
-        await appClearRoomArchives(accessCodeRef.current)
-      } catch (error) {
-        if (!isMissingArchiveRpcError(error)) {
-          console.warn('Room archive cleanup failed during reset.', error)
-        }
-      }
-    }
-
-    const result = await persistPlayerState(nextPlayerState)
-
-    if (!result.ok) {
-      return result
-    }
-
-    resetLocalSession()
-    return { ok: true }
   }
 
   const loadRoomArchive = useCallback(async (categoryId) => {
@@ -723,11 +688,7 @@ export function PlayerStateProvider({ children }) {
     }
   }, [])
 
-  function resetMusicRoomIntro() {
-    updatePlayerState((currentState) => resetMusicRoomIntroInPlayerState(currentState))
-  }
-
-  function markRoomStarted(categoryId, challengeId = '') {
+  function markRoomStarted(categoryId, challengeId = '', introSeen = false) {
     updatePlayerState(
       (currentState) => {
         const previousProgress =
@@ -740,6 +701,7 @@ export function PlayerStateProvider({ children }) {
             [categoryId]: {
               ...previousProgress,
               startedAt: previousProgress.startedAt ?? Date.now(),
+              introSeen: introSeen ? true : previousProgress.introSeen,
             },
           },
           currentRoom: categoryId,
@@ -756,7 +718,7 @@ export function PlayerStateProvider({ children }) {
       return
     }
 
-    markRoomStarted(categoryId)
+    markRoomStarted(categoryId, '', true)
   }
 
   function queuePendingBridge({ sourceCategoryId, targetCategoryId }) {
@@ -844,11 +806,13 @@ export function PlayerStateProvider({ children }) {
   function buyRoomAccess(categoryId, cost) {
     const currentState = playerStateRef.current
 
+    if (currentState.unlockedCategoryIds.includes(categoryId)) return true
+
     if (currentState.credits < cost) {
       return false
     }
 
-    updatePlayerState({
+    updatePlayerState(withCreditMovement({
       ...currentState,
       credits: currentState.credits - cost,
       unlockedCategoryIds: Array.from(new Set([...currentState.unlockedCategoryIds, categoryId])),
@@ -857,7 +821,7 @@ export function PlayerStateProvider({ children }) {
           ? { pendingBridge: null }
           : currentState.transitionState,
       lastPlayedAt: new Date().toISOString(),
-    })
+    }, -cost, { kind: 'room_access', label: 'Sblocco stanza', categoryId, challengeId: null }))
 
     return true
   }
@@ -873,14 +837,14 @@ export function PlayerStateProvider({ children }) {
       return false
     }
 
-    updatePlayerState({
+    updatePlayerState(withCreditMovement({
       ...currentState,
       credits: currentState.credits - cost,
       unlockedCategoryIds: Array.from(
         new Set([...currentState.unlockedCategoryIds, ...categoryIds]),
       ),
       lastPlayedAt: new Date().toISOString(),
-    })
+    }, -cost, { kind: 'bundle_access', label: `Sblocco stanze: ${categoryIds.join(', ')}`, categoryId: categoryIds[0], challengeId: null }))
 
     return true
   }
@@ -958,58 +922,6 @@ export function PlayerStateProvider({ children }) {
     })
   }, [updatePlayerState])
 
-  function resetCurrentPosition() {
-    updatePlayerState((currentState) => resetCurrentPositionInPlayerState(currentState))
-  }
-
-  async function resetDailyCountersForCode(targetCode = accessCodeRef.current) {
-    if (!targetCode) {
-      return { ok: false }
-    }
-
-    if (targetCode === accessCodeRef.current || role !== 'admin') {
-      resetDailyCounters()
-      return { ok: true }
-    }
-
-    try {
-      await adminResetDailyLimits(accessCodeRef.current, targetCode)
-      return { ok: true }
-    } catch (error) {
-      setSyncError(getFallbackErrorMessage(error, 'Impossibile azzerare i contatori giornalieri.'))
-      return { ok: false, error }
-    }
-  }
-
-  async function resetPlayerStateForCode(targetCode = accessCodeRef.current) {
-    if (!targetCode) {
-      return { ok: false }
-    }
-
-    if (targetCode === accessCodeRef.current || role !== 'admin') {
-      return resetPlayerState()
-    }
-
-    try {
-      await adminResetPlayer(accessCodeRef.current, targetCode)
-      return { ok: true }
-    } catch (error) {
-      setSyncError(getFallbackErrorMessage(error, 'Impossibile resettare il profilo.'))
-      return { ok: false, error }
-    }
-  }
-
-  function setAdminStats({ credits, attemptsRemaining, livesRemaining }) {
-    updatePlayerState(
-      (currentState) => applyAdminStateOverrides(currentState, {
-        credits,
-        attemptsRemaining,
-        livesRemaining,
-      }),
-      { persist: 'immediate' },
-    )
-  }
-
   function markVictoryModalSeen(categoryId) {
     updatePlayerState(
       (currentState) => {
@@ -1038,7 +950,8 @@ export function PlayerStateProvider({ children }) {
     clearAuthFeedback,
     clearSyncFeedback,
     clearActiveSession,
-    resetCurrentPosition,
+    flushPlayerState,
+    refreshPlayerState,
     isAuthenticated: Boolean(accessCode && role),
     hasVipAccess: Boolean(accessCode && role),
     isHydrating,
@@ -1051,6 +964,7 @@ export function PlayerStateProvider({ children }) {
     playerState,
     role,
     syncError,
+    hasSyncConflict: persistence.blocked,
     unlockCategories,
     registerRoomOutcome,
     addCredits,
@@ -1058,11 +972,6 @@ export function PlayerStateProvider({ children }) {
     spendCredits,
     registerQuizAttempt,
     registerWrongAnswer,
-    resetDailyCounters,
-    resetDailyCountersForCode,
-    resetPlayerState,
-    resetPlayerStateForCode,
-    resetMusicRoomIntro,
     markRoomIntroSeen,
     setMusicEnabled,
     toggleMusicEnabled,
@@ -1073,7 +982,6 @@ export function PlayerStateProvider({ children }) {
     buyRoomAccess,
     buyCategoryBundle,
     syncActiveSessionSnapshot,
-    setAdminStats,
     markVictoryModalSeen,
     isCategoryUnlocked(categoryId) {
       return playerState.unlockedCategoryIds.includes(categoryId)
@@ -1086,6 +994,7 @@ export function PlayerStateProvider({ children }) {
     },
     canAttemptQuiz() {
       return (
+        !persistence.blocked &&
         playerState.stats.attemptsRemaining > 0 &&
         playerState.stats.livesRemaining > 0
       )
@@ -1097,7 +1006,8 @@ export function PlayerStateProvider({ children }) {
       return shouldShowHomeIntroForState(playerState)
     },
     isRoomIntroPending(categoryId) {
-      return !playerState.roomProgress[categoryId]?.startedAt
+      const room = playerState.roomProgress[categoryId]
+      return !(room?.introSeen ?? Boolean(room?.startedAt))
     },
   }
 

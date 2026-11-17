@@ -54,6 +54,8 @@ La protezione attende l'idratazione prima di controllare la sessione. I controll
 | `src/pages/PlayPage.jsx` | Regia: zone/sottogiochi, indizi, esiti, premi, email |
 | `src/hooks/usePlayerState.js` | Login, bootstrap, crediti, limiti, sblocchi, persistenza, archivi, admin |
 | `src/lib/playerStateSnapshot.js` | Default, normalizzazione e payload di progresso/giornalieri/archivi |
+| `src/lib/playerSaveQueue.js` | Salvataggi serializzati, ricevute idempotenti, revisioni e isolamento tra login |
+| `src/components/admin/`, `src/lib/adminOperations.js` | Impostazioni admin, anteprime, piani di reset e ripristino, storico economico |
 | `src/lib/supabaseClient.js`, `supabaseGameApi.js` | Configurazione e accesso al backend |
 | `src/lib/challengeRewards.js` | Crediti, scoring per gruppi, sottopremi e statistiche |
 | `src/lib/roomTransitions.js` | Passaggi musica → serie-film → cura-corpo |
@@ -71,7 +73,9 @@ Lo stato iniziale comprende `version`, `credits`, `stats`, `roomProgress`, `unlo
 
 localStorage conserva `path-to-graduation:access-code`, `path-to-graduation:music-enabled` e `path-to-graduation:vip-access`. Il progresso passa invece dalle RPC Supabase. Il flag VIP è un passaggio di presentazione, non una prova di autenticazione server.
 
-Il provider aggiorna stato React e ref, poi salva immediatamente o con debounce. Gli errori di sincronizzazione sono esposti con `syncError`. La sessione attiva conserva draft/runtime e risultati per la ripresa; evitare aggiornamenti che saltino questo percorso.
+Il provider aggiorna stato React e ref, poi salva immediatamente o con debounce attraverso una coda seriale. Gli errori di sincronizzazione sono esposti con `syncError` e un avviso globale; i conflitti di revisione bloccano ulteriori scritture dalla scheda. La sessione attiva conserva draft/runtime e risultati per la ripresa; evitare aggiornamenti che saltino questo percorso.
+
+Dal 17 novembre 2026 lo stato include `stateRevision` e ogni movimento di crediti è salvato con il progresso. Gli archivi nuovi sono inclusi nella stessa transazione. I reset passano esclusivamente dal pannello admin e conservano checkpoint prima/dopo; vedere [gestione amministrativa](GESTIONE_ADMIN.md). `introSeen` distingue la narrazione dal timestamp di inizio, mantenendo il fallback per i vecchi salvataggi.
 
 Le stanze concluse hanno riepiloghi e snapshot di dettaglio. `buildRoomArchivePayload` costruisce l'archivio, `buildProgressPayload` può alleggerire il progresso quando esiste il dettaglio archiviato, `loadRoomArchive` recupera il dettaglio. Nel provider esistono fallback per backend privi delle RPC archivi: non assumere che la migration sia già applicata ovunque.
 

@@ -43,6 +43,8 @@ Le variabili `VITE_` sono pubbliche. Non usarle per chiavi privilegiate. Non con
 
 Fonte: `src/lib/supabaseGameApi.js`. Questa tabella descrive le chiamate attese, non lo schema SQL completo.
 
+**Aggiornamento 17 novembre 2026:** la migration del pannello admin aggiunge registro economico, checkpoint e controllo revisioni. Contratti e verifiche sono in [Gestione admin](GESTIONE_ADMIN.md). `app_save_snapshot` salva anche movimenti e archivi nella stessa transazione. I vecchi reset elencati sotto sono disabilitati a favore di `admin_apply_operation`; il salvataggio separato archivi resta soltanto per compatibilità controllata.
+
 | RPC | Parametri |
 | --- | --- |
 | `app_login` | `p_code` |
@@ -58,7 +60,7 @@ Il wrapper espone inoltre `appDeletePlayerState`: delete dirette da `player_prog
 
 Tabelle referenziate: `access_codes`, `player_progress`, `player_daily_limits`, `player_room_archives`. Le email usano `access_codes.email` e `player_progress.email_state`. Nei documenti storici è riportata l'aggiunta manuale delle colonne JSONB `reward_state` ed `email_state`.
 
-L'unica migration presente è `supabase/migrations/20260514000000_player_room_archives.sql`: crea archivi e tre RPC, abilita RLS e blocca l'accesso diretto con una policy. Le funzioni `security definer` usano `app_get_snapshot(p_code)` per identificare il giocatore.
+La migration `supabase/migrations/20260514000000_player_room_archives.sql` crea archivi e tre RPC, abilita RLS e blocca l'accesso diretto con una policy. La migration `20261117194025_admin_operations_and_credit_ledger.sql` aggiunge il pannello admin e sostituisce i percorsi di salvataggio/reset secondo il contratto corrente. Le funzioni identificano il giocatore tramite il codice e verificano separatamente il ruolo dell'attore per gli interventi amministrativi.
 
 **Mancano lo schema iniziale e le definizioni delle RPC principali.** La migration dipende da `access_codes` e `app_get_snapshot`: non basta per inizializzare un database vuoto. Per un setup riproducibile recuperare schema, funzioni, grant e policy dal backend esistente e provarli in un ambiente di test. Le sole variabili ambiente non creano database o codici.
 

@@ -11,6 +11,16 @@ function mapRpcError(error, fallbackMessage) {
     return fallbackMessage
   }
 
+  const messages = {
+    STALE_STATE: 'Il profilo è cambiato in un’altra scheda o tramite admin. Ricarica la pagina prima di continuare.',
+    STALE_MOVEMENT: 'Il movimento è già stato modificato. Ricarica il profilo e prepara di nuovo l’intervento.',
+    INVALID_BALANCE: 'Gli importi non corrispondono al saldo previsto o producono un saldo negativo.',
+    ADMIN_REQUIRED: 'Questa modifica richiede un intervento dal pannello admin.',
+    USE_ADMIN_PANEL: 'Usa il pannello di gestione per registrare e poter ripristinare questo intervento.',
+    REASON_REQUIRED: 'Inserisci il motivo dell’intervento.',
+  }
+  if (messages[error.message]) return messages[error.message]
+
   if (error.message === 'INVALID_CODE') {
     return 'Il codice personale non e corretto.'
   }
@@ -59,6 +69,28 @@ export async function appSaveSnapshot(code, progress, daily) {
     },
     'Impossibile salvare il progresso.',
   )
+}
+
+export function adminListPlayers(adminCode) {
+  return callRpc('admin_list_players', { p_admin_code: adminCode }, 'Impossibile caricare i giocatori.')
+}
+
+export function adminGetPlayerContext(adminCode, targetCode, historyOffset = 0) {
+  return callRpc('admin_get_player_context', {
+    p_admin_code: adminCode, p_target_code: targetCode, p_history_offset: historyOffset,
+  }, 'Impossibile caricare il profilo e lo storico.')
+}
+
+export function adminGetOperation(adminCode, targetCode, operationId) {
+  return callRpc('admin_get_operation', {
+    p_admin_code: adminCode, p_target_code: targetCode, p_operation_id: operationId,
+  }, 'Impossibile recuperare lo stato precedente.')
+}
+
+export function adminApplyOperation(adminCode, targetCode, plan) {
+  return callRpc('admin_apply_operation', {
+    p_admin_code: adminCode, p_target_code: targetCode, p_plan: plan,
+  }, 'Impossibile confermare l’intervento. Puoi riprovare la stessa richiesta senza duplicarla.')
 }
 
 export async function appSaveRoomArchive(code, categoryId, archive) {

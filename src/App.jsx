@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, NavLink, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import GlobalMusicToggle from './components/GlobalMusicToggle.jsx'
+import PlayerSyncNotice from './components/PlayerSyncNotice.jsx'
 import { usePlayerState } from './hooks/usePlayerState'
 import BridgePage from './pages/BridgePage.jsx'
 import DevPage from './pages/DevPage.jsx'
@@ -88,6 +89,7 @@ function App() {
   return (
     <BrowserRouter>
       <GlobalMusicToggle />
+      <PlayerSyncNotice />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
