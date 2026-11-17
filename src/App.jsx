@@ -18,8 +18,8 @@ function AppShell() {
   ]
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(8,145,178,0.18),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#111827_45%,_#020617_100%)] text-slate-100">
-      <header className="border-b border-cyan-400/15 bg-slate-950/70 backdrop-blur-xl">
+    <div className={`${isPlayRoute ? 'flex h-dvh flex-col' : 'min-h-screen'} bg-[radial-gradient(circle_at_top,_rgba(8,145,178,0.18),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#111827_45%,_#020617_100%)] text-slate-100`}>
+      <header className="shrink-0 border-b border-cyan-400/15 bg-slate-950/70 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-amber-300/80">
             LA MOSTRA DELLE OMBRE ILLUMINATE
@@ -47,7 +47,7 @@ function AppShell() {
         </div>
       </header>
 
-      <main className={isPlayRoute ? 'w-full' : 'mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8'}>
+      <main className={isPlayRoute ? 'min-h-0 w-full flex-1 overflow-y-auto' : 'mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8'}>
         <Outlet />
       </main>
     </div>

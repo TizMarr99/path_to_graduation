@@ -5,6 +5,7 @@ const TYPEWRITER_MS_PER_CHARACTER = 80
 function TypewriterText({
   alignment = 'center',
   className = '',
+  contentClassName = '',
   isActive,
   isComplete,
   onComplete,
@@ -124,7 +125,7 @@ function TypewriterText({
 
   return (
     <div className={className}>
-      <div className="relative">
+      <div className={`relative ${contentClassName}`}>
         <p aria-hidden="true" className="pointer-events-none invisible select-none">
           <span className="vip-typewriter">
             {text}
@@ -141,7 +142,7 @@ function TypewriterText({
       </div>
       {isSkippable ? (
         <button
-          className="mt-3 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/6 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+          className="mt-3 inline-flex shrink-0 self-start items-center justify-center rounded-full border border-white/15 bg-white/6 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
           onClick={handleSkip}
           onKeyDown={handleSkipKeyDown}
           type="button"

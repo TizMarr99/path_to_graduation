@@ -45,7 +45,7 @@ function RoomPlayLayout({
   const fear = category.fear
 
   return (
-    <section className="relative min-h-screen overflow-hidden text-amber-50">
+    <section className="relative flex min-h-full flex-col overflow-hidden text-amber-50">
       {backgroundImage ? (
         <img alt={category.title} className="absolute inset-0 h-full w-full object-cover" src={backgroundImage} />
       ) : null}
@@ -54,9 +54,9 @@ function RoomPlayLayout({
       <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
       <FearVisualOverlay fearId={fear?.id} isActive={isFearActive} />
 
-      <div className={['relative z-20 flex min-h-screen flex-col', isFearActive ? 'horror-shake' : ''].join(' ')}>
+      <div className={['relative z-20 flex flex-1 flex-col', isFearActive ? 'horror-shake' : ''].join(' ')}>
         {/* Top header bar */}
-        <header className="flex items-center justify-between gap-3 border-b border-white/10 bg-slate-950/60 px-5 py-3 backdrop-blur-xl sm:px-7">
+        <header className="flex flex-col items-start justify-between gap-3 border-b border-white/10 bg-slate-950/60 px-5 py-3 backdrop-blur-xl sm:flex-row sm:items-center sm:px-7">
           <div>
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.42em] text-amber-200/60">
               Sala
@@ -97,7 +97,7 @@ function RoomPlayLayout({
         </div>
 
         {/* Bottom bar: hint circle + progress */}
-        <div className="flex items-center gap-3 border-t border-white/10 bg-slate-950/55 px-5 py-3 backdrop-blur-xl sm:px-7">
+        <div className="flex items-center gap-3 border-t border-white/10 bg-slate-950/55 px-5 pb-20 pt-3 backdrop-blur-xl sm:py-3 sm:pl-7 sm:pr-44">
           <button
             aria-label="Apri informazioni sulla prova"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-400/10 text-sm font-bold text-cyan-100 transition hover:border-cyan-200/55 hover:bg-cyan-400/18 disabled:cursor-not-allowed disabled:opacity-60"

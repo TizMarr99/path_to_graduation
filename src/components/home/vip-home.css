@@ -17,6 +17,45 @@
   animation: vip-typewriter-caret 900ms steps(1, end) infinite;
 }
 
+.room-narrative-scene {
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.room-narrative-photo {
+  width: 4.5rem;
+  height: clamp(4.5rem, 12dvh, 6rem);
+}
+
+@media (max-height: 700px) and (max-width: 639px) {
+  .room-narrative-layout { gap: 0.5rem; padding-top: 0.5rem; }
+  .room-narrative-heading > p:first-child { font-size: 0.5625rem; line-height: 1.25; letter-spacing: 0.15em; }
+  .room-narrative-heading h1 { margin-top: 0.25rem; font-size: 1.125rem; line-height: 1.4rem; }
+  .room-narrative-heading > p:last-child { margin-top: 0.25rem; font-size: 0.75rem; line-height: 1rem; }
+  .room-narrative-scene { gap: 0.5rem; }
+  .room-narrative-scene > div:last-child { padding: 0.75rem; }
+  .room-narrative-photo { width: 2.75rem; height: 3.5rem; }
+  .room-narrative-layout > footer { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
+}
+
+@media (min-width: 640px) {
+  .room-narrative-scene { grid-template-rows: minmax(0, 1fr); }
+  .room-narrative-photo {
+    width: clamp(8rem, 14vw, 13rem);
+    height: clamp(8rem, 32dvh, 17rem);
+  }
+}
+
+@media (max-height: 550px) and (min-width: 640px) {
+  .room-narrative-layout { gap: 0.75rem; padding-top: 0.75rem; }
+  .room-narrative-heading h1 { margin-top: 0.25rem; font-size: 1.5rem; }
+  .room-narrative-heading > p:last-child { margin-top: 0.25rem; line-height: 1.25rem; }
+  .room-narrative-portrait { flex-direction: row; gap: 0.75rem; text-align: left; }
+  .room-narrative-photo { width: 4.5rem; height: 6rem; }
+  .room-narrative-portrait h2 { font-size: 1rem; }
+  .room-narrative-scene { grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr); gap: 1rem; }
+}
+
 @keyframes vip-typewriter-caret {
   0%,
   49% {
