@@ -16,6 +16,8 @@
 
 ## Aggiungere una sfida di tipo esistente
 
+Per le interfacce condivise di emoji, indizi, Dupe e round/griglie fotografiche consultare le [rifiniture UI del 17 novembre 2026](RIFINITURE_UI_GIOCHI.md): `ProgressiveClueBoard`, `DupeRoundChoices` e `round-games.css` gestiscono la presentazione conservando i contratti di draft e runtime.
+
 1. Individuare nel JSON un esempio dello stesso `type` e copiarne la struttura, usando un ID nuovo e stabile.
 2. Compilare prompt, risposte, asset, ricompensa, eventuale indizio/costo e metadati di zona/sottogioco. Consultare `RawChallenge` in `src/types/challenge.d.ts` e la normalizzazione effettiva.
 3. Se la sala usa gruppi, associare la prova tramite `challengeIds` o `quizTypes`. Verificare che nessun gruppo resti vuoto e che soglie/premi siano ancora quelli desiderati.
@@ -62,13 +64,29 @@ L'esempio non configura da solo zona o gruppo di scoring: aggiungere quei campi 
 7. Definire modale vittoria e, se prevista, email con handler, helper client, trigger e tracking. Il riuso della modale serie-film richiede una verifica dei testi.
 8. Verificare sblocco, acquisto, completamento, archivio, ritorno all'hub e ripresa con un profilo esistente e uno nuovo.
 
-## Effetto ragni agli errori
+## Continua tra giochi
 
-La sala `cura-corpo` usa `fear.spiderImageSrc` per la GIF dei ragni. Il campo opzionale è normalizzato da `challengeData.js` e sostituisce le immagini statiche di errore della sala. `SpiderErrorOverlay` mostra sei copie con traiettorie, dimensioni e velocità diverse, in loop durante i 4 secondi di `useFearEffects`, insieme a un lampeggio rosso di 550 ms.
+Dal 17 novembre 2026 il popup dell'ultimo round di `SequentialRoundChallenge` chiama `onSubmit(event, { continueToNext: true })`. `PlayPage` registra valutazione ed economia una sola volta, poi usa lo stesso `handleContinue` del risultato ordinario: chiude effetti e pannelli, seleziona la prossima prova non risolta e prepara l'introduzione del nuovo sottogioco. Non apre il riepilogo aggregato intermedio né la mappa. L'ordine delle prove segue il catalogo, attualmente coerente con zone e sottogiochi della mappa; le prove già risolte vengono saltate, ripartendo dall'inizio se necessario.
+
+`useChallengeSession.goToNextChallenge({ submittedFeedback })` accetta il feedback appena valutato per avanzare nello stesso batch React, prima che lo stato dei risultati sia aggiornato. Senza argomento mantiene il flusso ordinario dopo il popup finale. Restano attivi limiti giornalieri, storico e completamento/premi della sala. Regressione locale: `node --test tests/sequentialRoundCompletion.test.mjs`; non richiede servizi remoti.
+
+## Insetti volanti e ragni agli errori
+
+Configurazione attiva di `cura-corpo` dal 17 novembre 2026: `fear.flyingInsectImageSrcs`, array opzionale normalizzato e dichiarato in `CategoryFear`. `FlyingInsectsErrorOverlay` mostra quindici copie: sette vespe (primo asset) e otto cimici (secondo asset), sopra il pannello senza intercettare clic. Ogni copia sceglie nuove destinazioni durante il volo, con curve, velocità e dimensioni diverse, inclinazione e inversione orizzontale secondo la direzione. Le vespe volano il 25% più velocemente rispetto alla prima revisione; la velocità delle ali resta quella del file. Partenza distribuita su una griglia di cinque colonne e tre righe; tre insetti per lato ricevono destinazioni nelle fasce laterali del 20%, mentre gli altri attraversano tutta la finestra. Le cimici usano luminosità 1,8, contrasto 1,2, saturazione 0,85 e una lieve ombra chiara/scura sul contorno per distinguersi dal rosso; il lampeggio è esplicitamente dietro gli insetti. I media originali restano invariati. I percorsi si adattano al ridimensionamento e tutte le animazioni vengono annullate alla chiusura. Il movimento ridotto nasconde l'intero effetto e arresta i voli.
+
+Asset direttamente in `public/corpo-moda-fotografia/`: `wasp-wingbeat-fast.gif` deriva dalla GIF originale `Animated Wasp Wingbeat Sequence (1.25x).gif`, con soli ritardi modificati da 70 a 50 ms (1,4× rispetto al file fornito; 8 frame e trasparenza invariati). `insetto_sfondo_trasparente.webp` è un'immagine WebP animata trasparente: 121 frame da 42 ms, ciclo di 5,082 s; le ali battono. Entrambi gli originali restano integri.
+
+`useFearEffects` mantiene audio e lampeggio fino alla chiusura del popup sia con `flyingInsectImageSrcs` sia con `spiderImageSrc`. Valgono gli stessi volumi e le stesse regole di storico, riavvio e pulizia descritte sotto. `ResultModal` dà precedenza agli insetti quando l'array è configurato; il passaggio vale anche per i popup intermedi dei round sequenziali.
+
+### Ragni conservati per una sala futura
+
+`SpiderErrorOverlay` e la relativa logica/CSS sono conservati. La GIF dei ragni è disponibile nel percorso pubblico `/33fd094fd495745cf38c4fe89a92a1e8.gif`, già spostata nella radice di `public/` prima di questa revisione. Per riutilizzarli configurare `fear.spiderImageSrc` nella prossima sala, senza `flyingInsectImageSrcs`.
+
+Il campo opzionale `fear.spiderImageSrc` è normalizzato da `challengeData.js` e sostituisce le immagini statiche di errore della sala. `SpiderErrorOverlay` mostra sei copie con traiettorie, dimensioni e velocità diverse, in loop fino alla chiusura del popup, gestita da `useFearEffects`. Ultima revisione del 17 novembre: attraversamenti di 6,9–9,3 s e lampeggio rosso ciclico di 2,4 s, entrambi fino alla chiusura. Audio errore a volume 0,65 quando abilitato; `PlayPage` attenua la musica al 10% e ripristina il volume quando l'effetto termina, senza riavviare il brano.
 
 Dal 17 novembre 2026 le copie sono ingrandite al doppio della dimensione precedente: larghezza responsive con minimo 96 px e massimi individuali di 144–240 px. La GIF originale (215×500, 67 frame) resta integra: l'animazione del file si combina con la traslazione CSS. Non viene ritagliata, per conservare tutti i frame. Verifica della resa della camminata nel browser non eseguita.
 
-L'effetto è sopra lo sfondo del risultato e sotto il pannello opaco dell'Inquisitore, non intercetta clic ed è escluso dalla consultazione dello storico. Ogni nuovo errore riavvia animazioni e timer senza aggiungere copie; Continua e lo smontaggio della pagina eliminano l'effetto. Con `prefers-reduced-motion` lampeggio e ragni sono nascosti. Il popup e il flusso di gioco restano disponibili.
+L'effetto è sopra lo sfondo e sopra il pannello dell'Inquisitore, non intercetta clic ed è escluso dalla consultazione dello storico. Ogni nuovo errore riavvia animazioni e audio senza aggiungere copie; Continua e lo smontaggio della pagina eliminano l'effetto. Con `prefers-reduced-motion` lampeggio e ragni sono nascosti. Il popup e il flusso di gioco restano disponibili.
 
 ## Cambiare stato o database
 

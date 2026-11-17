@@ -4,7 +4,7 @@ Consolidata il 16 novembre 2026. Questo documento sostituisce le precedenti vers
 
 ## Chiusura delle decisioni — aggiornamento prioritario
 
-**Progettazione chiusa.** Leggere anche `docs/DECISIONI_FINALI_CORPO_MODA_FOTO.md`, che è parte integrante di questa specifica: contiene tempi 3/7 secondi, banner residuo, tutte le alternative, sinonimi delegati, mappatura dei supporti, campioni ottanio, soglie e bonus. Vittoria **8 giochi su 12**, unico regalo **Kodak Charmera**, nessun sottoregalo. L’utente ha delegato le scelte di bilanciamento e validazione e ha accettato le domande profumi: non richiedere nuovamente conferma dei precedenti punti aperti.
+**Progettazione chiusa.** Leggere anche `docs/DECISIONI_FINALI_CORPO_MODA_FOTO.md`, che è parte integrante di questa specifica: contiene tempi **5/10 secondi** (ultima revisione del 17 novembre 2026), countdown, tutte le alternative, sinonimi delegati, mappatura dei supporti, campioni ottanio, soglie e bonus. Vittoria **8 giochi su 12**, unico regalo **Kodak Charmera**, nessun sottoregalo. L’utente ha delegato le scelte di bilanciamento e validazione e ha accettato le domande profumi: non richiedere nuovamente conferma dei precedenti punti aperti.
 
 ## Come iniziare in VS Code
 
@@ -56,9 +56,9 @@ Sono 59 elementi/round distribuiti in 12 prove, non 59 tentativi distinti. Vecch
 
 Radice media `public/corpo-moda-fotografia/osservazione/`.
 
-**Palette:** originali `palette-01.jpg`, `palette-02.jpg`, `palette-03.jpg`, mostrati per 3 secondi con banner del tempo residuo. Non anticipare domanda, oggetto o opzioni. Poi nascondere la foto e chiedere, rispettivamente, colore delle cuffie (verde), degli occhiali (arancione), della borsa (borgogna). Risposta tramite campioni visivi; non ricostruire una combinazione di tre capi. Campioni e distrattori definiti in `DECISIONI_FINALI_CORPO_MODA_FOTO.md`; soglia 2/3.
+**Palette:** originali `palette-01.jpg`, `palette-02.jpg`, `palette-03.jpg`, mostrati per **5 secondi** direttamente nella vista ampia, con countdown (revisione del 17 novembre 2026). Non anticipare domanda, oggetto o opzioni. Poi nascondere la foto e chiedere, rispettivamente, colore delle cuffie (verde), degli occhiali (arancione), della borsa (borgogna). Risposta tramite campioni visivi; non ricostruire una combinazione di tre capi. Campioni e distrattori definiti in `DECISIONI_FINALI_CORPO_MODA_FOTO.md`; soglia 2/3.
 
-**Dettagli:** quattro originali `dettaglio-01.png`–`dettaglio-04.png`, osservati per 7 secondi con banner del tempo residuo senza indizi preventivi. A scadenza mostrare soltanto la corrispondente foto oscurata `dettaglio-NN-d.png` e la domanda con opzioni. Prima della conferma nessuna seconda visualizzazione originale o zoom che superi il timer. Dopo la conferma irreversibile mostrare l’originale come rivelazione. Versioni oscurate già fornite: non rigenerarle.
+**Dettagli:** quattro originali `dettaglio-01.png`–`dettaglio-04.png`, osservati per 10 secondi con banner del tempo residuo senza indizi preventivi. A scadenza mostrare soltanto la corrispondente foto oscurata `dettaglio-NN-d.png` e la domanda con opzioni. Prima della conferma nessuna seconda visualizzazione originale o zoom che superi il timer. Dopo la conferma irreversibile mostrare l’originale come rivelazione. Versioni oscurate già fornite: non rigenerarle.
 
 | Round | Domanda | Stato risposta |
 | --- | --- | --- |

@@ -8,11 +8,13 @@ Riferimento: **24 ottobre 2026**, codice del workspace incluse modifiche non com
 | --- | --- |
 | Comprendere moduli, route, stato e scoring | [Architettura](ARCHITETTURA.md) |
 | Sapere cosa è pronto e cosa manca | [Stato e backlog](STATO_PROGETTO.md) |
+| Gestire reset, accessi, crediti e ripristini admin | [Pannello amministrativo e registro economico](GESTIONE_ADMIN.md) |
 | Preparare i media della stanza corpo/moda/fotografia | [Inventario corrente e correzioni immagini](MEDIA_CORPO_MODA_FOTOGRAFIA_CORRENTE.md) |
 | Ultimi media per profumi e finale | [Inventario delle 9 immagini finali](MEDIA_DA_RECUPERARE_CORPO_MODA_FOTO.md) |
 | Tempi, sinonimi, opzioni, soglie e regalo definitivi | [Decisioni finali corpo/moda/fotografia](DECISIONI_FINALI_CORPO_MODA_FOTO.md) |
 | Riprendere il completamento dei giochi in VS Code | [Specifica consolidata al 16 novembre](PROMPT_COMPLETAMENTO_STANZA_CORPO_MODA_FOTO.md) |
 | Implementare una sfida, sala o modifica | [Guida sviluppo](GUIDA_SVILUPPO.md) |
+| Consultare le ultime rifiniture visive di emoji, indizi, Dupe e griglie foto | [Rifiniture UI giochi](RIFINITURE_UI_GIOCHI.md) |
 | Configurare ambiente, Supabase ed email | [Configurazione](CONFIGURAZIONE.md) |
 | Iniziare una nuova chat con un agente o ChatGPT | [Contesto chat](CONTESTO_CHAT.md) |
 | Istruzioni operative per agent nel repository | [AGENTS.md](../AGENTS.md) |

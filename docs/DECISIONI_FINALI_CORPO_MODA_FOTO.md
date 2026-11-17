@@ -4,9 +4,9 @@
 
 ## Tempi e osservazione
 
-- Palette: **3 secondi** per immagine; dettagli: **7 secondi**.
-- Riutilizzare il banner/conteggio del tempo residuo già presente nel progetto; cercare il componente/stile usato nelle altre prove, senza creare un flusso nuovo. Il tempo parte quando l’immagine è caricata e viene resa osservabile, non alla richiesta di rete.
-- Nessun suggerimento preventivo su cosa osservare, né domanda o alternative visibili durante l’osservazione. Banner neutro: «Tempo per osservare: … s».
+- Ultima revisione del **17 novembre 2026**: palette **5 secondi** per immagine; dettagli **10 secondi**. Sostituisce i precedenti tempi 3/7 e 4/7 secondi.
+- Il comando di osservazione apre direttamente una vista modale a tutta finestra, con foto intera adattata allo spazio disponibile e countdown separato. Non richiede scroll o un secondo clic di zoom. Il tempo parte dopo il caricamento e la preparazione della vista, quando la pagina è visibile, non alla richiesta di rete.
+- Nessun suggerimento preventivo su cosa osservare, né domanda o alternative visibili durante l’osservazione. Titolo e countdown neutri.
 - A scadenza originale nascosto; nei dettagli mostrare soltanto la versione `-d`. Nessuna riapertura, zoom residuo o seconda visione prima della conferma. Dopo la conferma irreversibile viene rivelato l’originale nei dettagli. Dopo la conferma: feedback/soluzione del round e avanzamento irreversibile.
 - Ripresa: memorizzare scadenza assoluta e fase nel runtime/draft esistente. Se già scaduta, mostrare direttamente la domanda; se ancora valida, solo il tempo residuo, senza azzerare il timer. Se immagine non caricata/non resa visibile, non consumare l’osservazione. Ripresa e salvataggi seguono il provider esistente, senza nuove chiamate remote di verifica.
 
@@ -166,9 +166,11 @@ Le tre domande e tutte le loro alternative in `PROFUMI_CINQUE_ROUND.md` sono ora
 
 Non restano decisioni editoriali obbligatorie prima dell’implementazione. Media presenti, Samba già corretta in PNG. Eventuali discrepanze tecniche reali vanno segnalate con evidenza, non trasformate in nuove domande sulle scelte già delegate. **In questa chat aggiornati soltanto documenti; implementazione, lint/build ed eventuali prove di gioco non eseguiti.**
 
-## Crediti aggiornati — 17 novembre 2026
+## Crediti aggiornati — 18 novembre 2026
 
-Proposta approvata: Hitster 12, outfit 10, effetti 9, supporti 9, emoji 8, indizi 10, cultura 12. Invariati palette 6, dettagli 6, prodotti 5, dupe 6 e profumi 5. Massimo base stanza 98; con tutti i bonus Hitster 112, contro 170 di serie-film. Accesso 90 e costi indizi invariati. I risultati già registrati non vengono riaccreditati retroattivamente.
+Redistribuzione approvata in base a impegno e difficoltà delle risposte: dettagli 6 → 8, outfit 10 → 12, effetti 9 → 7, prodotti 5 → 6, dupe 6 → 5, emoji 8 → 6. Sostituisce la distribuzione del 17 novembre. Restano palette 6, Hitster 12 più fino a 14 bonus, supporti 9, profumi 5, indizi 10 e cultura 12.
+
+Il massimo base stanza resta 98 crediti; con tutti i bonus Hitster 112, contro 170 di serie-film. Si mantiene l'accredito proporzionale alle risposte corrette, arrotondato all'intero; le rivelazioni di emoji e indizi incidono soltanto sui punti descrittivi. Accesso 90, costi indizi, soglie e peso dei giochi invariati. I risultati già registrati non vengono riaccreditati retroattivamente.
 
 ## Rivelazioni fotografiche — 17 novembre 2026
 
