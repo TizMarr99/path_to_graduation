@@ -71,6 +71,8 @@ La protezione attende l'idratazione prima di controllare la sessione. I controll
 
 Lo stato iniziale comprende `version`, `credits`, `stats`, `roomProgress`, `unlockedCategoryIds`, `currentRoom`, `currentChallengeId`, `activeSession`, `transitionState`, `rewardState` ed `emailState`. La sala inizialmente sbloccata è `musica`. Default giornalieri: 3 tentativi quiz e 2 vite (`playerStateSnapshot.js`); controllare anche sessione e backend prima di cambiare il significato dei contatori.
 
+Nella Grotta delle Ombre, lo sblocco acquistato e il relativo addebito vengono salvati insieme. Il gioco attende la conferma del salvataggio prima di portare il giocatore nella nuova stanza. Con i limiti giornalieri esauriti, la porta già sbloccata resta cliccabile e mostra un avviso. Gli archivi e i sottogiochi a punteggio ponderato già iniziati restano accessibili.
+
 localStorage conserva `path-to-graduation:access-code`, `path-to-graduation:music-enabled` e `path-to-graduation:vip-access`. Il progresso passa invece dalle RPC Supabase. Il flag VIP è un passaggio di presentazione, non una prova di autenticazione server.
 
 Il provider aggiorna stato React e ref, poi salva immediatamente o con debounce attraverso una coda seriale. Gli errori di sincronizzazione sono esposti con `syncError` e un avviso globale; i conflitti di revisione bloccano ulteriori scritture dalla scheda. La sessione attiva conserva draft/runtime e risultati per la ripresa; evitare aggiornamenti che saltino questo percorso.

@@ -803,27 +803,35 @@ export function PlayerStateProvider({ children }) {
     )
   }
 
-  function buyRoomAccess(categoryId, cost) {
+  async function buyRoomAccess(categoryId, cost) {
     const currentState = playerStateRef.current
 
-    if (currentState.unlockedCategoryIds.includes(categoryId)) return true
+    if (currentState.unlockedCategoryIds.includes(categoryId)) {
+      const hasPendingPurchase = currentState._creditMovements?.some(
+        (movement) => movement.kind === 'room_access' && movement.category_id === categoryId,
+      )
+      return !hasPendingPurchase || (await flushPlayerState()).ok
+    }
 
-    if (currentState.credits < cost) {
+    if (persistence.blocked || currentState.credits < cost) {
       return false
     }
 
-    updatePlayerState(withCreditMovement({
+    const nextState = withCreditMovement({
       ...currentState,
       credits: currentState.credits - cost,
-      unlockedCategoryIds: Array.from(new Set([...currentState.unlockedCategoryIds, categoryId])),
+      unlockedCategoryIds: [...currentState.unlockedCategoryIds, categoryId],
       transitionState:
         currentState.transitionState?.pendingBridge?.targetCategoryId === categoryId
           ? { pendingBridge: null }
           : currentState.transitionState,
       lastPlayedAt: new Date().toISOString(),
-    }, -cost, { kind: 'room_access', label: 'Sblocco stanza', categoryId, challengeId: null }))
+    }, -cost, { kind: 'room_access', label: 'Sblocco stanza', categoryId, challengeId: null })
 
-    return true
+    commitPlayerState(nextState, { persist: 'none' })
+    if (!accessCodeRef.current) return true
+    clearScheduledSave()
+    return (await persistPlayerState(nextState)).ok
   }
 
   function buyCategoryBundle(categoryIds = [], cost = 0) {
@@ -995,8 +1003,8 @@ export function PlayerStateProvider({ children }) {
     canAttemptQuiz() {
       return (
         !persistence.blocked &&
-        playerState.stats.attemptsRemaining > 0 &&
-        playerState.stats.livesRemaining > 0
+        playerStateRef.current.stats.attemptsRemaining > 0 &&
+        playerStateRef.current.stats.livesRemaining > 0
       )
     },
     getResumePath() {
