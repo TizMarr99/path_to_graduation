@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBackgroundAudio } from '../hooks/useBackgroundAudio'
 import { usePlayerState } from '../hooks/usePlayerState'
 import { getCategoryById } from '../lib/challengeData'
+import { getAttemptsRemaining, getLivesRemaining } from '../lib/playerStateSnapshot'
 import { getIncomingRoomTransition } from '../lib/roomTransitions'
 
 const shadowSlots = [
@@ -181,6 +182,22 @@ function resolvePortalOutcome(progress, activeSession = null, category = null) {
   }
 }
 
+function canResumeSubgame(category, session) {
+  if (!category?.weightedScoring || !session) return false
+
+  const currentChallenge = category.challenges.find((challenge) => challenge.id === session.currentChallengeId)
+  if (!currentChallenge?.zoneId) return false
+
+  const subgameId = getCategoryChallengeSubgameId(category, currentChallenge)
+  const challenges = category.challenges.filter((challenge) =>
+    challenge.zoneId === currentChallenge.zoneId &&
+    getCategoryChallengeSubgameId(category, challenge) === subgameId,
+  )
+  const results = session.challengeResults ?? {}
+  return challenges.some((challenge) => Object.hasOwn(results, challenge.id)) &&
+    challenges.some((challenge) => !Object.hasOwn(results, challenge.id))
+}
+
 function resolveDefeatedPortalImage(category, outcome) {
   const categoryImages = category?.wrongAnswerImageSrcs ?? []
 
@@ -202,13 +219,14 @@ function ShadowSlot({
   defeated,
   defeatedImageSrc = null,
   dailyBlocked,
-  onNavigate,
+  purchasePending,
+  onEnter,
   onRevealRequest,
   staticBright = false,
   revealCost = null,
   scoreLabel = null,
 }) {
-  const isClickable = unlocked
+  const isClickable = unlocked && !purchasePending
   const isRevealOnly = visible && !unlocked && !comingSoon
   const canReveal = isRevealOnly && typeof onRevealRequest === 'function'
   const isInteractive = (isClickable || canReveal) && !comingSoon
@@ -218,7 +236,7 @@ function ShadowSlot({
 
   function handleClick() {
     if (isClickable) {
-      onNavigate(`/play/${slot.categoryId}`)
+      onEnter()
       return
     }
 
@@ -275,6 +293,7 @@ function ShadowSlot({
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
       aria-label={slot.label}
+      aria-busy={purchasePending || undefined}
       onKeyDown={isInteractive ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleClick() } : undefined}
       onClick={handleClick}
       style={{
@@ -508,6 +527,8 @@ function ShadowSlot({
           >
             {dailyBlocked ? 'Sblocca oggi · entra domani' : 'Sblocco disponibile'}
           </p>
+        ) : purchasePending ? (
+          <p className="text-xs text-slate-200">Sblocco in salvataggio…</p>
         ) : completed ? (
           <p
             style={{
@@ -518,16 +539,16 @@ function ShadowSlot({
           >
             👁 Consulta
           </p>
-        ) : defeated ? null : dailyBlocked ? (
+        ) : dailyBlocked ? (
           <p
             style={{
               fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
-              color: defeated ? 'rgba(148, 163, 184, 0.78)' : theme.muted,
+              color: theme.muted,
             }}
           >
-            👁 Visita · gioca domani
+            Gioca domani
           </p>
-        ) : (
+        ) : defeated ? null : (
           <p
             style={{
               fontSize: 'clamp(0.55rem, 0.85vw, 0.65rem)',
@@ -578,16 +599,22 @@ export default function ShadowHallPage() {
   } = usePlayerState()
   const { unlockedCategoryIds, roomProgress } = playerState
   const navigate = useNavigate()
-  const dailyBlocked = !canAttemptQuiz()
+  const dailyBlocked = getAttemptsRemaining(playerState) <= 0 || getLivesRemaining(playerState) <= 0
   const pendingBridge = playerState.transitionState?.pendingBridge ?? null
   const credits = getCredits()
   const [purchaseCategoryId, setPurchaseCategoryId] = useState(null)
+  const [blockedRoomLabel, setBlockedRoomLabel] = useState('')
+  const purchaseRequestRef = useRef(null)
   const purchaseTargetCategory = getCategoryById(purchaseCategoryId)
   const purchaseSourceTransition = getIncomingRoomTransition(purchaseCategoryId)?.[1] ?? null
   const purchaseRoomCost = purchaseTargetCategory?.buyAccessCost ?? 0
   const hasCreditsForPurchase = credits >= purchaseRoomCost
 
   useBackgroundAudio({ src: '/audio/shadow-hall-ambient.mp3', volume: 0.28 }, isMusicEnabled)
+
+  useEffect(() => () => {
+    purchaseRequestRef.current = null
+  }, [])
 
   const musicProgress = roomProgress['musica']
   const serieFilmProgress = roomProgress['serie-film']
@@ -626,10 +653,14 @@ export default function ShadowHallPage() {
   )
 
   useEffect(() => {
-    if (pendingBridge && !pendingBridge.bridgeCompletedAt) {
+    if (
+      pendingBridge &&
+      !pendingBridge.bridgeCompletedAt &&
+      !unlockedCategoryIds.includes(pendingBridge.targetCategoryId)
+    ) {
       navigate('/bridge', { replace: true })
     }
-  }, [navigate, pendingBridge])
+  }, [navigate, pendingBridge, unlockedCategoryIds])
 
   useEffect(() => {
     if (
@@ -640,27 +671,29 @@ export default function ShadowHallPage() {
     }
   }, [clearPendingBridge, pendingBridge, unlockedCategoryIds])
 
-  function handleRoomPurchase() {
-    if (!isPurchaseModalOpen || !hasCreditsForPurchase) {
-      return
-    }
+  async function handleRoomPurchase() {
+    if (!isPurchaseModalOpen || !hasCreditsForPurchase || purchaseRequestRef.current) return
 
-    const cost = purchaseTargetCategory.buyAccessCost ?? 0
-    const purchaseSucceeded = buyRoomAccess(purchaseTargetCategory.id, cost)
-
-    if (!purchaseSucceeded) {
-      return
-    }
-
+    const request = buyRoomAccess(purchaseCategoryId, purchaseRoomCost)
+    purchaseRequestRef.current = request
+    const purchaseSucceeded = await request
+    if (purchaseRequestRef.current !== request) return
+    purchaseRequestRef.current = null
     setPurchaseCategoryId(null)
 
+    if (!purchaseSucceeded) return
     if (canAttemptQuiz()) {
-      navigate(`/play/${purchaseTargetCategory.id}`)
+      navigate(`/play/${purchaseCategoryId}`)
+    } else {
+      setBlockedRoomLabel(purchaseTargetCategory.title)
     }
   }
 
   function handleRevealRequest(categoryId) {
+    if (purchaseRequestRef.current) return
+
     if (isRoomRevealed(categoryId) && getCategoryById(categoryId) && !unlockedCategoryIds.includes(categoryId)) {
+      setBlockedRoomLabel('')
       setPurchaseCategoryId(categoryId)
     }
   }
@@ -753,6 +786,11 @@ export default function ShadowHallPage() {
           const revealCost = !unlocked && !comingSoon ? slotCategory?.buyAccessCost ?? null : null
           const canOpenRevealModal = visible && !unlocked && !comingSoon && Boolean(slotCategory)
 
+          const blockedForSlot = dailyBlocked && !completed && !canResumeSubgame(slotCategory, activeSessionForSlot)
+          const purchasePending = playerState._creditMovements?.some(
+            (movement) => movement.kind === 'room_access' && movement.category_id === slot.categoryId,
+          )
+
           return (
             <ShadowSlot
               key={slot.id}
@@ -764,8 +802,16 @@ export default function ShadowHallPage() {
               prizeWon={prizeWon}
               defeated={defeated}
               defeatedImageSrc={defeatedImageSrc}
-              dailyBlocked={dailyBlocked}
-              onNavigate={navigate}
+              dailyBlocked={blockedForSlot}
+              purchasePending={purchasePending}
+              onEnter={() => {
+                if (purchaseRequestRef.current) return
+                if (blockedForSlot) {
+                  setBlockedRoomLabel(slot.label)
+                  return
+                }
+                navigate(`/play/${slot.categoryId}`)
+              }}
               onRevealRequest={canOpenRevealModal ? handleRevealRequest : undefined}
               staticBright={staticBright}
               revealCost={revealCost}
@@ -925,6 +971,16 @@ export default function ShadowHallPage() {
         aria-live="polite"
       >
         Crediti disponibili: <strong>{credits}</strong> 🪙
+      </div>
+
+      <div aria-live="polite" className="pointer-events-none absolute inset-x-4 top-24 z-10 flex justify-center">
+        {dailyBlocked && blockedRoomLabel ? (
+          <p className="max-w-sm rounded-2xl border border-amber-300/40 bg-slate-950/95 px-4 py-3 text-center text-sm text-amber-100 shadow-lg">
+            <strong>{blockedRoomLabel}</strong>
+            <br />
+            Hai esaurito i tentativi o le vite per oggi. Riprova domani.
+          </p>
+        ) : null}
       </div>
 
       {/* Top navigation bar */}
